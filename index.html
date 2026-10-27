@@ -51,6 +51,11 @@ table.list tr.cl{cursor:pointer}table.list tr.cl:hover{background:var(--card2)}
 .tiles{display:grid;gap:14px;margin-top:6px}.tile{display:flex;align-items:center;gap:16px;text-align:left;background:var(--card);border:1.5px solid var(--bd);color:var(--ink);padding:18px;border-radius:20px;box-shadow:var(--sh);font-weight:500}
 .tile:hover{border-color:var(--p)}.tile .ic{width:54px;height:54px;border-radius:16px;display:grid;place-items:center;font-size:26px;background:linear-gradient(135deg,rgba(37,99,235,.15),rgba(13,148,136,.2));flex:none}
 .tile b{display:block;font-size:16px;margin-bottom:2px}.tile small{color:var(--mu);font-size:12.5px}
+.forms{margin-top:18px}.forms h3{margin:14px 0 6px}.frow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--bd)}.frow:last-child{border-bottom:0}.frow b{display:block;font-size:14px}.frow small{color:var(--mu);font-size:12.5px}.frow a{flex:none;text-decoration:none;background:var(--card2);border:1.5px solid var(--bd);color:var(--p);font-weight:700;font-size:13px;padding:8px 14px;border-radius:12px}.frow a:hover{border-color:var(--p)}
+.brand{background:none;color:#fff;padding:0;font-size:19px;font-weight:800;letter-spacing:.2px;text-align:left;border-radius:8px}
+.nav2{display:flex;gap:8px;overflow-x:auto;margin:10px -4px 0;padding:2px 4px 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}.nav2::-webkit-scrollbar{display:none}
+.nav2 button{flex:none;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3);padding:8px 14px;border-radius:999px;font-size:13px;font-weight:700;white-space:nowrap;box-shadow:none}
+.nav2 button.on{background:#fff;color:#1e40af;border-color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.18)}
 .hero{background:linear-gradient(135deg,rgba(37,99,235,.1),rgba(13,148,136,.12));border:1px solid var(--bd);border-radius:20px;padding:20px;margin-bottom:16px}.hero h2{font-size:22px}.hero p{margin:6px 0 0;color:var(--mu);font-size:14px}
 .link{background:none;color:var(--mu);font-size:12px;font-weight:600;padding:8px 12px;border-radius:10px}
 .sigprev{border:1.5px dashed var(--bd);border-radius:14px;background:var(--card2);padding:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -64,7 +69,7 @@ table.list tr.cl{cursor:pointer}table.list tr.cl:hover{background:var(--card2)}
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:12px 18px;border-radius:14px;font-size:14px;font-weight:600;z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.4)}
 .card .doc{background:#fff;color:#000;padding:14px;border-radius:12px;border:1px solid var(--bd)}
 @media(max-width:640px){.f.w3,.f.w2,.f.w4{grid-column:span 6}.choice{grid-template-columns:1fr}.card{padding:16px;border-radius:18px}.nav button{flex:1}}
-@media(max-width:640px){header h1{font-size:17px}}
+@media(max-width:640px){.brand{font-size:17px}header p{display:none}header{padding:12px 14px}}
 /* ---------- documents ---------- */
 #printArea{display:none}
 .doc{font-family:Arial,Helvetica,sans-serif;font-size:10pt;color:#000;background:#fff}
@@ -99,13 +104,13 @@ div.ctr{page:ctr}
 </style>
 </head>
 <body>
-<header><h1>🎓 ARAL Tutor Engagement</h1><p>Schools Division Office of Romblon · Applications · Monthly reports · Evaluation and registries</p></header>
+<header><button class="brand" data-act="home">🎓 ARAL Tutor Engagement</button><p>Schools Division Office of Romblon</p><nav class="nav2" id="nav2"></nav></header>
 <main id="app"></main>
 <datalist id="schl"></datalist>
 <div id="printArea" class="doc"></div>
 <script>
 /* ================= CONFIG ================= */
-const API_URL = 'https://script.google.com/macros/s/AKfycbxuN2OVcDd3sxaKRWg4GId-nXqSbZ_9K5rOm87x_F2P048e4F99BXcfSuhysSwzgQg/exec';   // <-- paste your Apps Script Web App URL here (ends with /exec)
+const API_URL = '';   // <-- paste your Apps Script Web App URL here (ends with /exec)
 const BOX_YES='☒', BOX_NO='☐';
 
 /* ================= HELPERS ================= */
@@ -131,7 +136,7 @@ function fresh(){return{cat:'',sy:'2026-2027',school:'',district:'',schoolAddres
 let savedMail=null,rsavedMail=null;
 let S=fresh(), stepIdx=0, saved=null, staff=null, mode='home', R=null, rsaved=null;
 const DEFAULT_SCHOOLS=[["Agbay-Ang IS","Alcantara"],["Alcantara CES","Alcantara"],["Alcantara NHS","Alcantara"],["Bagsik ES","Alcantara"],["Bonlao ES","Alcantara"],["Calagonsao ES","Alcantara"],["Camili ES","Alcantara"],["Comod-Om ES","Alcantara"],["Don Manuel L. Solidum MES","Alcantara"],["Felipe Madali MES","Alcantara"],["Gui-ob ES","Alcantara"],["Melodias Imperial Sr. NHS","Alcantara"],["San Isidro ES","Alcantara"],["San Roque ES (Alcantara)","Alcantara"],["Tugdan NHS","Alcantara"],["Balogo ES (Banton)","Banton"],["Banice ES","Banton"],["Banton CES","Banton"],["Banton NHS","Banton"],["Libtong ES","Banton"],["Nasunogan ES","Banton"],["Tan-ag ES","Banton"],["Tumalum-Lagang ES","Banton"],["Tungonan ES","Banton"],["Tungonan NHS","Banton"],["Agsao ES","Cajidiocan-Magdiwang"],["Agutay ES","Cajidiocan-Magdiwang"],["Agutay NHS","Cajidiocan-Magdiwang"],["Ambulong ES (Cajidiocan-Magdiwang)","Cajidiocan-Magdiwang"],["Angel Rio ES","Cajidiocan-Magdiwang"],["Cajidiocan CES","Cajidiocan-Magdiwang"],["Cajidiocan NHS","Cajidiocan-Magdiwang"],["Camanglad ES","Cajidiocan-Magdiwang"],["Cambajao ES","Cajidiocan-Magdiwang"],["Cambalo ES","Cajidiocan-Magdiwang"],["Cambalo NHS","Cajidiocan-Magdiwang"],["Cambijang ES","Cajidiocan-Magdiwang"],["Cantagda ES","Cajidiocan-Magdiwang"],["Damaso Ramilo MES","Cajidiocan-Magdiwang"],["Danao ES","Cajidiocan-Magdiwang"],["Danao NHS","Cajidiocan-Magdiwang"],["Dulangan ES","Cajidiocan-Magdiwang"],["Gutivan ES","Cajidiocan-Magdiwang"],["Haguimit Cultural Minority School","Cajidiocan-Magdiwang"],["Ipil ES","Cajidiocan-Magdiwang"],["Jao-Asan ES","Cajidiocan-Magdiwang"],["Lumbang East NHS","Cajidiocan-Magdiwang"],["Lumbang West ES","Cajidiocan-Magdiwang"],["Magdiwang ES","Cajidiocan-Magdiwang"],["Magdiwang NHS","Cajidiocan-Magdiwang"],["Marigondon ES","Cajidiocan-Magdiwang"],["Panaguintingan ES","Cajidiocan-Magdiwang"],["Silum ES","Cajidiocan-Magdiwang"],["Taguilos ES","Cajidiocan-Magdiwang"],["Tampayan ES","Cajidiocan-Magdiwang"],["Tomas & Maria T. Maglaya MS","Cajidiocan-Magdiwang"],["Agbatang PS","Concepcion"],["Bakhawan ES","Concepcion"],["Bakhawan NHS","Concepcion"],["Calabasahan ES","Concepcion"],["Concepcion CS","Concepcion"],["Concepcion NHS","Concepcion"],["Dalajican ES","Concepcion"],["Masadya PS","Concepcion"],["Masudsud ES","Concepcion"],["Sampong ES","Concepcion"],["San Vicente ES (Concepcion)","Concepcion"],["Alegria ES","Corcuera"],["Ambulong ES (Corcuera)","Corcuera"],["Colong-Colong ES","Corcuera"],["Corcuera CES","Corcuera"],["Corcuera NHS","Corcuera"],["Gobon ES","Corcuera"],["Ilijan ES","Corcuera"],["Labnig ES","Corcuera"],["Mabini ES (Corcuera)","Corcuera"],["Mabini NHS","Corcuera"],["Mahaba ES","Corcuera"],["Mangansag ES","Corcuera"],["Mauricio F. Fabito NHS","Corcuera"],["San Roque ES (Corcuera)","Corcuera"],["San Vicente ES (Corcuera)","Corcuera"],["Tacasan ES","Corcuera"],["Agojo IS","Looc"],["Balatucan ES","Looc"],["Buenavista ES (Looc)","Looc"],["Buenavista NHS","Looc"],["Crispin Grimares ES","Looc"],["Gov. Gonzales ES","Looc"],["Guinhaya-An IS","Looc"],["Jose M. Solis ES","Looc"],["Limon Norte ES","Looc"],["Limon Norte NHS","Looc"],["Limon Sur ES","Looc"],["Looc CES","Looc"],["Looc NHS","Looc"],["Manhac ES","Looc"],["Pili ES","Looc"],["Punta ES","Looc"],["Aurora ES","Odiongan North"],["Boliganay ES","Odiongan North"],["Budiong ES","Odiongan North"],["Canduyong ES","Odiongan North"],["Canlumay Cultural CS","Odiongan North"],["Gabawan ES","Odiongan North"],["Gabawan NHS","Odiongan North"],["Libertad ES","Odiongan North"],["Libertad NHS","Odiongan North"],["Odiongan North CS","Odiongan North"],["Palati PS","Odiongan North"],["Panique ES","Odiongan North"],["Pato-o IS","Odiongan North"],["Poctoy-Baito ES","Odiongan North"],["Tuburan ES","Odiongan North"],["Tumingad ES","Odiongan North"],["Agnocnoc ES","Odiongan South"],["Amatong ES","Odiongan South"],["Anahao IS","Odiongan South"],["Bagulayag ES","Odiongan South"],["Bangon ES","Odiongan South"],["Bunsoran ES","Odiongan South"],["Claro M. Recto ES","Odiongan South"],["Ferrol CES","Odiongan South"],["Ferrol NHS","Odiongan South"],["Hinag-oman ES","Odiongan South"],["Malilico ES","Odiongan South"],["Mayha ES","Odiongan South"],["Mayha NHS","Odiongan South"],["Odiongan NHS","Odiongan South"],["Odiongan South CES","Odiongan South"],["Paulino F. Fabon Sr. MS","Odiongan South"],["Progreso Este ES","Odiongan South"],["Progreso Oeste ES","Odiongan South"],["Rizal ES","Odiongan South"],["Tabobo-an ES","Odiongan South"],["Tubigon ES","Odiongan South"],["Tulay ES","Odiongan South"],["Agbaluto ES","Romblon"],["Agnaga ES","Romblon"],["Agnay ES","Romblon"],["Agnipa ES","Romblon"],["Agnipa NHS","Romblon"],["Agpanabat ES","Romblon"],["Agtongo ES","Romblon"],["Alad Lamao ES","Romblon"],["Alad NHS","Romblon"],["Alad Recudo ES","Romblon"],["Bagacay ES","Romblon"],["Cajimos ES","Romblon"],["Calabogo ES","Romblon"],["Cobrador ES","Romblon"],["Cogon ES","Romblon"],["Ginablan ES","Romblon"],["Guimpingan ES","Romblon"],["Ilauran ES","Romblon"],["Lamao ES","Romblon"],["Li-O ES","Romblon"],["Li-O NHS","Romblon"],["Logbon ES","Romblon"],["Lonos ES","Romblon"],["Lunas ES","Romblon"],["Macario Molina NHS","Romblon"],["Maximino Mazo Motin ES","Romblon"],["Palje PS","Romblon"],["Romblon East CS","Romblon"],["Romblon NHS","Romblon"],["Romblon West CS","Romblon"],["Sablayan ES","Romblon"],["Sablayan NHS","Romblon"],["San Jose ES","Romblon"],["Sawang ES","Romblon"],["Timla ES","Romblon"],["Alfredo P. Navarette MS","San Agustin-Santa Maria-Calatrava"],["Balogo ES (San Agustin-Santa Maria-Calatrava)","San Agustin-Santa Maria-Calatrava"],["Bonga ES","San Agustin-Santa Maria-Calatrava"],["Buli ES","San Agustin-Santa Maria-Calatrava"],["Cabibihan ES","San Agustin-Santa Maria-Calatrava"],["Cabolutan ES","San Agustin-Santa Maria-Calatrava"],["Cabolutan NHS","San Agustin-Santa Maria-Calatrava"],["Calatrava ES","San Agustin-Santa Maria-Calatrava"],["Calatrava NHS","San Agustin-Santa Maria-Calatrava"],["Camantaya ES","San Agustin-Santa Maria-Calatrava"],["Carmen ES","San Agustin-Santa Maria-Calatrava"],["Carmen NHS","San Agustin-Santa Maria-Calatrava"],["Cawayan ES","San Agustin-Santa Maria-Calatrava"],["Concepcion Norte ES","San Agustin-Santa Maria-Calatrava"],["Concepcion Sur ES","San Agustin-Santa Maria-Calatrava"],["Doña Juana ES","San Agustin-Santa Maria-Calatrava"],["Eduardo M. Moreno NHS","San Agustin-Santa Maria-Calatrava"],["Esteban Madrona NHS","San Agustin-Santa Maria-Calatrava"],["Esteban Minon Madrona ES","San Agustin-Santa Maria-Calatrava"],["Fetalvero-Mingoa MS","San Agustin-Santa Maria-Calatrava"],["Hinugusan ES","San Agustin-Santa Maria-Calatrava"],["Josefina Fetalino Malayo ES","San Agustin-Santa Maria-Calatrava"],["Linao ES","San Agustin-Santa Maria-Calatrava"],["Long Beach ES","San Agustin-Santa Maria-Calatrava"],["Luis M. Abello Sr. PS","San Agustin-Santa Maria-Calatrava"],["Pagsangahan ES","San Agustin-Santa Maria-Calatrava"],["Pang-Alaalang Paaralang Severina M. Solidum","San Agustin-Santa Maria-Calatrava"],["Paroyhog ES","San Agustin-Santa Maria-Calatrava"],["Pascual Catajay Linao NHS","San Agustin-Santa Maria-Calatrava"],["San Agustin CES","San Agustin-Santa Maria-Calatrava"],["San Agustin NTS","San Agustin-Santa Maria-Calatrava"],["Santa Maria NHS","San Agustin-Santa Maria-Calatrava"],["Sto. Nino NHS","San Agustin-Santa Maria-Calatrava"],["Sto. Niño ES","San Agustin-Santa Maria-Calatrava"],["Sugod ES","San Agustin-Santa Maria-Calatrava"],["Talamban ES","San Agustin-Santa Maria-Calatrava"],["Talisay IS","San Agustin-Santa Maria-Calatrava"],["Victorio Sixon Balogo NHS","San Agustin-Santa Maria-Calatrava"],["Agpudlos ES","San Andres"],["Ben G. Talamisan MS","San Andres"],["Calunacon ES","San Andres"],["Dona Martina F. Ganan MS","San Andres"],["Geminiano Galicia Sr. MS","San Andres"],["Linawan IS","San Andres"],["Marigondon Norte IS","San Andres"],["Marigondon Sur ES","San Andres"],["Matutuna ES","San Andres"],["Nemesio N. Ganan III MS","San Andres"],["San Andres CES","San Andres"],["San Andres Cultural HS","San Andres"],["San Andres NHS","San Andres"],["Tan-Agan ES","San Andres"],["Tanagan NHS","San Andres"],["Victoria ES","San Andres"],["Agtiwa ES","San Fernando"],["Armin Rios-Marin NHS","San Fernando"],["Azagra ES","San Fernando"],["Azagra NHS","San Fernando"],["Campalingo ES","San Fernando"],["Canjalon ES","San Fernando"],["Don Carlos MMMNHS","San Fernando"],["Espana NHS","San Fernando"],["España ES","San Fernando"],["Layag Cultural Minority School","San Fernando"],["Mabini ES (San Fernando)","San Fernando"],["Mabulo ES","San Fernando"],["Otod ES","San Fernando"],["San Fernando ES","San Fernando"],["Taclobo ES","San Fernando"],["Teresa Bernas MS","San Fernando"],["Agmanic ES","San Jose-Santa Fe"],["Agripino Armedilla NHS","San Jose-Santa Fe"],["Buenavista ES (San Jose-Santa Fe)","San Jose-Santa Fe"],["Busay ES","San Jose-Santa Fe"],["Canyayo ES","San Jose-Santa Fe"],["Combot ES","San Jose-Santa Fe"],["Danao Sur ES","San Jose-Santa Fe"],["Guinbirayan ES","San Jose-Santa Fe"],["Guinbirayan NHS","San Jose-Santa Fe"],["Guinpoingan ES","San Jose-Santa Fe"],["Guintigbasan ES","San Jose-Santa Fe"],["Inihawan ES","San Jose-Santa Fe"],["Lamberto Antaran MS","San Jose-Santa Fe"],["Lanas ES","San Jose-Santa Fe"],["Lindero IS","San Jose-Santa Fe"],["Magsaysay ES","San Jose-Santa Fe"],["Mat-I ES","San Jose-Santa Fe"],["Pandan ES","San Jose-Santa Fe"],["Pinamihagan ES","San Jose-Santa Fe"],["Pinamihagan NHS","San Jose-Santa Fe"],["San Jose AHS","San Jose-Santa Fe"],["San Jose CS","San Jose-Santa Fe"],["Santa Fe CES","San Jose-Santa Fe"],["Santa Fe Senior High School","San Jose-Santa Fe"],["Silvino G. Gajarion ES","San Jose-Santa Fe"],["Sta. Fe NHS","San Jose-Santa Fe"],["Tabugon ES","San Jose-Santa Fe"],["Trangquilino Cawaling Sr. NHS","San Jose-Santa Fe"],["V. A. Gutierrez Montiel MES","San Jose-Santa Fe"]];
-let CFG={settings:{},schools:DEFAULT_SCHOOLS.map(x=>({id:'',name:x[0],district:x[1],address:''}))};
+let CFG={settings:{},forms:[],schools:DEFAULT_SCHOOLS.map(x=>({id:'',name:x[0],district:x[1],address:''}))};
 const districts=()=>Array.from(new Set(CFG.schools.map(x=>x.district).filter(Boolean))).sort();
 const root=()=>mode==='report'?R:S;
 
@@ -146,7 +151,7 @@ function SCH(label,p,o={}){const ph='Start typing and pick from the list, or typ
 const schoolMatch=v=>CFG.schools.find(x=>x.name.toLowerCase()===String(v||'').trim().toLowerCase());
 const schoolOK=v=>true; // schools that are not in the list are allowed: the user types the full name
 function fillSchools(){const d=document.getElementById('schl');if(d)d.innerHTML=CFG.schools.map(x=>`<option value="${esc(x.name)}">${esc(x.district)}</option>`).join('')}
-async function loadConfig(){if(!API_URL)return;try{const r=await api('config',{});if(r.ok){CFG={settings:r.settings,schools:(r.schools&&r.schools.length>3)?r.schools:CFG.schools};fillSchools();const ae=document.activeElement;if(!ae||ae===document.body)render()}}catch(e){}}
+async function loadConfig(){if(!API_URL)return;try{const r=await api('config',{});if(r.ok){CFG={settings:r.settings,forms:Array.isArray(r.forms)?r.forms:[],schools:(r.schools&&r.schools.length>3)?r.schools:CFG.schools};fillSchools();const ae=document.activeElement;if(!ae||ae===document.body)render()}}catch(e){}}
 
 /* ================= STEPS ================= */
 const isT=()=>S.cat==='tutor';
@@ -201,7 +206,9 @@ const active=()=>STEPS.filter(s=>!s.pds||isT()||S.alsoPDS);
 
 /* ================= RENDER ================= */
 function render(){
+ drawNav();
  if(staff!==null){return renderStaff()}
+ if(mode==='forms')return renderForms();
  if(mode==='home')return renderHome();
  if(mode==='report')return renderReport();
  if(mode==='lookup')return renderLookup();
@@ -234,17 +241,18 @@ document.addEventListener('click',async e=>{
  else if(a==='ctr-word')doWordR(docE(S,{}),'ARAL_Contract_'+(S.last||'tutor'));
  else if(a==='word')doWord(docAll(S),'ARAL_'+(S.last||'applicant'));
  else if(a==='newapp'){S=fresh();saved=null;stepIdx=0;render()}
- else if(a==='staff'){staff=false;renderStaff()}
- else if(a==='home'){staff=null;mode='home';render()}
+ else if(a==='staff'){if(staff!==null){renderStaff()}else if(staffKeep){staff=staffKeep;staffKeep=null;renderStaff()}else{staff=false;renderStaff()}}
+ else if(a==='home'){leaveStaff();mode='home';render()}
+ else if(a==='go-forms'){leaveStaff();mode='forms';render()}
  else if(a==='sig-s'){openSig(u=>{S.sig=u;S.sigAt=new Date().toISOString();render()})}
  else if(a==='sigrm-s'){S.sig='';S.sigAt='';render()}
  else if(a==='sig-r'){openSig(u=>{R.sig=u;R.sigAt=new Date().toISOString();renderReport()})}
  else if(a==='sigrm-r'){R.sig='';R.sigAt='';renderReport()}
  else if(a==='sig-my'){openSig(u=>{try{localStorage.setItem('aralHeadSig',u)}catch(e){}staff.sig=u;toast('Saved on this device only');renderStaff()})}
  else if(a==='sigrm-my'){try{localStorage.removeItem('aralHeadSig')}catch(e){}staff.sig='';renderStaff()}
- else if(a==='go-apply'){mode='apply';render()}
+ else if(a==='go-apply'){leaveStaff();mode='apply';render()}
  else if(a==='copyref')copyText(mode==='report'?(R.ref||rsaved):(saved||S.ref));
- else if(a==='go-lookup'){mode='lookup';LK=null;lkMsg='';lkForgot=false;render()}
+ else if(a==='go-lookup'){leaveStaff();mode='lookup';LK=null;lkMsg='';lkForgot=false;render()}
  else if(a==='lk-find')lkFind();
  else if(a==='lk-forgot'){lkForgot=true;lkMsg='';LK=null;renderLookup()}
  else if(a==='lk-noforgot'){lkForgot=false;lkMsg='';renderLookup()}
@@ -254,7 +262,7 @@ document.addEventListener('click',async e=>{
  else if(a==='lk-contract')doPrint(docE(LK.data,LK.eval));
  else if(a==='lk-contractword')doWordR(docE(LK.data,LK.eval),'ARAL_Contract_'+(LK.data.last||'tutor'));
  else if(a==='lk-edit'){R=LK.data;R.ref=LK.ref;R.pin=LK.pin;rsaved=null;mode='report';renderReport()}
- else if(a==='go-report'){mode='report';if(!R)R=freshR();render()}
+ else if(a==='go-report'){leaveStaff();mode='report';if(!R)R=freshR();render()}
  else if(a==='addses'){R.sessions.push(newSes());renderReport()}
  else if(a==='delses'){R.sessions.splice(+b.dataset.i,1);if(!R.sessions.length)R.sessions.push(newSes());renderReport()}
  else if(a==='dupses'){const c=JSON.parse(JSON.stringify(R.sessions[+b.dataset.i]));c.date='';R.sessions.splice(+b.dataset.i+1,0,c);renderReport()}
@@ -295,6 +303,19 @@ function showRefModal(ref,what,emailTo,emailed){
  ok.addEventListener('change',()=>{go.disabled=!ok.checked});
  m.querySelector('#rfc').addEventListener('click',()=>copyText(ref));
  go.addEventListener('click',()=>{if(m.querySelector('#rfr').checked){try{localStorage.setItem('aralLastRef',ref)}catch(e){}}refPending=false;m.remove()})}
+
+
+/* ================= TOP TABS ================= */
+let staffKeep=null;
+const NAVTABS=[['apply','📝 Apply as ARAL Tutor / Aide','go-apply'],['report','🗓️ Monthly reports','go-report'],['lookup','🔎 Check my application','go-lookup'],['forms','📁 ARAL Forms','go-forms'],['staff','🏫 Staff','staff']];
+function drawNav(){const el=document.getElementById('nav2');if(!el)return;const cur=staff!==null?'staff':mode;
+ el.innerHTML=NAVTABS.map(t=>`<button data-act="${t[2]}" class="${cur===t[0]?'on':''}">${t[1]}</button>`).join('')}
+function leaveStaff(){if(staff&&typeof staff==='object')staffKeep=staff;staff=null;detail=null}
+function renderForms(){
+ const F=(CFG.forms||[]).filter(f=>/^https:\/\//i.test(f.url));
+ const groups=[];F.forEach(f=>{let g=groups.find(x=>x.n===f.group);if(!g){g={n:f.group,items:[]};groups.push(g)}g.items.push(f)});
+ $('#app').innerHTML=`<div class="card"><h2>📁 ARAL Forms</h2><p class="sub">Blank copies of the memos and annexes, for reference or for filling in by hand. The <b>Apply</b> and <b>Monthly reports</b> tabs are faster and fill in the forms for you.</p>
+ ${groups.length?groups.map(g=>`<h3>${esc(g.n)}</h3>${g.items.map(f=>`<div class="frow"><span><b>${esc(f.title)}</b>${f.note?`<small>${esc(f.note)}</small>`:''}</span><a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">Open</a></div>`).join('')}`).join(''):'<div class="msg info">The forms will be posted here soon. Please check again later.</div>'}</div>`;window.scrollTo(0,0)}
 
 /* ================= CHECK MY APPLICATION / REPORT ================= */
 let LK=null,lkMsg='',lkForgot=false;
@@ -566,10 +587,16 @@ const sessSorted=D=>D.sessions.filter(s=>s.date).slice().sort((a,b)=>(a.date+a.t
 const totMin=D=>sessSorted(D).reduce((n,s)=>n+mins(s.tin,s.tout),0);
 function autoPeriod(D){if(D.period)return D.period;if(!D.month)return'';const[y,mo]=D.month.split('-').map(Number);const last=new Date(y,mo,0).getDate();return MONTHS[mo-1]+' 1–'+last+', '+y}
 function updTot(){const e=$('#tot');if(e)e.textContent=hm(totMin(R))+' ('+sessSorted(R).length+' session'+(sessSorted(R).length===1?'':'s')+')'}
+function formsSection(){
+ const F=(CFG.forms||[]).filter(f=>/^https:\/\//i.test(f.url));if(!F.length)return'';
+ const groups=[];F.forEach(f=>{let g=groups.find(x=>x.n===f.group);if(!g){g={n:f.group,items:[]};groups.push(g)}g.items.push(f)});
+ return `<div class="card forms"><h2>📁 ARAL Forms</h2><p class="sub">Blank copies of the memos and annexes, for reference or for filling in by hand. The app above is faster and fills in the forms for you.</p>
+ ${groups.map(g=>`<h3>${esc(g.n)}</h3>${g.items.map(f=>`<div class="frow"><span><b>${esc(f.title)}</b>${f.note?`<small>${esc(f.note)}</small>`:''}</span><a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">Open</a></div>`).join('')}`).join('')}</div>`}
 function renderHome(){$('#app').innerHTML=`<div class="hero"><h2>Mabuhay! Welcome</h2><p>Engage ARAL tutors and support aides faster: fill in once, sign on screen, then print or save as PDF or Word.</p></div>
  <div class="tiles"><button class="tile" data-act="go-apply"><span class="ic">📝</span><span><b>Apply as ARAL Tutor / Support Aide</b><small>Expression of Intent (Annex A or B) and Personal Data Sheet</small></span></button>
  <button class="tile" data-act="go-report"><span class="ic">🗓️</span><span><b>Monthly reports</b><small>Daily Time Record (Annex F) and Accomplishment Report (Annex G)</small></span></button>
  <button class="tile" data-act="go-lookup"><span class="ic">🔎</span><span><b>Check my application or report</b><small>Use your Reference number and PIN: see the status, print your copies and your contract</small></span></button>
+ <button class="tile" data-act="go-forms"><span class="ic">📁</span><span><b>ARAL Forms</b><small>Blank copies of the memos and annexes to open or download</small></span></button>
  <button class="tile" data-act="staff"><span class="ic">🏫</span><span><b>Staff area</b><small>School Heads, encoders and SDO HRMO: evaluation, registries, contract</small></span></button></div>`}
 function renderReport(){
  const o=R,sess=o.sessions.map((s,i)=>`<div class="sessbox"><b>Session ${i+1}</b>
@@ -763,6 +790,7 @@ function evalPanel(d){const ev=d.eval||{},as=(ev.assign||[]).concat([{},{},{}]).
  ${H?`<label class="f"><span>Fund source (SDO)</span><input type="text" id="ev_fund" value="${esc(ev.fund||setg('DEFAULT_FUND'))}"></label><label class="f w3"><span>Contract: from</span><input type="date" id="ev_cf" value="${esc(ev.cFrom||'')}"></label><label class="f w3"><span>Contract: to</span><input type="date" id="ev_ct" value="${esc(ev.cTo||'')}"></label>`:''}
  </div><div class="nav" style="justify-content:flex-start"><button class="b1" data-act="saveeval">Save evaluation</button></div>`}
 function renderStaff(){
+ drawNav();
  if(staff===false){$('#app').innerHTML=`<div class="card"><h2>Staff access</h2><p class="sub">School Heads, encoders (AO / selection committee) see their own school only. SDO HRMO sees all schools.</p>
   <div class="grid"><label class="f"><span>Access code</span><input type="text" id="code" autocomplete="off"></label></div>${staffMsg?`<div class="msg err">${esc(staffMsg)}</div>`:''}
   <div class="nav"><button class="b2" data-act="home">Back</button><button class="b1" data-act="login">Log in</button></div></div>`;return}
@@ -801,7 +829,7 @@ function dl(name,text,type){const a=document.createElement('a');a.href=URL.creat
 async function staffClick(b,a){
  try{
  if(a==='login'){const code=$('#code').value.trim();const r=await api('list',{code});if(!r.ok){staffMsg=r.error||'Invalid code';renderStaff();return}staff={code,role:r.role,name:r.name,school:r.school,sig:''};try{staff.sig=localStorage.getItem('aralHeadSig')||''}catch(e){}list=r.rows;const q=await api('listReports',{code});rlist=q.rows||[];staffMsg='';tab='apps';reg=null;renderStaff()}
- else if(a==='logout'){staff=false;list=[];rlist=[];detail=null;reg=null;staffMsg='';renderStaff()}
+else if(a==='logout'){staffKeep=null;staff=false;list=[];rlist=[];detail=null;reg=null;staffMsg='';renderStaff()}
  else if(a==='refresh'){await loadLists();renderStaff()}
  else if(a.startsWith('tab-')){tab=a.slice(4);reg=null;staffMsg='';needMsg='';renderStaff()}
  else if(a==='open'){const ref=(b.closest('[data-ref]')||b).dataset.ref;const r=await api('get',{code:staff.code,ref});if(!r.ok){staffMsg=r.error;renderStaff();return}r.data.ref=r.ref;detail=Object.assign(r,{kind:'app'});staffMsg='';renderStaff()}
