@@ -59,6 +59,8 @@ table.list tr.cl{cursor:pointer}table.list tr.cl:hover{background:var(--card2)}
 .mbox{background:var(--card);border-radius:22px;padding:18px;width:100%;max-width:560px;max-height:92vh;overflow:auto;box-shadow:0 30px 80px rgba(0,0,0,.5)}
 .mbox canvas{width:100%;height:auto;background:#fff;border:2px dashed var(--bd);border-radius:14px;touch-action:none;display:block}
 .hint{font-size:12px;color:var(--mu);margin:6px 0}
+.refbig{font:800 24px/1.25 ui-monospace,Consolas,Menlo,monospace;letter-spacing:.5px;background:var(--card2);border:2px dashed var(--p);padding:16px;border-radius:16px;text-align:center;user-select:all;-webkit-user-select:all;word-break:break-all;margin:12px 0}
+.warnbox{background:rgba(245,158,11,.14);border:1px solid rgba(245,158,11,.5);border-radius:14px;padding:12px 14px;font-size:13.5px;margin:10px 0}
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:12px 18px;border-radius:14px;font-size:14px;font-weight:600;z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.4)}
 .card .doc{background:#fff;color:#000;padding:14px;border-radius:12px;border:1px solid var(--bd)}
 @media(max-width:640px){.f.w3,.f.w2,.f.w4{grid-column:span 6}.choice{grid-template-columns:1fr}.card{padding:16px;border-radius:18px}.nav button{flex:1}}
@@ -96,7 +98,7 @@ div.Section2{page:land}
 <div id="printArea" class="doc"></div>
 <script>
 /* ================= CONFIG ================= */
-const API_URL = 'https://script.google.com/macros/s/AKfycbxuN2OVcDd3sxaKRWg4GId-nXqSbZ_9K5rOm87x_F2P048e4F99BXcfSuhysSwzgQg/exec';   // <-- paste your Apps Script Web App URL here (ends with /exec)
+const API_URL = '';   // <-- paste your Apps Script Web App URL here (ends with /exec)
 const BOX_YES='☒', BOX_NO='☐';
 
 /* ================= HELPERS ================= */
@@ -183,7 +185,7 @@ const STEPS=[
   const D=S;return `<h2>Review &amp; submit</h2><p class="sub">Check your details. Submitting saves your application so your School Head can evaluate it.</p>
   <div class="msg info"><b>${esc(fullName(D))}</b> · ${D.cat==='tutor'?'ARAL Tutor':'ARAL Support Aide'} · ${esc(D.school)} (SY ${esc(D.sy)})<br>${esc(D.mobile)} · ${esc(D.email)}</div>
   ${saved?'':`<div class="grid" style="margin-top:10px">${sigBox('Your e-signature (optional)',S.sig,'sig-s','sigrm-s')}<label class="f w3"><span>Create a PIN (4 to 6 digits) <b>*</b></span><input type="password" inputmode="numeric" maxlength="6" autocomplete="new-password" data-p="pin" value="${esc(S.pin)}" placeholder="You will need it to come back"></label></div>`}
-  ${saved?`<div class="msg ok"><b>Saved.</b> Your reference number is <b>${esc(saved)}</b>${savedMail===true?` (we also emailed it to <b>${esc(S.email)}</b>)`:savedMail===false?' (we could not email it, so please write it down)':''}. <b>Write it down together with your PIN</b>: you need both to check your status, reprint your forms and print your contract. Print or download your form(s), sign them by hand, then submit them to your School Head together with your other documents.</div>
+  ${saved?`<div class="msg ok"><b>Saved.</b> Your reference number is <b>${esc(saved)}</b>${savedMail===true?` (we also emailed it to <b>${esc(S.email)}</b>)`:savedMail===false?' (we could not email it, so please write it down)':''}. <button class="b2" data-act="copyref" style="padding:4px 10px;font-size:12px">Copy</button> <b>Write it down together with your PIN</b>: you need both to check your status, reprint your forms and print your contract. Print or download your form(s), sign them by hand, then submit them to your School Head together with your other documents.</div>
   <div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b1" data-act="print">Print / Save as PDF</button><button class="b3" data-act="word">Download Word</button><button class="b2" data-act="newapp">New application</button></div>`:
   `<div id="subMsg"></div><div class="nav" style="justify-content:flex-start"><button class="b1" data-act="submit" id="subBtn">Submit &amp; save</button></div>`}
   <div class="msg info" style="margin-top:14px">Forms must be signed by hand (wet signature). The PDS must also be sworn before a person authorized to administer oaths.</div>`}}
@@ -232,6 +234,7 @@ document.addEventListener('click',async e=>{
  else if(a==='sig-my'){openSig(u=>{try{localStorage.setItem('aralHeadSig',u)}catch(e){}staff.sig=u;toast('Saved on this device only');renderStaff()})}
  else if(a==='sigrm-my'){try{localStorage.removeItem('aralHeadSig')}catch(e){}staff.sig='';renderStaff()}
  else if(a==='go-apply'){mode='apply';render()}
+ else if(a==='copyref')copyText(mode==='report'?(R.ref||rsaved):(saved||S.ref));
  else if(a==='go-lookup'){mode='lookup';LK=null;lkMsg='';lkForgot=false;render()}
  else if(a==='lk-find')lkFind();
  else if(a==='lk-forgot'){lkForgot=true;lkMsg='';LK=null;renderLookup()}
@@ -264,6 +267,29 @@ document.addEventListener('input',onField);document.addEventListener('change',on
 
 
 
+
+/* ================= REFERENCE NUMBER REMINDER ================= */
+let refPending=false;
+window.addEventListener('beforeunload',e=>{if(refPending){e.preventDefault();e.returnValue='';return ''}});
+function copyText(t){const done=()=>toast('Copied: '+t);if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t).then(done,()=>fallbackCopy(t,done))}else fallbackCopy(t,done)}
+function fallbackCopy(t,done){const x=document.createElement('textarea');x.value=t;x.style.position='fixed';x.style.opacity='0';document.body.appendChild(x);x.select();try{document.execCommand('copy');done()}catch(e){toast('Select the number and copy it')}x.remove()}
+function showRefModal(ref,what,emailTo,emailed){
+ refPending=true;let last='';try{last=localStorage.getItem('aralLastRef')||''}catch(e){}
+ const m=document.createElement('div');m.className='modal';
+ m.innerHTML=`<div class="mbox"><h2>Saved. Copy your reference number now</h2>
+ <p class="sub">Your ${esc(what)} was saved. You need this number <b>and your PIN</b> to come back, edit${what.indexOf('report')>=0?' (until your School Head verifies it)':''}, reprint your copies${what.indexOf('application')>=0?' and print your contract':''}.</p>
+ <div class="refbig" id="rfn">${esc(ref)}</div>
+ <div class="nav" style="justify-content:center;margin-top:0"><button class="b3" id="rfc">Copy reference number</button></div>
+ <div class="warnbox"><b>Keep it safe:</b> copy it, take a screenshot, or write it down together with your PIN. If you lose it, you can still use “Forgot your reference number?”, but you will need your PIN.${emailed===true?`<br>We also emailed the reference number to <b>${esc(emailTo)}</b> (check your spam folder).`:emailed===false?'<br>We could not email it, so please copy or write it down.':''}</div>
+ <label style="display:flex;gap:8px;align-items:center;font-size:13px;margin:8px 0"><input type="checkbox" id="rfr"> Remember this reference number on this device (do not tick on a shared computer)</label>
+ <label style="display:flex;gap:8px;align-items:flex-start;font-size:14px;font-weight:600;margin:8px 0"><input type="checkbox" id="rfk" style="margin-top:3px"> I have copied or written down my reference number and my PIN.</label>
+ <div class="nav"><button class="b1" id="rfo" disabled style="width:100%">Continue</button></div></div>`;
+ document.body.appendChild(m);
+ const ok=m.querySelector('#rfk'),go=m.querySelector('#rfo');
+ ok.addEventListener('change',()=>{go.disabled=!ok.checked});
+ m.querySelector('#rfc').addEventListener('click',()=>copyText(ref));
+ go.addEventListener('click',()=>{if(m.querySelector('#rfr').checked){try{localStorage.setItem('aralLastRef',ref)}catch(e){}}refPending=false;m.remove()})}
+
 /* ================= CHECK MY APPLICATION / REPORT ================= */
 let LK=null,lkMsg='',lkForgot=false;
 const CONTRACT_OK=['Selected','Approved by SDS','Engaged'];
@@ -281,7 +307,7 @@ function renderLookup(){
   ${!isR&&D.cat==='tutor'&&CONTRACT_OK.includes(L.status)?'<button class="b3" data-act="lk-contract">Print my contract (Annex E)</button><button class="b2" data-act="lk-contractword">Contract as Word</button>':''}</div>
   <p class="hint">E-signature images are removed from the system 7 days after verification or a final decision. Copies you already saved or printed keep their signature.</p></div>`}
  $('#app').innerHTML=`<div class="card"><h2>Check my application or report</h2><p class="sub">Enter the Reference number (ARAL-… for an application, RPT-… for a monthly report) and the PIN you created.</p>
-  <div class="grid"><label class="f w3"><span>Reference number</span><input type="text" id="lkr" placeholder="ARAL-20261027-0001" value="${esc(L?L.ref:'')}"></label>
+  <div class="grid"><label class="f w3"><span>Reference number</span><input type="text" id="lkr" placeholder="ARAL-20261027-0001" value="${esc(L?L.ref:(()=>{try{return localStorage.getItem('aralLastRef')||''}catch(e){return ''}})())}"></label>
   <label class="f w3"><span>PIN</span><input type="password" id="lkp" inputmode="numeric" maxlength="6" autocomplete="off"></label></div>
   ${lkMsg?`<div class="msg err">${esc(lkMsg)}</div>`:''}<div class="nav" style="justify-content:flex-start"><button class="b1" data-act="lk-find">Find</button><button class="link" data-act="lk-forgot">Forgot your reference number?</button></div></div>${res}
   <div style="text-align:center"><button class="link" data-act="home">← Home</button></div>`;window.scrollTo(0,0)}
@@ -353,7 +379,7 @@ async function api(action,payload){
 async function submit(){
  if(!/^\d{4,6}$/.test(S.pin||'')){$('#subMsg').innerHTML='<div class="msg err">Create a PIN of 4 to 6 digits first.</div>';return}
  const btn=$('#subBtn');btn.disabled=true;$('#subMsg').innerHTML='<div class="msg info">Saving…</div>';
- try{const r=await api('submit',{data:S,pin:S.pin});if(!r.ok)throw new Error(r.error||'Save failed');saved=r.ref;S.ref=r.ref;savedMail=r.emailed;render()}
+ try{const r=await api('submit',{data:S,pin:S.pin});if(!r.ok)throw new Error(r.error||'Save failed');saved=r.ref;S.ref=r.ref;savedMail=r.emailed;render();showRefModal(r.ref,'application',S.email,r.emailed)}
  catch(err){$('#subMsg').innerHTML=`<div class="msg err">${esc(err.message)}</div><div class="msg info">You can still print your form: <button class="b2" data-act="print">Print without saving</button></div>`;btn.disabled=false}}
 
 /* ================= DOCUMENTS ================= */
@@ -466,7 +492,7 @@ function renderReport(){
  <div class="grid" style="margin-top:12px">${sigBox('Your e-signature (optional)',o.sig,'sig-r','sigrm-r')}${o.ref?'':'<label class="f w3"><span>Email (optional): we will email your reference number</span><input type="text" inputmode="email" data-p="email" value="'+esc(o.email||'')+'" placeholder="name@example.com"></label><label class="f w3"><span>Create a PIN (4 to 6 digits) <b>*</b></span><input type="password" inputmode="numeric" maxlength="6" autocomplete="new-password" data-p="pin" value="'+esc(o.pin)+'" placeholder="You will need it to edit this report"></label>'}</div>
  <h3>Sessions</h3>${sess}<button class="b2" data-act="addses">+ Add session</button>
  <div class="msg info" style="margin-top:12px">Total hours rendered: <span class="tot" id="tot"></span></div>
- <div id="rMsg">${rsaved?`<div class="msg ok"><b>Saved.</b> Reference <b>${esc(rsaved)}</b>${rsavedMail===true?' (emailed to you)':rsavedMail===false?' (we could not email it, so please write it down)':''}. <b>Write it down with your PIN</b>: use them under “Check my application or report” to edit, reprint, or get the copy signed by your School Head. Print the forms, sign them by hand if you did not e-sign, and submit the signed copies.</div>`:''}</div>
+ <div id="rMsg">${rsaved?`<div class="msg ok"><b>Saved.</b> Reference <b>${esc(rsaved)}</b>${rsavedMail===true?' (emailed to you)':rsavedMail===false?' (we could not email it, so please write it down)':''}. <button class="b2" data-act="copyref" style="padding:4px 10px;font-size:12px">Copy</button> <b>Write it down with your PIN</b>: use them under “Check my application or report” to edit, reprint, or get the copy signed by your School Head. Print the forms, sign them by hand if you did not e-sign, and submit the signed copies.</div>`:''}</div>
  <div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b1" data-act="rsubmit" id="rBtn">Save report</button><button class="b3" data-act="rprint">Print / Save as PDF</button><button class="b2" data-act="rwordF">Word: Annex F (portrait)</button><button class="b2" data-act="rwordG">Word: Annex G (landscape)</button></div>
  <div class="msg info" style="margin-top:12px">Names of the School Head are left blank on the forms; write them by hand. The signed hard copies are what get submitted for processing of remuneration.</div></div>
  <div style="text-align:center"><button class="link" data-act="rnew">Start a new report</button> <button class="link" data-act="home">← Home</button> <button class="link" data-act="staff">Staff</button></div>`;
@@ -478,7 +504,7 @@ async function submitReport(){
  if(miss.length){$('#rMsg').innerHTML='<div class="msg err">Please complete: '+esc(miss.join(', '))+'.</div>';return}
  if(bad){$('#rMsg').innerHTML='<div class="msg err">A session has a Time Out that is not later than its Time In.</div>';return}
  const b=$('#rBtn');b.disabled=true;$('#rMsg').innerHTML='<div class="msg info">Saving…</div>';
- try{const r=await api('submitReport',{data:R,pin:R.pin,ref:R.ref||''});if(!r.ok)throw new Error(r.error||'Save failed');rsaved=r.ref;R.ref=r.ref;rsavedMail=r.emailed;renderReport()}
+ try{const r=await api('submitReport',{data:R,pin:R.pin,ref:R.ref||''});if(!r.ok)throw new Error(r.error||'Save failed');rsaved=r.ref;R.ref=r.ref;rsavedMail=r.emailed;renderReport();showRefModal(r.ref,'monthly report',R.email,r.emailed)}
  catch(err){$('#rMsg').innerHTML=`<div class="msg err">${esc(err.message)}</div>`;b.disabled=false}}
 function docF(D){
  const t=D.role==='tutor',who=t?'ARAL Tutor':'ARAL Support Aide',ss=sessSorted(D),n=Math.max(15,ss.length+1);
