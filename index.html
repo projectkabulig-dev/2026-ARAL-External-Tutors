@@ -72,8 +72,8 @@ table.list tr.cl{cursor:pointer}table.list tr.cl:hover{background:var(--card2)}
 .doc h1{font-size:16pt;text-align:center;margin:0}.doc h2{font-size:11pt;text-align:center;margin:0 0 6pt}
 .doc p{margin:0 0 8pt;text-align:justify}
 table.g,table.k{width:100%;border-collapse:collapse;table-layout:fixed}
-table.g td,table.k td,table.k th{border:1px solid #000;padding:3pt 4pt;vertical-align:middle;word-wrap:break-word}
-table.g td.bar{background:#000;color:#fff;font-weight:bold;font-size:11pt;padding:1pt 4pt}
+table.g td,table.k td,table.k th{border:1px solid #000;padding:2pt 4pt;vertical-align:middle;word-wrap:break-word}
+table.g td.bar{background:#000;color:#fff;font-weight:bold;font-size:11pt;padding:1pt 4pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 table.g td.c{text-align:center;font-weight:bold}table.g td.h{height:20pt}table.g td.h2{height:32pt}
 .sm{font-size:8pt}.it{font-style:italic}.fill{font-weight:normal}
 .doc .ann{font-style:italic;font-size:7pt;margin-bottom:2pt}
@@ -83,7 +83,14 @@ table.tc td,table.tc th{font-size:6.5pt;padding:2pt}
 .tabs{display:flex;gap:8px;margin:8px 0}.tabs button{background:#e2e8f0}.tabs button.on{background:var(--p);color:#fff}
 div.Section2{page:land}
 .sigbox{width:55%;margin:28pt 0 0 auto;text-align:center}.sigbox div{border-top:1px solid #000;padding-top:2pt}
+div.ctr{page:ctr}
+.ctr{font-family:"Bookman Old Style","Book Antiqua",Georgia,"Times New Roman",serif;font-size:11.5pt;line-height:1.3;color:#000}
+.ctr p{margin:0 0 7pt;text-align:justify}
+.ctr h2{font-size:12.5pt;margin:6pt 0 10pt}
+.ctr table.k td,.ctr table.k th{font-size:11pt;padding:5pt}
+.ctr .ann{font-size:11pt;font-style:italic;margin-bottom:6pt}
 @media print{
+ @page ctr{size:A4;margin:22mm 25mm}
  @page{size:A4;margin:11mm}
  @page land{size:A4 landscape;margin:11mm}
  body>*:not(#printArea){display:none!important}
@@ -98,7 +105,7 @@ div.Section2{page:land}
 <div id="printArea" class="doc"></div>
 <script>
 /* ================= CONFIG ================= */
-const API_URL = 'https://script.google.com/macros/s/AKfycbxuN2OVcDd3sxaKRWg4GId-nXqSbZ_9K5rOm87x_F2P048e4F99BXcfSuhysSwzgQg/exec';   // <-- paste your Apps Script Web App URL here (ends with /exec)
+const API_URL = '';   // <-- paste your Apps Script Web App URL here (ends with /exec)
 const BOX_YES='☒', BOX_NO='☐';
 
 /* ================= HELPERS ================= */
@@ -243,9 +250,7 @@ document.addEventListener('click',async e=>{
  else if(a==='lk-noforgot'){lkForgot=false;lkMsg='';renderLookup()}
  else if(a==='lk-recover')lkRecover();
  else if(a==='lk-print')doPrint(LK.kind==='report'?docR(LK.data):docAll(LK.data));
- else if(a==='lk-word')doWord(docAll(LK.data),'ARAL_'+(LK.data.last||'applicant'));
- else if(a==='lk-wordF')doWordR(docFonly(LK.data),'ARAL_AnnexF_DTR_'+(LK.data.name||'report'));
- else if(a==='lk-wordG')doWordR(docGonly(LK.data),'ARAL_AnnexG_Accomplishment_'+(LK.data.name||'report'));
+ else if(a==='lk-word'){if(LK.kind==='report')doWordR(docR(LK.data),'ARAL_AnnexF_G_'+(LK.data.name||'report'));else doWord(docAll(LK.data),'ARAL_'+(LK.data.last||'applicant'))}
  else if(a==='lk-contract')doPrint(docE(LK.data,LK.eval));
  else if(a==='lk-contractword')doWordR(docE(LK.data,LK.eval),'ARAL_Contract_'+(LK.data.last||'tutor'));
  else if(a==='lk-edit'){R=LK.data;R.ref=LK.ref;R.pin=LK.pin;rsaved=null;mode='report';renderReport()}
@@ -255,8 +260,7 @@ document.addEventListener('click',async e=>{
  else if(a==='dupses'){const c=JSON.parse(JSON.stringify(R.sessions[+b.dataset.i]));c.date='';R.sessions.splice(+b.dataset.i+1,0,c);renderReport()}
  else if(a==='rsubmit')submitReport();
  else if(a==='rprint')doPrint(docR(R));
- else if(a==='rwordF')doWordR(docFonly(R),'ARAL_AnnexF_DTR_'+(R.name||'report'));
- else if(a==='rwordG')doWordR(docGonly(R),'ARAL_AnnexG_Accomplishment_'+(R.name||'report'));
+ else if(a==='rword')doWordR(docR(R),'ARAL_AnnexF_G_'+(R.name||'report'));
  else if(a==='rnew'){R=freshR();rsaved=null;renderReport()}
  else staffClick(b,a);
 });
@@ -304,7 +308,7 @@ function renderLookup(){
   <p>Status: <span class="tag">${esc(L.status||'')}</span></p>${isR&&L.status==='For correction'&&L.remarks?`<div class="msg err"><b>For correction:</b> ${esc(L.remarks)}</div>`:''}
   ${isR&&L.status==='Verified'?'<div class="msg ok">Verified by your School Head. This report can no longer be edited.</div>':''}
   ${!isR&&contractOK(L.status)&&D.cat==='tutor'?(['Selected','Approved by SDS','Engaged'].includes(L.status)?'<div class="msg ok"><b>You were selected.</b> Your contract (Annex E) is ready to print. Bring it to be signed and notarized.</div>':'<div class="msg info"><b>Your contract (Annex E) is ready to print in advance</b>, with your name already filled in. It only takes effect after your engagement is approved, signed by the SDS and by you, and notarized.</div>'):''}
-  <div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b1" data-act="lk-print">Print / Save as PDF</button>${isR?'<button class="b2" data-act="lk-wordF">Word: Annex F (portrait)</button><button class="b2" data-act="lk-wordG">Word: Annex G (landscape)</button>':'<button class="b2" data-act="lk-word">Download Word</button>'}
+  <div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b1" data-act="lk-print">Print / Save as PDF</button><button class="b2" data-act="lk-word">Download Word</button>
   ${isR&&L.status!=='Verified'?'<button class="b3" data-act="lk-edit">Edit this report</button>':''}
   ${!isR&&D.cat==='tutor'&&contractOK(L.status)?'<button class="b3" data-act="lk-contract">Print my contract (Annex E)</button><button class="b2" data-act="lk-contractword">Contract as Word</button>':''}</div>
   <p class="hint">E-signature images are removed from the system 7 days after verification or a final decision. Copies you already saved or printed keep their signature.</p></div>`}
@@ -335,7 +339,7 @@ async function lkFind(){
 const dateOnly=iso=>{if(!iso)return'';const d=new Date(iso);return isNaN(d)?'':MON[d.getMonth()]+' '+String(d.getDate()).padStart(2,'0')+', '+d.getFullYear()};
 const dateTime=iso=>{const d=new Date(iso);if(isNaN(d))return'';let h=d.getHours();const ap=h>=12?'pm':'am';h=h%12||12;return dateOnly(iso)+', '+h+':'+String(d.getMinutes()).padStart(2,'0')+' '+ap};
 const sigImg=(src,h=26)=>src?`<img src="${src}" style="height:${h}pt;max-width:100%">`:'';
-const tala=(at,ref,extra)=>at?`<div style="font-size:6pt;color:#555;margin-top:1pt">E-signed ${esc(dateTime(at))}${ref?' · Ref '+esc(ref):''}${extra?' · '+esc(extra):''}</div>`:'';
+const tala=(at,ref,extra)=>at?`<div style="font-size:6pt;color:#555;margin-top:1pt;border:0">E-signed ${esc(dateTime(at))}${ref?' · Ref '+esc(ref):''}${extra?' · '+esc(extra):''}</div>`:'';
 function processSig(src,cb,scale){
  const img=new Image();img.onload=()=>{
   const MW=360*(scale||1),MH=140*(scale||1);let w=img.width,h=img.height;const sc=Math.min(1,MW/w,MH/h);w=Math.max(1,Math.round(w*sc));h=Math.max(1,Math.round(h*sc));
@@ -433,7 +437,7 @@ function docPDS(D){
   tr(td('Inclusive Date/s',2,'c'),td('Position Title',2,'c',' rowspan="2"'),td('Company/ Organization',2,'c',' rowspan="2"'),td('Tutoring / Teaching Experience ? (Yes/No)',2,'c',' rowspan="2"'),td('<i class="sm">Applicable for Tutoring/Teaching Experience only. Otherwise, indicate “N/A”.</i>',4,'c')),
   tr(td('From',1,'c'),td('To',1,'c'),td('Regular Class or Tutorial Session?',2,'c'),td('Grade Level/s',1,'c sm'),td('No of Hours per week',1,'c sm'))];
  const wn=Math.max(6,D.work.length);
- for(let i=0;i<wn;i++){const r=D.work[i]||{};p2.push(tr(td(fmtD(r.from),1,'','style="height:26pt"'),td(fmtD(r.to),1),td(V(r.position),2),td(V(r.company),2),td(V(r.tutoring),2),td(V(r.session),2),td(V(r.grade),1),td(V(r.hours),1)))}
+ for(let i=0;i<wn;i++){const r=D.work[i]||{};p2.push(tr(td(fmtD(r.from),1,'','style="height:17pt"'),td(fmtD(r.to),1),td(V(r.position),2),td(V(r.company),2),td(V(r.tutoring),2),td(V(r.session),2),td(V(r.grade),1),td(V(r.hours),1)))}
  const cats=[['DepEd teaching personnel','Other LET-eligible in the locality','Other LET-eligible in the locality, such as but not limited to teachers from private schools, SUCs/LUCs'],['Remaining LET-eligible applicants in the recent and/or previous RQAs','Para-teachers','Para-teachers who possess relevant experience and competency to provide academic support to learners'],['Other LET-eligible teacher applicants in the RQAs','Non-licensed education graduates','Non-licensed education graduates'],['Retired professional teachers','Other licensed professionals','Other licensed professionals'],['Pre-service teachers','Other individuals in the community','Other individuals in the community deemed qualified, competent, and of good character']];
  const lt={'DepEd teaching personnel':'DepEd teaching personnel','Remaining LET-eligible applicants in the recent and/or previous RQAs':'Remaining LET-eligible applicants in the recent and/or previous Registries of Qualified Applicants (RQAs)','Other LET-eligible teacher applicants in the RQAs':'Other LET-eligible teacher applicants in the RQAs who did not meet the cut-off score per existing DepEd hiring guidelines and other teaching practitioners in the community','Retired professional teachers':'Retired professional teachers','Pre-service teachers':'Pre-service teachers &nbsp; <span class="sm">With T/HEI/LUC MOA or CHED/T/HEI Cert.</span> '+cb(D.moa==='Yes')+' Yes '+cb(D.moa==='No')+' No'};
  p2.push(bar('V. OTHER INFORMATION'));
@@ -444,19 +448,107 @@ function docPDS(D){
  p2.push(tr(td('<b>Pursuant to: (a) Indigenous People’s Act (RA 8371); (b) Magna Carta for Disabled Persons (RA 7277, as amended); and (c) Expanded Solo Parents Welfare Act (RA 11861), please answer the following items:</b>',12,'sm')));
  [['Are you a member of any indigenous groups?','indigenous','If YES, please specify: ','indigenousSpec'],['Are you a person with disability?','pwd','If YES, please specify ID No.: ','pwdId'],['Are you a solo parent?','solo','If YES, please specify ID No.: ','soloId']].forEach(([q,k,l,d])=>p2.push(tr(td('<b>'+q+'</b>',4,'sm'),td(cb(D[k]==='Yes')+' YES '+cb(D[k]==='No')+' NO',2,'sm'),td(l+(D[d]?'<u>'+V(D[d])+'</u>':'____________________'),6,'sm'))));
  const oath=`<table class="k" style="margin-top:8pt"><colgroup><col style="width:58%"><col style="width:42%"></colgroup>
- <tr><td rowspan="2" class="sm"><b>I declare under oath that I have personally accomplished this Personal Data Sheet which is a true, correct, and complete statement pursuant to the provisions of pertinent laws, rules, and regulations of the Republic of the Philippines. I authorize the agency head/authorized representative to verify/validate the contents stated herein.<br><br>I agree that any misrepresentation made in this document and its attachments shall cause the filing of administrative/criminal case/s against me.</b></td><td style="height:34pt;vertical-align:bottom;text-align:center" class="sm">${sigImg(D.sig,22)}${tala(D.sigAt,D.ref,D.sig?'':'image removed after 7 days')}<b>Signature</b></td></tr>
- <tr><td style="height:24pt;vertical-align:bottom;text-align:center" class="sm">${D.sigAt?esc(dateOnly(D.sigAt))+'<br>':''}<b>Date Accomplished</b></td></tr>
- <tr><td class="sm"><b>SUBSCRIBED AND SWORN to before me this ________________, affiant exhibiting his/her validly issued government ID.</b></td><td style="height:34pt;vertical-align:bottom;text-align:center" class="sm"><b>Person Administering Oath</b></td></tr></table>`;
+ <tr><td rowspan="2" class="sm"><b>I declare under oath that I have personally accomplished this Personal Data Sheet which is a true, correct, and complete statement pursuant to the provisions of pertinent laws, rules, and regulations of the Republic of the Philippines. I authorize the agency head/authorized representative to verify/validate the contents stated herein.<br><br>I agree that any misrepresentation made in this document and its attachments shall cause the filing of administrative/criminal case/s against me.</b></td><td style="height:30pt;vertical-align:bottom;text-align:center" class="sm">${sigImg(D.sig,22)}${tala(D.sigAt,D.ref,D.sig?'':'image removed after 7 days')}<b>Signature</b></td></tr>
+ <tr><td style="height:18pt;vertical-align:bottom;text-align:center" class="sm">${D.sigAt?esc(dateOnly(D.sigAt))+'<br>':''}<b>Date Accomplished</b></td></tr>
+ <tr><td class="sm"><b>SUBSCRIBED AND SWORN to before me this ________________, affiant exhibiting his/her validly issued government ID.</b></td><td style="height:26pt;vertical-align:bottom;text-align:center" class="sm"><b>Person Administering Oath</b></td></tr></table>`;
  return `<section class="page"><div class="ann">Annex A of DM No. ____ s. 2026</div>${G(p1)}</section><section class="page"><div class="ann">Annex A of DM No. ____ s. 2026</div>${G(p2)}${oath}</section>`}
-const withRef=(h,ref)=>ref?h.replace(/<\/section>/g,`<div style="font-size:7pt;color:#444;text-align:right;margin-top:6pt">Ref: <b>${esc(ref)}</b></div></section>`):h;
+const withRef=(h,ref)=>ref?h.replace(/<\/section>/g,`<div style="font-size:7pt;color:#444;text-align:right;margin-top:2pt">Ref: <b>${esc(ref)}</b></div></section>`):h;
 const docAll=D=>withRef(docIntent(D)+((D.cat==='tutor'||D.alsoPDS)?docPDS(D):''),D.ref);
 function doPrint(html){$('#printArea').innerHTML=html;setTimeout(()=>window.print(),50)}
-function wordFile(html,name,land){
- const css=document.querySelector('style').textContent.split('/* ---------- documents ---------- */')[1].split('@media print')[0].replace('page:land','');
- const pg=land?'size:841.9pt 595.3pt;mso-page-orientation:landscape':'size:595.3pt 841.9pt;mso-page-orientation:portrait';
- const full=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${esc(name)}</title><!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]--><style>@page WordSection1{${pg};margin:31pt}div.WordSection1{page:WordSection1}${css}</style></head><body class="doc"><div class="WordSection1">${html}</div></body></html>`;
- const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+full],{type:'application/msword'}));a.download=name.replace(/[^\w-]+/g,'_')+'.doc';document.body.appendChild(a);a.click();a.remove()}
-function doWord(html,name){wordFile(html,name,false)}
+/* ================= REAL WORD (.docx) EXPORT ================= */
+function loadDocx(){return new Promise((res,rej)=>{if(window.docx){res(window.docx);return}const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js';s.onload=()=>window.docx?res(window.docx):rej(new Error('The Word library did not load.'));s.onerror=()=>rej(new Error('Could not load the Word library. Check your internet connection, or use Print / Save as PDF.'));document.head.appendChild(s)})}
+function buildDocx(html,D){
+ const {Document,Paragraph,TextRun,Table,TableRow,TableCell,WidthType,AlignmentType,BorderStyle,ShadingType,VerticalAlign,ImageRun,HeightRule,PageOrientation,LineRuleType,TableLayoutType}=D;
+ const doc=new DOMParser().parseFromString('<body>'+html+'</body>','text/html');
+ const BLOCK=new Set(['P','DIV','TABLE','H1','H2','H3','SECTION']);
+ const tw=p=>Math.round(p*20);
+ const styleOf=el=>{const o={};((el.getAttribute&&el.getAttribute('style'))||'').split(';').forEach(d=>{const i=d.indexOf(':');if(i>0)o[d.slice(0,i).trim().toLowerCase()]=d.slice(i+1).trim()});return o};
+ const ptOf=v=>{if(v==null)return null;const m=/^(-?[\d.]+)\s*(pt|px|mm)?$/.exec(String(v).trim());if(!m)return null;let n=parseFloat(m[1]);if(m[2]==='px')n*=0.75;else if(m[2]==='mm')n*=2.835;return n};
+ const boxOf=st=>{const o={t:null,r:null,b:null,l:null};
+  if(st.margin){const p=st.margin.trim().split(/\s+/).map(ptOf);if(p.length===1)o.t=o.r=o.b=o.l=p[0];else if(p.length===2){o.t=o.b=p[0];o.r=o.l=p[1]}else if(p.length===3){o.t=p[0];o.r=o.l=p[1];o.b=p[2]}else{o.t=p[0];o.r=p[1];o.b=p[2];o.l=p[3]}}
+  if(st['margin-top']!=null)o.t=ptOf(st['margin-top']);if(st['margin-bottom']!=null)o.b=ptOf(st['margin-bottom']);if(st['margin-left']!=null)o.l=ptOf(st['margin-left']);if(st['margin-right']!=null)o.r=ptOf(st['margin-right']);return o};
+ const st0={pending:false,W:10658,pages:0};
+ const HEX=c=>{if(!c)return null;const m=/^#([0-9a-f]{6})$/i.exec(c.trim());if(m)return m[1].toUpperCase();const s=/^#([0-9a-f]{3})$/i.exec(c.trim());return s?s[1].split('').map(x=>x+x).join('').toUpperCase():null};
+ const inlineCtx=(el,ctx)=>{const c=Object.assign({},ctx),tag=el.tagName,st=styleOf(el),cl=el.classList;
+  if(tag==='B'||tag==='STRONG'||tag==='TH'||tag==='H1'||tag==='H2')c.bold=true;if(tag==='I'||tag==='EM')c.italic=true;if(tag==='U')c.underline=true;
+  if(cl&&cl.contains('sm'))c.size=8;if(cl&&cl.contains('it'))c.italic=true;
+  if(cl&&cl.contains('ann')){c.italic=true;c.size=ctx.ctr?11:7}
+  if(tag==='H1')c.size=16;if(tag==='H2')c.size=ctx.ctr?12.5:11;
+  if(st['font-size']){const p=ptOf(st['font-size']);if(p)c.size=p}
+  if(st.color){const h=HEX(st.color);if(h)c.color=h}
+  if(/bold|700/.test(st['font-weight']||''))c.bold=true;if(/italic/.test(st['font-style']||''))c.italic=true;if(/underline/.test(st['text-decoration']||''))c.underline=true;return c};
+ const pngSize=b64=>{try{const b=atob(b64.slice(0,60));const u=i=>b.charCodeAt(i);return{w:(u(16)<<24)+(u(17)<<16)+(u(18)<<8)+u(19),h:(u(20)<<24)+(u(21)<<16)+(u(22)<<8)+u(23)}}catch(e){return{w:3,h:1}}};
+ function collect(nodes,ctx,out){for(const n of nodes){if(n.nodeType===3){const t=n.nodeValue.replace(/\s+/g,' ');if(t)out.push({k:'t',text:t,ctx})}else if(n.nodeType===1){const tag=n.tagName;if(tag==='BR'){out.push({k:'br'});continue}if(tag==='IMG'){out.push({k:'img',el:n});continue}collect(n.childNodes,inlineCtx(n,ctx),out)}}}
+ function toRuns(nodes,ctx){const toks=[];collect(nodes,ctx,toks);
+  for(let i=0;i<toks.length;i++){const t=toks[i];if(t.k==='t'){const prev=toks[i-1];if(!prev||prev.k==='br'||(prev.k==='t'&&/\s$/.test(prev.text)))t.text=t.text.replace(/^\s+/,'');const next=toks[i+1];if(!next||next.k==='br')t.text=t.text.replace(/\s+$/,'')}}
+  const runs=[];for(const t of toks){if(t.k==='br')runs.push(new TextRun({break:1}));else if(t.k==='img'){const src=t.el.getAttribute('src')||'';const m=/^data:image\/png;base64,(.+)$/.exec(src);if(!m)continue;const bin=atob(m[1]),bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);const sz=pngSize(m[1]);const hp=ptOf(styleOf(t.el).height)||26;let h=hp*96/72,w=h*(sz.w/Math.max(1,sz.h));if(w>260){h=h*260/w;w=260}runs.push(new ImageRun({data:bytes,transformation:{width:Math.round(w),height:Math.round(h)},type:'png'}))}
+   else if(t.text){const c=t.ctx;runs.push(new TextRun({text:t.text,font:c.font,size:Math.round(c.size*2),bold:c.bold||undefined,italics:c.italic||undefined,underline:c.underline?{}:undefined,color:c.color||undefined}))}}
+  return runs}
+ const AL={left:AlignmentType.LEFT,center:AlignmentType.CENTER,right:AlignmentType.RIGHT,justify:AlignmentType.BOTH,both:AlignmentType.BOTH};
+ function mkPara(runs,ctx,o){const pb=st0.pending;st0.pending=false;
+  const sp={before:tw(o.before||0),after:tw(o.after||0)};if(o.lineAtLeast){sp.line=tw(o.lineAtLeast);sp.lineRule=LineRuleType.AT_LEAST}else if(ctx.ctr&&!ctx.inCell){sp.line=312;sp.lineRule=LineRuleType.AUTO}
+  const ind={left:tw(o.left||0),right:tw(o.right||0)};if(o.first>0)ind.firstLine=tw(o.first);else if(o.first<0)ind.hanging=tw(-o.first);
+  return new Paragraph({children:runs,alignment:AL[o.align]||AlignmentType.LEFT,spacing:sp,indent:ind,border:o.borderTop?{top:{style:BorderStyle.SINGLE,size:6,color:'000000',space:1}}:undefined,pageBreakBefore:pb||undefined,keepNext:o.keepNext||undefined})}
+ function paraOpts(el,ctx,scope){const st=el?styleOf(el):{},tag=el?el.tagName:'DIV',cl=el&&el.classList||{contains:()=>false};
+  const o={before:0,after:0,align:ctx.cellAlign||'left'};
+  if(!ctx.inCell){if(tag==='P'){o.after=ctx.ctr?7:8;o.align='both'}if(tag==='H1'){o.align='center'}if(tag==='H2'){o.align='center';o.before=ctx.ctr?6:0;o.after=ctx.ctr?10:6}if(cl.contains('ann'))o.after=ctx.ctr?6:2}
+  else if(tag==='H1'||tag==='H2')o.align='center';
+  if(scope&&scope.sig){o.align='center';o.left=scope.sig.left;o.right=scope.sig.right;if(el&&tag==='DIV'&&!/border:\s*0/.test(el.getAttribute('style')||''))o.borderTop=true;if(scope.sig.first){o.before=scope.sig.top;scope.sig.first=false}}
+  if(st['text-align'])o.align=st['text-align'];
+  const b=boxOf(st);if(b.t!=null)o.before=b.t;if(b.b!=null)o.after=b.b;if(b.l!=null)o.left=(o.left||0)+b.l;if(b.r!=null)o.right=(o.right||0)+b.r;
+  if(st['text-indent']){const p=ptOf(st['text-indent']);if(p!=null)o.first=p}
+  if(st.height){const p=ptOf(st.height);if(p)o.lineAtLeast=p}
+  if(st['border-top']&&!/^(0|none)/.test(st['border-top']))o.borderTop=true;
+  if(ctx.inCell&&ctx.cellW&&st.width&&/%/.test(st.width)&&/auto/.test(st.margin||'')){const wp=parseFloat(st.width);const ind=ctx.cellW*(100-wp)/200;o.left=(o.left||0)+ind;o.right=(o.right||0)+ind}
+  return o}
+ function inlinePara(nodes,ctx,o){return mkPara(toRuns(nodes,ctx),ctx,o)}
+ function blocks(el,ctx,out,scope){let buf=[];const flush=()=>{if(buf.some(n=>n.nodeType===1||(n.nodeValue&&n.nodeValue.trim())))out.push(inlinePara(buf,ctx,paraOpts(null,ctx,scope)));buf=[]};
+  for(const n of el.childNodes){if(n.nodeType===1&&BLOCK.has(n.tagName)){flush();blockEl(n,ctx,out,scope)}else buf.push(n)}flush()}
+ function blockEl(el,ctx,out,scope){const tag=el.tagName,cl=el.classList;
+  if(tag==='TABLE'){tableEl(el,ctx,out);return}
+  if(tag==='SECTION'){if(st0.pages++>0)st0.pending=true;blocks(el,ctx,out,scope);return}
+  if(cl.contains('sigbox')){const st=styleOf(el),wp=parseFloat((st.width||'55%'))||55,leftZero=/margin-left:\s*0/.test(el.getAttribute('style')||'');const W=st0.W;
+   const gapPt=W*(100-wp)/100/20;const top=(st['margin-top']!=null?ptOf(st['margin-top']):(st.margin?ptOf(st.margin.split(/\s+/)[0]):28))||0;
+   blocks(el,Object.assign({},ctx),out,{sig:{left:leftZero?0:gapPt,right:leftZero?gapPt:0,top,first:true}});return}
+  const hasBlock=[...el.children].some(c=>BLOCK.has(c.tagName));
+  if(tag==='DIV'&&hasBlock){blocks(el,inlineCtx(el,ctx),out,scope);return}
+  const c2=inlineCtx(el,ctx);out.push(inlinePara(el.childNodes,c2,paraOpts(el,ctx,scope)))}
+ function tableEl(t,ctx,out){const rows=[...t.rows];if(!rows.length)return;const cg=t.querySelector('colgroup');const occ=[];let ncols=cg?cg.querySelectorAll('col').length:0;
+  rows.forEach((r,ri)=>{occ[ri]=occ[ri]||[];let c=0;[...r.cells].forEach(cell=>{while(occ[ri][c])c++;const cs=cell.colSpan||1,rs=cell.rowSpan||1;cell._p={ri,c,cs,rs};for(let i=0;i<rs;i++){occ[ri+i]=occ[ri+i]||[];for(let j=0;j<cs;j++)occ[ri+i][c+j]=true}c+=cs;ncols=Math.max(ncols,c)})});
+  let pct=[];if(cg)[...cg.querySelectorAll('col')].forEach(col=>pct.push(parseFloat(styleOf(col).width)||0));
+  if(pct.length!==ncols||pct.some(x=>!x)){pct=Array(ncols).fill(1);const fr=rows[0];if(fr.cells.length===ncols&&[...fr.cells].every(c=>/%/.test(styleOf(c).width||'')))pct=[...fr.cells].map(c=>parseFloat(styleOf(c).width))}
+  const sum=pct.reduce((a,b)=>a+b,0),W=st0.W;let colW=pct.map(p=>Math.round(W*p/sum));colW[colW.length-1]+=W-colW.reduce((a,b)=>a+b,0);
+  const tst=styleOf(t),bordered=(t.classList.contains('g')||t.classList.contains('k'))&&!/border:\s*0/.test(t.getAttribute('style')||'');
+  const NB={style:BorderStyle.NONE,size:0,color:'FFFFFF'},B1={style:BorderStyle.SINGLE,size:4,color:'000000'};
+  const trs=rows.map((r,ri)=>{let rowH=0;const cells=[...r.cells].map(td=>{const p=td._p,tst2=styleOf(td),cl=td.classList,isTh=td.tagName==='TH';
+    let w=0;for(let i=0;i<p.cs;i++)w+=colW[p.c+i];
+    let c2=Object.assign({},ctx,{inCell:true,cellW:w/20-8});if(t.classList.contains('tc'))c2.size=6.5;else if(ctx.ctr&&t.classList.contains('k'))c2.size=11;
+    c2=inlineCtx(td,c2);
+    let align=tst2['text-align']||(isTh?'center':(cl.contains('c')?'center':'left'));if(cl.contains('c'))c2.bold=true;c2.cellAlign=align;
+    let fill;if(cl.contains('bar')){fill='000000';c2.color='FFFFFF';c2.bold=true;c2.size=11}
+    const paras=[];blocks(td,c2,paras,{});if(!paras.length)paras.push(new Paragraph({children:[]}));
+    let h=ptOf(tst2.height);if(h==null){if(cl.contains('h'))h=20;else if(cl.contains('h2'))h=32}if(h)rowH=Math.max(rowH,h);
+    const va=/top/.test(tst2['vertical-align']||'')?VerticalAlign.TOP:/bottom/.test(tst2['vertical-align']||'')?VerticalAlign.BOTTOM:VerticalAlign.CENTER;
+    const noB=!bordered||/border:\s*0/.test(td.getAttribute('style')||'');const bd=noB?{top:NB,bottom:NB,left:NB,right:NB}:{top:B1,bottom:B1,left:B1,right:B1};
+    return new TableCell({children:paras,columnSpan:p.cs>1?p.cs:undefined,rowSpan:p.rs>1?p.rs:undefined,width:{size:w,type:WidthType.DXA},verticalAlign:va,borders:bd,shading:fill?{type:ShadingType.CLEAR,color:'auto',fill}:undefined,margins:{top:40,bottom:40,left:80,right:80}})});
+   return new TableRow({children:cells,cantSplit:true,height:rowH?{value:tw(rowH),rule:HeightRule.ATLEAST}:undefined})});
+  out.push(new Table({rows:trs,width:{size:W,type:WidthType.DXA},columnWidths:colW,layout:TableLayoutType.FIXED}));
+  out.push(new Paragraph({children:[],spacing:{before:0,after:0,line:40,lineRule:LineRuleType.EXACT}}))}
+ // ---- sections
+ const groups=[];let bare=null;
+ for(const el of doc.body.children){if(el.classList.contains('Section1')||el.classList.contains('Section2')){bare=null;groups.push({els:[el],land:el.classList.contains('Section2'),ctr:el.classList.contains('ctr')})}else{if(!bare){bare={els:[],land:false,ctr:false};groups.push(bare)}bare.els.push(el)}}
+ const sections=groups.map(g=>{const m=g.ctr?{l:1417,r:1417,t:1247,b:1247}:{l:624,r:624,t:624,b:624};const pw=g.land?16838:11906;st0.W=pw-m.l-m.r;st0.pending=false;st0.pages=0;
+  const ctx={font:g.ctr?'Bookman Old Style':'Arial',size:g.ctr?11.5:10,bold:false,italic:false,underline:false,color:null,ctr:g.ctr,inCell:false,cellAlign:null};
+  const out=[];for(const el of g.els){if(el.tagName==='SECTION'||BLOCK.has(el.tagName)){if(el.tagName==='DIV'&&!el.classList.contains('sigbox')&&[...el.children].some(c=>BLOCK.has(c.tagName)))blocks(el,ctx,out,{});else blockEl(el,ctx,out,{})}}
+  if(!out.length)out.push(new Paragraph({children:[]}));
+  return{properties:{page:{size:{width:11906,height:16838,orientation:g.land?PageOrientation.LANDSCAPE:PageOrientation.PORTRAIT},margin:{top:m.t,bottom:m.b,left:m.l,right:m.r,header:360,footer:360}}},children:out}});
+ return new Document({creator:'SDO Romblon ARAL App',title:'ARAL',styles:{default:{document:{run:{font:'Arial',size:20},paragraph:{spacing:{before:0,after:0}}}}},sections})}
+async function exportDocx(html,name){
+ try{const D=await loadDocx();const dd=buildDocx(html,D);const blob=await D.Packer.toBlob(dd);
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name.replace(/[^\w-]+/g,'_')+'.docx';document.body.appendChild(a);a.click();a.remove();toast('Word file downloaded')}
+ catch(err){alert('Could not make the Word file: '+err.message)}}
+
+function doWord(html,name){exportDocx(html,name)}
 
 /* ================= MONTHLY REPORT (Annex F + G) ================= */
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -495,7 +587,7 @@ function renderReport(){
  <h3>Sessions</h3>${sess}<button class="b2" data-act="addses">+ Add session</button>
  <div class="msg info" style="margin-top:12px">Total hours rendered: <span class="tot" id="tot"></span></div>
  <div id="rMsg">${rsaved?`<div class="msg ok"><b>Saved.</b> Reference <b>${esc(rsaved)}</b>${rsavedMail===true?' (emailed to you)':rsavedMail===false?' (we could not email it, so please write it down)':''}. <button class="b2" data-act="copyref" style="padding:4px 10px;font-size:12px">Copy</button> <b>Write it down with your PIN</b>: use them under “Check my application or report” to edit, reprint, or get the copy signed by your School Head. Print the forms, sign them by hand if you did not e-sign, and submit the signed copies.</div>`:''}</div>
- <div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b1" data-act="rsubmit" id="rBtn">Save report</button><button class="b3" data-act="rprint">Print / Save as PDF</button><button class="b2" data-act="rwordF">Word: Annex F (portrait)</button><button class="b2" data-act="rwordG">Word: Annex G (landscape)</button></div>
+ <div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b1" data-act="rsubmit" id="rBtn">Save report</button><button class="b3" data-act="rprint">Print / Save as PDF</button><button class="b2" data-act="rword">Download Word</button></div>
  <div class="msg info" style="margin-top:12px">Names of the School Head are left blank on the forms; write them by hand. The signed hard copies are what get submitted for processing of remuneration.</div></div>
  <div style="text-align:center"><button class="link" data-act="rnew">Start a new report</button> <button class="link" data-act="home">← Home</button> <button class="link" data-act="staff">Staff</button></div>`;
  updTot();window.scrollTo(0,0)}
@@ -536,7 +628,7 @@ function docG(D){
  <tr><th>Week</th><th>Date and Time</th><th>Subject</th><th>Learners Served</th><th>Grade Level</th><th>Accomplishments<br><i style="font-size:7pt;font-weight:normal">(For tutors, include learning sessions conducted, and progress or feedback on the tutorial session. For support aides, include types of support provided)</i></th></tr>${rows}</table>
  <table style="width:100%;margin-top:16pt;border:0"><tr><td style="width:50%;vertical-align:top"><i>Prepared by:</i><br>${D.sig?sigImg(D.sig,26):'<br>'}<br><b>${esc(D.name||'')}</b><br>${t?'ARAL Tutor':'ARAL Support Aide'}${tala(D.sigAt,D.ref,D.sig?'':'image removed after 7 days')}</td><td style="vertical-align:top"><i>Attested by:</i><br>${D.headSig?sigImg(D.headSig,26):'<br>'}<br><b>&nbsp;</b><br>School Head<br>Date of Signing: ${D.headSigAt?esc(dateOnly(D.headSigAt)):'______________________'}${tala(D.headSigAt,D.ref,'attested'+(D.headSig?'':' · image removed after 7 days'))}</td></tr></table></section>`}
 const docR=D=>`<div class="Section1">${withRef(docF(D),D.ref)}</div><div class="Section2">${withRef(docG(D),D.ref)}</div>`;
-function doWordR(html,name){wordFile(html,name,/class="Section2"/.test(html))}
+function doWordR(html,name){exportDocx(html,name)}
 const docFonly=D=>`<div class="Section1">${withRef(docF(D),D.ref)}</div>`,docGonly=D=>`<div class="Section2">${withRef(docG(D),D.ref)}</div>`;
 
 /* ================= MODULE 3 DOCUMENTS (Annex C, D, H, E) ================= */
@@ -606,7 +698,7 @@ function docE(D,ev){
   <table class="k"><tr><th>Name</th><th>Competent Evidence of Identity</th><th>Date and Place of Issue</th></tr><tr><td style="height:24pt"><i>${lbl}</i><br>${esc(who)}</td><td></td><td></td></tr></table>
   <p style="margin-top:8pt;text-indent:36pt">known to me and to me known to be the same person who executed the foregoing Agreement, and acknowledged to me that the same is his free and voluntary act and deed and that of the entity he represents.</p>
   <p style="text-indent:36pt">IN WITNESS WHEREOF, I have hereunto set my hand and affixed my notarial seal, this __________, at ____________.</p><p style="margin-top:14pt">NOTARY PUBLIC</p><p>Doc. No. ____;<br>Page No. ____;<br>Book No. ____;<br>Series of 202___.</p></section>`;
- return `<div class="Section1"><section class="page"><div class="ann">Annex E</div><h2 style="margin:8pt 0">ARAL TUTOR ENGAGEMENT CONTRACT</h2><p><b>KNOW ALL MEN BY THESE PRESENTS:</b></p>
+ return `<div class="Section1 ctr"><section class="page"><div class="ann">Annex E</div><h2 style="margin:8pt 0">ARAL TUTOR ENGAGEMENT CONTRACT</h2><p><b>KNOW ALL MEN BY THESE PRESENTS:</b></p>
  ${p('This Agreement, made and entered into by and between:','text-indent:36pt')}
  ${p(`The Department of Education - (Schools Division, DepEd Region NO. ${UL(setg('REGION'),6)}), a government agency with office address at ${UL(addr,30)}, represented by ${UL(sds,24)}, ${esc(sdT(sdsT))}, ${esc(sdo)}, herein referred to as the “FIRST PARTY”,`,'text-indent:36pt')}
  <p style="text-align:center">-and-</p>
@@ -681,7 +773,7 @@ function renderStaff(){
   <h2 style="margin-top:12px">${esc(d.ref)} · ${esc(isR?D.name:fullName(D))}</h2><p class="sub">${isR?esc(mLabel(D.month))+' · '+esc(D.school)+' · '+hm(totMin(D)):esc(D.cat==='tutor'?'ARAL Tutor':'ARAL Support Aide')+' · '+esc(D.school)} · Status: <span class="tag">${esc(d.status||(isR?'Submitted':'Received'))}</span></p>
   ${opts.length?`<div class="grid"><label class="f w3"><span>Status</span><select id="stat">${opts.map(s=>`<option ${s===(d.status||opts[0])?'selected':''}>${s}</option>`).join('')}</select></label><label class="f w3"><span>Remarks</span><input type="text" id="rem" value="${esc(d.remarks||'')}"></label></div>`:'<p class="sub">Encoders cannot change the status.</p>'}
   ${staffMsg?`<div class="msg ok">${esc(staffMsg)}</div>`:''}
-  <div class="nav" style="justify-content:flex-start;flex-wrap:wrap">${opts.length?'<button class="b1" data-act="setstat">Save status</button>':''}<button class="b3" data-act="sprint">Print forms</button>${isR?'<button class="b2" data-act="swordF">Word: Annex F (portrait)</button><button class="b2" data-act="swordG">Word: Annex G (landscape)</button>':'<button class="b2" data-act="sword">Download Word</button>'}${canC?'<button class="b3" data-act="cprint">Print contract (Annex E)</button><button class="b2" data-act="cword">Contract as Word</button>':''}</div>
+  <div class="nav" style="justify-content:flex-start;flex-wrap:wrap">${opts.length?'<button class="b1" data-act="setstat">Save status</button>':''}<button class="b3" data-act="sprint">Print forms</button><button class="b2" data-act="sword">Download Word</button>${canC?'<button class="b3" data-act="cprint">Print contract (Annex E)</button><button class="b2" data-act="cword">Contract as Word</button>':''}</div>
   ${!isR?evalPanel(d):''}
   ${(staff.role==='HRMO'||staff.role==='SCHOOLHEAD')?`<h3>Forgot PIN?</h3><div class="grid"><label class="f w3"><span>New PIN for this ${isR?'report':'application'} (4 to 6 digits)</span><input type="text" id="newpin" inputmode="numeric" maxlength="6"></label></div><div class="nav" style="justify-content:flex-start"><button class="b2" data-act="resetpin">Reset PIN</button></div>`:''}</div>
   <div class="card" style="overflow:auto"><div class="doc">${isR?withRef(docF(D)+docG(D),D.ref):docAll(D)}</div></div>`;return}
@@ -721,9 +813,7 @@ async function staffClick(b,a){
   const ev={interview:g('ev_int'),perf:g('ev_perf'),others:g('ev_oth'),remarks:g('ev_rem'),assign};if($('#ev_fund')){ev.fund=g('ev_fund');ev.cFrom=g('ev_cf');ev.cTo=g('ev_ct')}
   const r=await api('saveEval',{code:staff.code,ref:detail.ref,ev});if(r.ok){detail.eval=r.eval;staffMsg='Evaluation saved.'}else staffMsg=r.error;renderStaff()}
  else if(a==='sprint')doPrint(detail.kind==='report'?docR(detail.data):docAll(detail.data));
- else if(a==='sword')doWord(docAll(detail.data),'ARAL_'+(detail.data.last||'applicant'));
- else if(a==='swordF')doWordR(docFonly(detail.data),'ARAL_AnnexF_DTR_'+(detail.data.name||'report'));
- else if(a==='swordG')doWordR(docGonly(detail.data),'ARAL_AnnexG_Accomplishment_'+(detail.data.name||'report'));
+ else if(a==='sword'){if(detail.kind==='report')doWordR(docR(detail.data),'ARAL_AnnexF_G_'+(detail.data.name||'report'));else doWord(docAll(detail.data),'ARAL_'+(detail.data.last||'applicant'))}
  else if(a==='resetpin'){const np=($('#newpin')||{}).value||'';const r=await api('resetPin',{code:staff.code,kind:detail.kind==='report'?'report':'app',ref:detail.ref,pin:np.trim()});staffMsg=r.ok?'PIN reset. Give the new PIN to the applicant.':r.error;renderStaff()}
  else if(a==='cprint')doPrint(docE(detail.data,detail.eval));
  else if(a==='cword')doWordR(docE(detail.data,detail.eval),'ARAL_Contract_'+(detail.data.last||'tutor'));
