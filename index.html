@@ -98,7 +98,7 @@ div.Section2{page:land}
 <div id="printArea" class="doc"></div>
 <script>
 /* ================= CONFIG ================= */
-const API_URL = 'https://script.google.com/macros/s/AKfycbxuN2OVcDd3sxaKRWg4GId-nXqSbZ_9K5rOm87x_F2P048e4F99BXcfSuhysSwzgQg/exec';   // <-- paste your Apps Script Web App URL here (ends with /exec)
+const API_URL = '';   // <-- paste your Apps Script Web App URL here (ends with /exec)
 const BOX_YES='☒', BOX_NO='☐';
 
 /* ================= HELPERS ================= */
@@ -292,7 +292,7 @@ function showRefModal(ref,what,emailTo,emailed){
 
 /* ================= CHECK MY APPLICATION / REPORT ================= */
 let LK=null,lkMsg='',lkForgot=false;
-const CONTRACT_OK=['Selected','Approved by SDS','Engaged'];
+const contractOK=st=>st!=='Not selected'; // the contract is available right away, with the applicant's name filled in
 function renderLookup(){
  if(lkForgot){$('#app').innerHTML=recoverForm()+'<div style="text-align:center"><button class="link" data-act="home">← Home</button></div>';window.scrollTo(0,0);return}
  const L=LK;let res='';
@@ -301,10 +301,10 @@ function renderLookup(){
   ${L.recovered?`<div class="msg ok">Your reference number is <b>${esc(L.ref)}</b>. Write it down.</div>`:''}
   <p>Status: <span class="tag">${esc(L.status||'')}</span></p>${isR&&L.status==='For correction'&&L.remarks?`<div class="msg err"><b>For correction:</b> ${esc(L.remarks)}</div>`:''}
   ${isR&&L.status==='Verified'?'<div class="msg ok">Verified by your School Head. This report can no longer be edited.</div>':''}
-  ${!isR&&CONTRACT_OK.includes(L.status)&&D.cat==='tutor'?'<div class="msg ok"><b>You were selected.</b> Your contract (Annex E) is ready to print. Bring it to be signed and notarized.</div>':''}
+  ${!isR&&contractOK(L.status)&&D.cat==='tutor'?(['Selected','Approved by SDS','Engaged'].includes(L.status)?'<div class="msg ok"><b>You were selected.</b> Your contract (Annex E) is ready to print. Bring it to be signed and notarized.</div>':'<div class="msg info"><b>Your contract (Annex E) is ready to print in advance</b>, with your name already filled in. It only takes effect after your engagement is approved, signed by the SDS and by you, and notarized.</div>'):''}
   <div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b1" data-act="lk-print">Print / Save as PDF</button>${isR?'<button class="b2" data-act="lk-wordF">Word: Annex F (portrait)</button><button class="b2" data-act="lk-wordG">Word: Annex G (landscape)</button>':'<button class="b2" data-act="lk-word">Download Word</button>'}
   ${isR&&L.status!=='Verified'?'<button class="b3" data-act="lk-edit">Edit this report</button>':''}
-  ${!isR&&D.cat==='tutor'&&CONTRACT_OK.includes(L.status)?'<button class="b3" data-act="lk-contract">Print my contract (Annex E)</button><button class="b2" data-act="lk-contractword">Contract as Word</button>':''}</div>
+  ${!isR&&D.cat==='tutor'&&contractOK(L.status)?'<button class="b3" data-act="lk-contract">Print my contract (Annex E)</button><button class="b2" data-act="lk-contractword">Contract as Word</button>':''}</div>
   <p class="hint">E-signature images are removed from the system 7 days after verification or a final decision. Copies you already saved or printed keep their signature.</p></div>`}
  $('#app').innerHTML=`<div class="card"><h2>Check my application or report</h2><p class="sub">Enter the Reference number (ARAL-… for an application, RPT-… for a monthly report) and the PIN you created.</p>
   <div class="grid"><label class="f w3"><span>Reference number</span><input type="text" id="lkr" placeholder="ARAL-20261027-0001" value="${esc(L?L.ref:(()=>{try{return localStorage.getItem('aralLastRef')||''}catch(e){return ''}})())}"></label>
@@ -674,7 +674,7 @@ function renderStaff(){
   <div class="nav"><button class="b2" data-act="home">Back</button><button class="b1" data-act="login">Log in</button></div></div>`;return}
  if(detail){const d=detail,isR=d.kind==='report',D=d.data;
   const opts=isR?(staff.role==='ENCODER'?[]:['Submitted','Verified','For correction']):statOpts(staff.role);
-  const canC=!isR&&D.cat==='tutor'&&['Selected','Approved by SDS','Engaged'].includes(d.status);
+  const canC=!isR&&D.cat==='tutor'&&contractOK(d.status);
   $('#app').innerHTML=`<div class="card"><button class="b2" data-act="closedetail">← Back to list</button>
   <h2 style="margin-top:12px">${esc(d.ref)} · ${esc(isR?D.name:fullName(D))}</h2><p class="sub">${isR?esc(mLabel(D.month))+' · '+esc(D.school)+' · '+hm(totMin(D)):esc(D.cat==='tutor'?'ARAL Tutor':'ARAL Support Aide')+' · '+esc(D.school)} · Status: <span class="tag">${esc(d.status||(isR?'Submitted':'Received'))}</span></p>
   ${opts.length?`<div class="grid"><label class="f w3"><span>Status</span><select id="stat">${opts.map(s=>`<option ${s===(d.status||opts[0])?'selected':''}>${s}</option>`).join('')}</select></label><label class="f w3"><span>Remarks</span><input type="text" id="rem" value="${esc(d.remarks||'')}"></label></div>`:'<p class="sub">Encoders cannot change the status.</p>'}
