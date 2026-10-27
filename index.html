@@ -96,7 +96,7 @@ div.Section2{page:land}
 <div id="printArea" class="doc"></div>
 <script>
 /* ================= CONFIG ================= */
-const API_URL = 'https://script.google.com/macros/s/AKfycbxuN2OVcDd3sxaKRWg4GId-nXqSbZ_9K5rOm87x_F2P048e4F99BXcfSuhysSwzgQg/exec';   // <-- paste your Apps Script Web App URL here (ends with /exec)
+const API_URL = '';   // <-- paste your Apps Script Web App URL here (ends with /exec)
 const BOX_YES='☒', BOX_NO='☐';
 
 /* ================= HELPERS ================= */
@@ -119,6 +119,7 @@ function fresh(){return{cat:'',sy:'2026-2027',school:'',district:'',schoolAddres
  areas:{reading:false,math:false,science:false,aide:false},appCat:'',moa:'',
  adminOffense:'',adminDetails:'',charged:'',chargedDetails:'',convicted:'',convictedDetails:'',
  indigenous:'',indigenousSpec:'',pwd:'',pwdId:'',solo:'',soloId:'',sig:'',sigAt:'',ref:'',pin:''}}
+let savedMail=null,rsavedMail=null;
 let S=fresh(), stepIdx=0, saved=null, staff=null, mode='home', R=null, rsaved=null;
 const DEFAULT_SCHOOLS=[["Agbay-Ang IS","Alcantara"],["Alcantara CES","Alcantara"],["Alcantara NHS","Alcantara"],["Bagsik ES","Alcantara"],["Bonlao ES","Alcantara"],["Calagonsao ES","Alcantara"],["Camili ES","Alcantara"],["Comod-Om ES","Alcantara"],["Don Manuel L. Solidum MES","Alcantara"],["Felipe Madali MES","Alcantara"],["Gui-ob ES","Alcantara"],["Melodias Imperial Sr. NHS","Alcantara"],["San Isidro ES","Alcantara"],["San Roque ES (Alcantara)","Alcantara"],["Tugdan NHS","Alcantara"],["Balogo ES (Banton)","Banton"],["Banice ES","Banton"],["Banton CES","Banton"],["Banton NHS","Banton"],["Libtong ES","Banton"],["Nasunogan ES","Banton"],["Tan-ag ES","Banton"],["Tumalum-Lagang ES","Banton"],["Tungonan ES","Banton"],["Tungonan NHS","Banton"],["Agsao ES","Cajidiocan-Magdiwang"],["Agutay ES","Cajidiocan-Magdiwang"],["Agutay NHS","Cajidiocan-Magdiwang"],["Ambulong ES (Cajidiocan-Magdiwang)","Cajidiocan-Magdiwang"],["Angel Rio ES","Cajidiocan-Magdiwang"],["Cajidiocan CES","Cajidiocan-Magdiwang"],["Cajidiocan NHS","Cajidiocan-Magdiwang"],["Camanglad ES","Cajidiocan-Magdiwang"],["Cambajao ES","Cajidiocan-Magdiwang"],["Cambalo ES","Cajidiocan-Magdiwang"],["Cambalo NHS","Cajidiocan-Magdiwang"],["Cambijang ES","Cajidiocan-Magdiwang"],["Cantagda ES","Cajidiocan-Magdiwang"],["Damaso Ramilo MES","Cajidiocan-Magdiwang"],["Danao ES","Cajidiocan-Magdiwang"],["Danao NHS","Cajidiocan-Magdiwang"],["Dulangan ES","Cajidiocan-Magdiwang"],["Gutivan ES","Cajidiocan-Magdiwang"],["Haguimit Cultural Minority School","Cajidiocan-Magdiwang"],["Ipil ES","Cajidiocan-Magdiwang"],["Jao-Asan ES","Cajidiocan-Magdiwang"],["Lumbang East NHS","Cajidiocan-Magdiwang"],["Lumbang West ES","Cajidiocan-Magdiwang"],["Magdiwang ES","Cajidiocan-Magdiwang"],["Magdiwang NHS","Cajidiocan-Magdiwang"],["Marigondon ES","Cajidiocan-Magdiwang"],["Panaguintingan ES","Cajidiocan-Magdiwang"],["Silum ES","Cajidiocan-Magdiwang"],["Taguilos ES","Cajidiocan-Magdiwang"],["Tampayan ES","Cajidiocan-Magdiwang"],["Tomas & Maria T. Maglaya MS","Cajidiocan-Magdiwang"],["Agbatang PS","Concepcion"],["Bakhawan ES","Concepcion"],["Bakhawan NHS","Concepcion"],["Calabasahan ES","Concepcion"],["Concepcion CS","Concepcion"],["Concepcion NHS","Concepcion"],["Dalajican ES","Concepcion"],["Masadya PS","Concepcion"],["Masudsud ES","Concepcion"],["Sampong ES","Concepcion"],["San Vicente ES (Concepcion)","Concepcion"],["Alegria ES","Corcuera"],["Ambulong ES (Corcuera)","Corcuera"],["Colong-Colong ES","Corcuera"],["Corcuera CES","Corcuera"],["Corcuera NHS","Corcuera"],["Gobon ES","Corcuera"],["Ilijan ES","Corcuera"],["Labnig ES","Corcuera"],["Mabini ES (Corcuera)","Corcuera"],["Mabini NHS","Corcuera"],["Mahaba ES","Corcuera"],["Mangansag ES","Corcuera"],["Mauricio F. Fabito NHS","Corcuera"],["San Roque ES (Corcuera)","Corcuera"],["San Vicente ES (Corcuera)","Corcuera"],["Tacasan ES","Corcuera"],["Agojo IS","Looc"],["Balatucan ES","Looc"],["Buenavista ES (Looc)","Looc"],["Buenavista NHS","Looc"],["Crispin Grimares ES","Looc"],["Gov. Gonzales ES","Looc"],["Guinhaya-An IS","Looc"],["Jose M. Solis ES","Looc"],["Limon Norte ES","Looc"],["Limon Norte NHS","Looc"],["Limon Sur ES","Looc"],["Looc CES","Looc"],["Looc NHS","Looc"],["Manhac ES","Looc"],["Pili ES","Looc"],["Punta ES","Looc"],["Aurora ES","Odiongan North"],["Boliganay ES","Odiongan North"],["Budiong ES","Odiongan North"],["Canduyong ES","Odiongan North"],["Canlumay Cultural CS","Odiongan North"],["Gabawan ES","Odiongan North"],["Gabawan NHS","Odiongan North"],["Libertad ES","Odiongan North"],["Libertad NHS","Odiongan North"],["Odiongan North CS","Odiongan North"],["Palati PS","Odiongan North"],["Panique ES","Odiongan North"],["Pato-o IS","Odiongan North"],["Poctoy-Baito ES","Odiongan North"],["Tuburan ES","Odiongan North"],["Tumingad ES","Odiongan North"],["Agnocnoc ES","Odiongan South"],["Amatong ES","Odiongan South"],["Anahao IS","Odiongan South"],["Bagulayag ES","Odiongan South"],["Bangon ES","Odiongan South"],["Bunsoran ES","Odiongan South"],["Claro M. Recto ES","Odiongan South"],["Ferrol CES","Odiongan South"],["Ferrol NHS","Odiongan South"],["Hinag-oman ES","Odiongan South"],["Malilico ES","Odiongan South"],["Mayha ES","Odiongan South"],["Mayha NHS","Odiongan South"],["Odiongan NHS","Odiongan South"],["Odiongan South CES","Odiongan South"],["Paulino F. Fabon Sr. MS","Odiongan South"],["Progreso Este ES","Odiongan South"],["Progreso Oeste ES","Odiongan South"],["Rizal ES","Odiongan South"],["Tabobo-an ES","Odiongan South"],["Tubigon ES","Odiongan South"],["Tulay ES","Odiongan South"],["Agbaluto ES","Romblon"],["Agnaga ES","Romblon"],["Agnay ES","Romblon"],["Agnipa ES","Romblon"],["Agnipa NHS","Romblon"],["Agpanabat ES","Romblon"],["Agtongo ES","Romblon"],["Alad Lamao ES","Romblon"],["Alad NHS","Romblon"],["Alad Recudo ES","Romblon"],["Bagacay ES","Romblon"],["Cajimos ES","Romblon"],["Calabogo ES","Romblon"],["Cobrador ES","Romblon"],["Cogon ES","Romblon"],["Ginablan ES","Romblon"],["Guimpingan ES","Romblon"],["Ilauran ES","Romblon"],["Lamao ES","Romblon"],["Li-O ES","Romblon"],["Li-O NHS","Romblon"],["Logbon ES","Romblon"],["Lonos ES","Romblon"],["Lunas ES","Romblon"],["Macario Molina NHS","Romblon"],["Maximino Mazo Motin ES","Romblon"],["Palje PS","Romblon"],["Romblon East CS","Romblon"],["Romblon NHS","Romblon"],["Romblon West CS","Romblon"],["Sablayan ES","Romblon"],["Sablayan NHS","Romblon"],["San Jose ES","Romblon"],["Sawang ES","Romblon"],["Timla ES","Romblon"],["Alfredo P. Navarette MS","San Agustin-Santa Maria-Calatrava"],["Balogo ES (San Agustin-Santa Maria-Calatrava)","San Agustin-Santa Maria-Calatrava"],["Bonga ES","San Agustin-Santa Maria-Calatrava"],["Buli ES","San Agustin-Santa Maria-Calatrava"],["Cabibihan ES","San Agustin-Santa Maria-Calatrava"],["Cabolutan ES","San Agustin-Santa Maria-Calatrava"],["Cabolutan NHS","San Agustin-Santa Maria-Calatrava"],["Calatrava ES","San Agustin-Santa Maria-Calatrava"],["Calatrava NHS","San Agustin-Santa Maria-Calatrava"],["Camantaya ES","San Agustin-Santa Maria-Calatrava"],["Carmen ES","San Agustin-Santa Maria-Calatrava"],["Carmen NHS","San Agustin-Santa Maria-Calatrava"],["Cawayan ES","San Agustin-Santa Maria-Calatrava"],["Concepcion Norte ES","San Agustin-Santa Maria-Calatrava"],["Concepcion Sur ES","San Agustin-Santa Maria-Calatrava"],["Doña Juana ES","San Agustin-Santa Maria-Calatrava"],["Eduardo M. Moreno NHS","San Agustin-Santa Maria-Calatrava"],["Esteban Madrona NHS","San Agustin-Santa Maria-Calatrava"],["Esteban Minon Madrona ES","San Agustin-Santa Maria-Calatrava"],["Fetalvero-Mingoa MS","San Agustin-Santa Maria-Calatrava"],["Hinugusan ES","San Agustin-Santa Maria-Calatrava"],["Josefina Fetalino Malayo ES","San Agustin-Santa Maria-Calatrava"],["Linao ES","San Agustin-Santa Maria-Calatrava"],["Long Beach ES","San Agustin-Santa Maria-Calatrava"],["Luis M. Abello Sr. PS","San Agustin-Santa Maria-Calatrava"],["Pagsangahan ES","San Agustin-Santa Maria-Calatrava"],["Pang-Alaalang Paaralang Severina M. Solidum","San Agustin-Santa Maria-Calatrava"],["Paroyhog ES","San Agustin-Santa Maria-Calatrava"],["Pascual Catajay Linao NHS","San Agustin-Santa Maria-Calatrava"],["San Agustin CES","San Agustin-Santa Maria-Calatrava"],["San Agustin NTS","San Agustin-Santa Maria-Calatrava"],["Santa Maria NHS","San Agustin-Santa Maria-Calatrava"],["Sto. Nino NHS","San Agustin-Santa Maria-Calatrava"],["Sto. Niño ES","San Agustin-Santa Maria-Calatrava"],["Sugod ES","San Agustin-Santa Maria-Calatrava"],["Talamban ES","San Agustin-Santa Maria-Calatrava"],["Talisay IS","San Agustin-Santa Maria-Calatrava"],["Victorio Sixon Balogo NHS","San Agustin-Santa Maria-Calatrava"],["Agpudlos ES","San Andres"],["Ben G. Talamisan MS","San Andres"],["Calunacon ES","San Andres"],["Dona Martina F. Ganan MS","San Andres"],["Geminiano Galicia Sr. MS","San Andres"],["Linawan IS","San Andres"],["Marigondon Norte IS","San Andres"],["Marigondon Sur ES","San Andres"],["Matutuna ES","San Andres"],["Nemesio N. Ganan III MS","San Andres"],["San Andres CES","San Andres"],["San Andres Cultural HS","San Andres"],["San Andres NHS","San Andres"],["Tan-Agan ES","San Andres"],["Tanagan NHS","San Andres"],["Victoria ES","San Andres"],["Agtiwa ES","San Fernando"],["Armin Rios-Marin NHS","San Fernando"],["Azagra ES","San Fernando"],["Azagra NHS","San Fernando"],["Campalingo ES","San Fernando"],["Canjalon ES","San Fernando"],["Don Carlos MMMNHS","San Fernando"],["Espana NHS","San Fernando"],["España ES","San Fernando"],["Layag Cultural Minority School","San Fernando"],["Mabini ES (San Fernando)","San Fernando"],["Mabulo ES","San Fernando"],["Otod ES","San Fernando"],["San Fernando ES","San Fernando"],["Taclobo ES","San Fernando"],["Teresa Bernas MS","San Fernando"],["Agmanic ES","San Jose-Santa Fe"],["Agripino Armedilla NHS","San Jose-Santa Fe"],["Buenavista ES (San Jose-Santa Fe)","San Jose-Santa Fe"],["Busay ES","San Jose-Santa Fe"],["Canyayo ES","San Jose-Santa Fe"],["Combot ES","San Jose-Santa Fe"],["Danao Sur ES","San Jose-Santa Fe"],["Guinbirayan ES","San Jose-Santa Fe"],["Guinbirayan NHS","San Jose-Santa Fe"],["Guinpoingan ES","San Jose-Santa Fe"],["Guintigbasan ES","San Jose-Santa Fe"],["Inihawan ES","San Jose-Santa Fe"],["Lamberto Antaran MS","San Jose-Santa Fe"],["Lanas ES","San Jose-Santa Fe"],["Lindero IS","San Jose-Santa Fe"],["Magsaysay ES","San Jose-Santa Fe"],["Mat-I ES","San Jose-Santa Fe"],["Pandan ES","San Jose-Santa Fe"],["Pinamihagan ES","San Jose-Santa Fe"],["Pinamihagan NHS","San Jose-Santa Fe"],["San Jose AHS","San Jose-Santa Fe"],["San Jose CS","San Jose-Santa Fe"],["Santa Fe CES","San Jose-Santa Fe"],["Santa Fe Senior High School","San Jose-Santa Fe"],["Silvino G. Gajarion ES","San Jose-Santa Fe"],["Sta. Fe NHS","San Jose-Santa Fe"],["Tabugon ES","San Jose-Santa Fe"],["Trangquilino Cawaling Sr. NHS","San Jose-Santa Fe"],["V. A. Gutierrez Montiel MES","San Jose-Santa Fe"]];
 let CFG={settings:{},schools:DEFAULT_SCHOOLS.map(x=>({id:'',name:x[0],district:x[1],address:''}))};
@@ -182,7 +183,7 @@ const STEPS=[
   const D=S;return `<h2>Review &amp; submit</h2><p class="sub">Check your details. Submitting saves your application so your School Head can evaluate it.</p>
   <div class="msg info"><b>${esc(fullName(D))}</b> · ${D.cat==='tutor'?'ARAL Tutor':'ARAL Support Aide'} · ${esc(D.school)} (SY ${esc(D.sy)})<br>${esc(D.mobile)} · ${esc(D.email)}</div>
   ${saved?'':`<div class="grid" style="margin-top:10px">${sigBox('Your e-signature (optional)',S.sig,'sig-s','sigrm-s')}<label class="f w3"><span>Create a PIN (4 to 6 digits) <b>*</b></span><input type="password" inputmode="numeric" maxlength="6" autocomplete="new-password" data-p="pin" value="${esc(S.pin)}" placeholder="You will need it to come back"></label></div>`}
-  ${saved?`<div class="msg ok"><b>Saved.</b> Your reference number is <b>${esc(saved)}</b>. <b>Write it down together with your PIN</b>: you need both to check your status, reprint your forms and print your contract. Print or download your form(s), sign them by hand, then submit them to your School Head together with your other documents.</div>
+  ${saved?`<div class="msg ok"><b>Saved.</b> Your reference number is <b>${esc(saved)}</b>${savedMail===true?` (we also emailed it to <b>${esc(S.email)}</b>)`:savedMail===false?' (we could not email it, so please write it down)':''}. <b>Write it down together with your PIN</b>: you need both to check your status, reprint your forms and print your contract. Print or download your form(s), sign them by hand, then submit them to your School Head together with your other documents.</div>
   <div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b1" data-act="print">Print / Save as PDF</button><button class="b3" data-act="word">Download Word</button><button class="b2" data-act="newapp">New application</button></div>`:
   `<div id="subMsg"></div><div class="nav" style="justify-content:flex-start"><button class="b1" data-act="submit" id="subBtn">Submit &amp; save</button></div>`}
   <div class="msg info" style="margin-top:14px">Forms must be signed by hand (wet signature). The PDS must also be sworn before a person authorized to administer oaths.</div>`}}
@@ -231,10 +232,15 @@ document.addEventListener('click',async e=>{
  else if(a==='sig-my'){openSig(u=>{try{localStorage.setItem('aralHeadSig',u)}catch(e){}staff.sig=u;toast('Saved on this device only');renderStaff()})}
  else if(a==='sigrm-my'){try{localStorage.removeItem('aralHeadSig')}catch(e){}staff.sig='';renderStaff()}
  else if(a==='go-apply'){mode='apply';render()}
- else if(a==='go-lookup'){mode='lookup';LK=null;lkMsg='';render()}
+ else if(a==='go-lookup'){mode='lookup';LK=null;lkMsg='';lkForgot=false;render()}
  else if(a==='lk-find')lkFind();
+ else if(a==='lk-forgot'){lkForgot=true;lkMsg='';LK=null;renderLookup()}
+ else if(a==='lk-noforgot'){lkForgot=false;lkMsg='';renderLookup()}
+ else if(a==='lk-recover')lkRecover();
  else if(a==='lk-print')doPrint(LK.kind==='report'?docR(LK.data):docAll(LK.data));
- else if(a==='lk-word'){if(LK.kind==='report')doWordR(docR(LK.data),'ARAL_FG_'+(LK.data.name||'report'));else doWord(docAll(LK.data),'ARAL_'+(LK.data.last||'applicant'))}
+ else if(a==='lk-word')doWord(docAll(LK.data),'ARAL_'+(LK.data.last||'applicant'));
+ else if(a==='lk-wordF')doWordR(docFonly(LK.data),'ARAL_AnnexF_DTR_'+(LK.data.name||'report'));
+ else if(a==='lk-wordG')doWordR(docGonly(LK.data),'ARAL_AnnexG_Accomplishment_'+(LK.data.name||'report'));
  else if(a==='lk-contract')doPrint(docE(LK.data,LK.eval));
  else if(a==='lk-contractword')doWordR(docE(LK.data,LK.eval),'ARAL_Contract_'+(LK.data.last||'tutor'));
  else if(a==='lk-edit'){R=LK.data;R.ref=LK.ref;R.pin=LK.pin;rsaved=null;mode='report';renderReport()}
@@ -244,7 +250,8 @@ document.addEventListener('click',async e=>{
  else if(a==='dupses'){const c=JSON.parse(JSON.stringify(R.sessions[+b.dataset.i]));c.date='';R.sessions.splice(+b.dataset.i+1,0,c);renderReport()}
  else if(a==='rsubmit')submitReport();
  else if(a==='rprint')doPrint(docR(R));
- else if(a==='rword')doWordR(docR(R),'ARAL_FG_'+(R.name||'report'));
+ else if(a==='rwordF')doWordR(docFonly(R),'ARAL_AnnexF_DTR_'+(R.name||'report'));
+ else if(a==='rwordG')doWordR(docGonly(R),'ARAL_AnnexG_Accomplishment_'+(R.name||'report'));
  else if(a==='rnew'){R=freshR();rsaved=null;renderReport()}
  else staffClick(b,a);
 });
@@ -258,24 +265,36 @@ document.addEventListener('input',onField);document.addEventListener('change',on
 
 
 /* ================= CHECK MY APPLICATION / REPORT ================= */
-let LK=null,lkMsg='';
+let LK=null,lkMsg='',lkForgot=false;
 const CONTRACT_OK=['Selected','Approved by SDS','Engaged'];
 function renderLookup(){
+ if(lkForgot){$('#app').innerHTML=recoverForm()+'<div style="text-align:center"><button class="link" data-act="home">← Home</button></div>';window.scrollTo(0,0);return}
  const L=LK;let res='';
  if(L){const D=L.data,isR=L.kind==='report';
   res=`<div class="card"><h2>${esc(isR?D.name:fullName(D))}</h2><p class="sub">${isR?'Monthly report · '+esc(mLabel(D.month)):(D.cat==='tutor'?'ARAL Tutor':'ARAL Support Aide')+' application'} · ${esc(D.school)} · Ref ${esc(L.ref)}</p>
+  ${L.recovered?`<div class="msg ok">Your reference number is <b>${esc(L.ref)}</b>. Write it down.</div>`:''}
   <p>Status: <span class="tag">${esc(L.status||'')}</span></p>${isR&&L.status==='For correction'&&L.remarks?`<div class="msg err"><b>For correction:</b> ${esc(L.remarks)}</div>`:''}
   ${isR&&L.status==='Verified'?'<div class="msg ok">Verified by your School Head. This report can no longer be edited.</div>':''}
   ${!isR&&CONTRACT_OK.includes(L.status)&&D.cat==='tutor'?'<div class="msg ok"><b>You were selected.</b> Your contract (Annex E) is ready to print. Bring it to be signed and notarized.</div>':''}
-  <div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b1" data-act="lk-print">Print / Save as PDF</button><button class="b2" data-act="lk-word">Download Word</button>
+  <div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b1" data-act="lk-print">Print / Save as PDF</button>${isR?'<button class="b2" data-act="lk-wordF">Word: Annex F (portrait)</button><button class="b2" data-act="lk-wordG">Word: Annex G (landscape)</button>':'<button class="b2" data-act="lk-word">Download Word</button>'}
   ${isR&&L.status!=='Verified'?'<button class="b3" data-act="lk-edit">Edit this report</button>':''}
   ${!isR&&D.cat==='tutor'&&CONTRACT_OK.includes(L.status)?'<button class="b3" data-act="lk-contract">Print my contract (Annex E)</button><button class="b2" data-act="lk-contractword">Contract as Word</button>':''}</div>
   <p class="hint">E-signature images are removed from the system 7 days after verification or a final decision. Copies you already saved or printed keep their signature.</p></div>`}
  $('#app').innerHTML=`<div class="card"><h2>Check my application or report</h2><p class="sub">Enter the Reference number (ARAL-… for an application, RPT-… for a monthly report) and the PIN you created.</p>
   <div class="grid"><label class="f w3"><span>Reference number</span><input type="text" id="lkr" placeholder="ARAL-20261027-0001" value="${esc(L?L.ref:'')}"></label>
   <label class="f w3"><span>PIN</span><input type="password" id="lkp" inputmode="numeric" maxlength="6" autocomplete="off"></label></div>
-  ${lkMsg?`<div class="msg err">${esc(lkMsg)}</div>`:''}<div class="nav" style="justify-content:flex-start"><button class="b1" data-act="lk-find">Find</button></div></div>${res}
+  ${lkMsg?`<div class="msg err">${esc(lkMsg)}</div>`:''}<div class="nav" style="justify-content:flex-start"><button class="b1" data-act="lk-find">Find</button><button class="link" data-act="lk-forgot">Forgot your reference number?</button></div></div>${res}
   <div style="text-align:center"><button class="link" data-act="home">← Home</button></div>`;window.scrollTo(0,0)}
+function recoverForm(){return `<div class="card"><h2>Forgot your reference number?</h2><p class="sub">Enter the details you used and your PIN. We show the record only if the PIN is correct. If you forgot the PIN too, ask your School Head or the SDO HRMO.</p>
+ <div class="grid"><label class="f w3"><span>Type</span><select id="rk"><option value="app">Application</option><option value="report">Monthly report</option></select></label><label class="f w3"><span>Month (for a monthly report)</span><input type="month" id="rm"></label>
+ <label class="f w3"><span>Last name</span><input type="text" id="rl"></label><label class="f w3"><span>First name</span><input type="text" id="rf"></label>
+ <label class="f w4"><span>School</span><input type="text" id="rs" list="schl" placeholder="Start typing"></label><label class="f w2"><span>PIN</span><input type="password" id="rp" inputmode="numeric" maxlength="6" autocomplete="off"></label></div>
+ ${lkMsg&&lkForgot?`<div class="msg err">${esc(lkMsg)}</div>`:''}<div class="nav" style="justify-content:flex-start"><button class="b1" data-act="lk-recover">Find my record</button><button class="b2" data-act="lk-noforgot">I have my reference number</button></div></div>`}
+async function lkRecover(){const g=id=>($('#'+id)||{}).value||'';const kind=g('rk');
+ try{const sc=schoolMatch(g('rs'));const r=await api('recover',{kind,last:g('rl').trim(),first:g('rf').trim(),school:(sc?sc.name:g('rs')).trim(),month:g('rm'),pin:g('rp').trim()});
+  if(!r.ok){lkMsg=r.error;LK=null;renderLookup();return}
+  lkMsg='';r.data.ref=r.ref;if(r.kind==='report'){r.data.headSig=r.headSig||'';r.data.headSigAt=r.headSigAt||''}LK=Object.assign(r,{pin:g('rp').trim(),recovered:true});lkForgot=false;renderLookup()}
+ catch(err){lkMsg=err.message;renderLookup()}}
 async function lkFind(){
  const ref=($('#lkr').value||'').trim().toUpperCase(),pin=($('#lkp').value||'').trim();
  if(!ref||!pin){lkMsg='Enter the Reference number and the PIN.';renderLookup();return}
@@ -334,7 +353,7 @@ async function api(action,payload){
 async function submit(){
  if(!/^\d{4,6}$/.test(S.pin||'')){$('#subMsg').innerHTML='<div class="msg err">Create a PIN of 4 to 6 digits first.</div>';return}
  const btn=$('#subBtn');btn.disabled=true;$('#subMsg').innerHTML='<div class="msg info">Saving…</div>';
- try{const r=await api('submit',{data:S,pin:S.pin});if(!r.ok)throw new Error(r.error||'Save failed');saved=r.ref;S.ref=r.ref;render()}
+ try{const r=await api('submit',{data:S,pin:S.pin});if(!r.ok)throw new Error(r.error||'Save failed');saved=r.ref;S.ref=r.ref;savedMail=r.emailed;render()}
  catch(err){$('#subMsg').innerHTML=`<div class="msg err">${esc(err.message)}</div><div class="msg info">You can still print your form: <button class="b2" data-act="print">Print without saving</button></div>`;btn.disabled=false}}
 
 /* ================= DOCUMENTS ================= */
@@ -401,17 +420,20 @@ function docPDS(D){
  <tr><td style="height:24pt;vertical-align:bottom;text-align:center" class="sm">${D.sigAt?esc(dateOnly(D.sigAt))+'<br>':''}<b>Date Accomplished</b></td></tr>
  <tr><td class="sm"><b>SUBSCRIBED AND SWORN to before me this ________________, affiant exhibiting his/her validly issued government ID.</b></td><td style="height:34pt;vertical-align:bottom;text-align:center" class="sm"><b>Person Administering Oath</b></td></tr></table>`;
  return `<section class="page"><div class="ann">Annex A of DM No. ____ s. 2026</div>${G(p1)}</section><section class="page"><div class="ann">Annex A of DM No. ____ s. 2026</div>${G(p2)}${oath}</section>`}
-const docAll=D=>docIntent(D)+((D.cat==='tutor'||D.alsoPDS)?docPDS(D):'');
+const withRef=(h,ref)=>ref?h.replace(/<\/section>/g,`<div style="font-size:7pt;color:#444;text-align:right;margin-top:6pt">Ref: <b>${esc(ref)}</b></div></section>`):h;
+const docAll=D=>withRef(docIntent(D)+((D.cat==='tutor'||D.alsoPDS)?docPDS(D):''),D.ref);
 function doPrint(html){$('#printArea').innerHTML=html;setTimeout(()=>window.print(),50)}
-function doWord(html,name){
- const css=document.querySelector('style').textContent.split('/* ---------- documents ---------- */')[1].split('@media print')[0];
- const full=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${esc(name)}</title><!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]--><style>@page{size:A4;margin:1.1cm}${css}</style></head><body class="doc">${html}</body></html>`;
+function wordFile(html,name,land){
+ const css=document.querySelector('style').textContent.split('/* ---------- documents ---------- */')[1].split('@media print')[0].replace('page:land','');
+ const pg=land?'size:841.9pt 595.3pt;mso-page-orientation:landscape':'size:595.3pt 841.9pt;mso-page-orientation:portrait';
+ const full=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${esc(name)}</title><!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]--><style>@page WordSection1{${pg};margin:31pt}div.WordSection1{page:WordSection1}${css}</style></head><body class="doc"><div class="WordSection1">${html}</div></body></html>`;
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+full],{type:'application/msword'}));a.download=name.replace(/[^\w-]+/g,'_')+'.doc';document.body.appendChild(a);a.click();a.remove()}
+function doWord(html,name){wordFile(html,name,false)}
 
 /* ================= MONTHLY REPORT (Annex F + G) ================= */
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 function newSes(){return{date:'',subject:'Reading',tin:'',tout:'',grade:'',learners:'',acc:'',late:'',remarks:''}}
-function freshR(){return{role:'tutor',name:'',school:'',month:'',period:'',areas:{reading:false,science:false,math:false},sessions:[newSes()],sig:'',sigAt:'',ref:'',pin:'',headSig:'',headSigAt:''}}
+function freshR(){return{role:'tutor',name:'',school:'',month:'',period:'',areas:{reading:false,science:false,math:false},sessions:[newSes()],email:'',sig:'',sigAt:'',ref:'',pin:'',headSig:'',headSigAt:''}}
 const mins=(a,b)=>{if(!a||!b)return 0;const[h1,m1]=a.split(':').map(Number),[h2,m2]=b.split(':').map(Number);return Math.max(0,(h2*60+m2)-(h1*60+m1))};
 const t12=t=>{if(!t)return'';let[h,m]=t.split(':').map(Number);const ap=h>=12?'pm':'am';h=h%12||12;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+' '+ap};
 const hm=m=>Math.floor(m/60)+' h '+String(m%60).padStart(2,'0')+' min';
@@ -441,11 +463,11 @@ function renderReport(){
  ${T('Full Name of ARAL Tutor/Support Aide','name',{w:'w3',req:1})}${SCH('DepEd School (do not abbreviate)','school',{w:'w3'})}
  ${T('Month','month',{type:'month',w:'w2',req:1})}${T('Inclusive Period (auto if blank)','period',{w:'w4',ph:autoPeriod(o)||'e.g. October 1–31, 2026'})}
  <div class="f"><span>Area of Specialization (check all that applies)</span><div class="chk">${CB('Reading','areas.reading')}${CB('Science','areas.science')}${CB('Mathematics','areas.math')}</div></div></div>
- <div class="grid" style="margin-top:12px">${sigBox('Your e-signature (optional)',o.sig,'sig-r','sigrm-r')}${o.ref?'':'<label class="f w3"><span>Create a PIN (4 to 6 digits) <b>*</b></span><input type="password" inputmode="numeric" maxlength="6" autocomplete="new-password" data-p="pin" value="'+esc(o.pin)+'" placeholder="You will need it to edit this report"></label>'}</div>
+ <div class="grid" style="margin-top:12px">${sigBox('Your e-signature (optional)',o.sig,'sig-r','sigrm-r')}${o.ref?'':'<label class="f w3"><span>Email (optional): we will email your reference number</span><input type="text" inputmode="email" data-p="email" value="'+esc(o.email||'')+'" placeholder="name@example.com"></label><label class="f w3"><span>Create a PIN (4 to 6 digits) <b>*</b></span><input type="password" inputmode="numeric" maxlength="6" autocomplete="new-password" data-p="pin" value="'+esc(o.pin)+'" placeholder="You will need it to edit this report"></label>'}</div>
  <h3>Sessions</h3>${sess}<button class="b2" data-act="addses">+ Add session</button>
  <div class="msg info" style="margin-top:12px">Total hours rendered: <span class="tot" id="tot"></span></div>
- <div id="rMsg">${rsaved?`<div class="msg ok"><b>Saved.</b> Reference <b>${esc(rsaved)}</b>. <b>Write it down with your PIN</b>: use them under “Check my application or report” to edit, reprint, or get the copy signed by your School Head. Print the forms, sign them by hand if you did not e-sign, and submit the signed copies.</div>`:''}</div>
- <div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b1" data-act="rsubmit" id="rBtn">Save report</button><button class="b3" data-act="rprint">Print / Save as PDF</button><button class="b2" data-act="rword">Download Word</button></div>
+ <div id="rMsg">${rsaved?`<div class="msg ok"><b>Saved.</b> Reference <b>${esc(rsaved)}</b>${rsavedMail===true?' (emailed to you)':rsavedMail===false?' (we could not email it, so please write it down)':''}. <b>Write it down with your PIN</b>: use them under “Check my application or report” to edit, reprint, or get the copy signed by your School Head. Print the forms, sign them by hand if you did not e-sign, and submit the signed copies.</div>`:''}</div>
+ <div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b1" data-act="rsubmit" id="rBtn">Save report</button><button class="b3" data-act="rprint">Print / Save as PDF</button><button class="b2" data-act="rwordF">Word: Annex F (portrait)</button><button class="b2" data-act="rwordG">Word: Annex G (landscape)</button></div>
  <div class="msg info" style="margin-top:12px">Names of the School Head are left blank on the forms; write them by hand. The signed hard copies are what get submitted for processing of remuneration.</div></div>
  <div style="text-align:center"><button class="link" data-act="rnew">Start a new report</button> <button class="link" data-act="home">← Home</button> <button class="link" data-act="staff">Staff</button></div>`;
  updTot();window.scrollTo(0,0)}
@@ -456,7 +478,7 @@ async function submitReport(){
  if(miss.length){$('#rMsg').innerHTML='<div class="msg err">Please complete: '+esc(miss.join(', '))+'.</div>';return}
  if(bad){$('#rMsg').innerHTML='<div class="msg err">A session has a Time Out that is not later than its Time In.</div>';return}
  const b=$('#rBtn');b.disabled=true;$('#rMsg').innerHTML='<div class="msg info">Saving…</div>';
- try{const r=await api('submitReport',{data:R,pin:R.pin,ref:R.ref||''});if(!r.ok)throw new Error(r.error||'Save failed');rsaved=r.ref;R.ref=r.ref;renderReport()}
+ try{const r=await api('submitReport',{data:R,pin:R.pin,ref:R.ref||''});if(!r.ok)throw new Error(r.error||'Save failed');rsaved=r.ref;R.ref=r.ref;rsavedMail=r.emailed;renderReport()}
  catch(err){$('#rMsg').innerHTML=`<div class="msg err">${esc(err.message)}</div>`;b.disabled=false}}
 function docF(D){
  const t=D.role==='tutor',who=t?'ARAL Tutor':'ARAL Support Aide',ss=sessSorted(D),n=Math.max(15,ss.length+1);
@@ -485,11 +507,9 @@ function docG(D){
  <table class="k"><colgroup><col style="width:7%"><col style="width:17%"><col style="width:9%"><col style="width:24%"><col style="width:9%"><col style="width:34%"></colgroup>
  <tr><th>Week</th><th>Date and Time</th><th>Subject</th><th>Learners Served</th><th>Grade Level</th><th>Accomplishments<br><i style="font-size:7pt;font-weight:normal">(For tutors, include learning sessions conducted, and progress or feedback on the tutorial session. For support aides, include types of support provided)</i></th></tr>${rows}</table>
  <table style="width:100%;margin-top:16pt;border:0"><tr><td style="width:50%;vertical-align:top"><i>Prepared by:</i><br>${D.sig?sigImg(D.sig,26):'<br>'}<br><b>${esc(D.name||'')}</b><br>${t?'ARAL Tutor':'ARAL Support Aide'}${tala(D.sigAt,D.ref,D.sig?'':'image removed after 7 days')}</td><td style="vertical-align:top"><i>Attested by:</i><br>${D.headSig?sigImg(D.headSig,26):'<br>'}<br><b>&nbsp;</b><br>School Head<br>Date of Signing: ${D.headSigAt?esc(dateOnly(D.headSigAt)):'______________________'}${tala(D.headSigAt,D.ref,'attested'+(D.headSig?'':' · image removed after 7 days'))}</td></tr></table></section>`}
-const docR=D=>`<div class="Section1">${docF(D)}</div><div class="Section2">${docG(D)}</div>`;
-function doWordR(html,name){
- const css=document.querySelector('style').textContent.split('/* ---------- documents ---------- */')[1].split('@media print')[0].replace('page:land','page:Section2');
- const full=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${esc(name)}</title><!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]--><style>@page Section1{size:595.3pt 841.9pt;margin:31pt}@page Section2{size:841.9pt 595.3pt;mso-page-orientation:landscape;margin:31pt}div.Section1{page:Section1}${css}</style></head><body class="doc">${html}</body></html>`;
- const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+full],{type:'application/msword'}));a.download=name.replace(/[^\w-]+/g,'_')+'.doc';document.body.appendChild(a);a.click();a.remove()}
+const docR=D=>`<div class="Section1">${withRef(docF(D),D.ref)}</div><div class="Section2">${withRef(docG(D),D.ref)}</div>`;
+function doWordR(html,name){wordFile(html,name,/class="Section2"/.test(html))}
+const docFonly=D=>`<div class="Section1">${withRef(docF(D),D.ref)}</div>`,docGonly=D=>`<div class="Section2">${withRef(docG(D),D.ref)}</div>`;
 
 /* ================= MODULE 3 DOCUMENTS (Annex C, D, H, E) ================= */
 const AREAS=['Reading','Mathematics','Science'],GRP=['1-3','4-6','7-10','3-6'];
@@ -633,10 +653,10 @@ function renderStaff(){
   <h2 style="margin-top:12px">${esc(d.ref)} · ${esc(isR?D.name:fullName(D))}</h2><p class="sub">${isR?esc(mLabel(D.month))+' · '+esc(D.school)+' · '+hm(totMin(D)):esc(D.cat==='tutor'?'ARAL Tutor':'ARAL Support Aide')+' · '+esc(D.school)} · Status: <span class="tag">${esc(d.status||(isR?'Submitted':'Received'))}</span></p>
   ${opts.length?`<div class="grid"><label class="f w3"><span>Status</span><select id="stat">${opts.map(s=>`<option ${s===(d.status||opts[0])?'selected':''}>${s}</option>`).join('')}</select></label><label class="f w3"><span>Remarks</span><input type="text" id="rem" value="${esc(d.remarks||'')}"></label></div>`:'<p class="sub">Encoders cannot change the status.</p>'}
   ${staffMsg?`<div class="msg ok">${esc(staffMsg)}</div>`:''}
-  <div class="nav" style="justify-content:flex-start;flex-wrap:wrap">${opts.length?'<button class="b1" data-act="setstat">Save status</button>':''}<button class="b3" data-act="sprint">Print forms</button><button class="b2" data-act="sword">Download Word</button>${canC?'<button class="b3" data-act="cprint">Print contract (Annex E)</button><button class="b2" data-act="cword">Contract as Word</button>':''}</div>
+  <div class="nav" style="justify-content:flex-start;flex-wrap:wrap">${opts.length?'<button class="b1" data-act="setstat">Save status</button>':''}<button class="b3" data-act="sprint">Print forms</button>${isR?'<button class="b2" data-act="swordF">Word: Annex F (portrait)</button><button class="b2" data-act="swordG">Word: Annex G (landscape)</button>':'<button class="b2" data-act="sword">Download Word</button>'}${canC?'<button class="b3" data-act="cprint">Print contract (Annex E)</button><button class="b2" data-act="cword">Contract as Word</button>':''}</div>
   ${!isR?evalPanel(d):''}
   ${(staff.role==='HRMO'||staff.role==='SCHOOLHEAD')?`<h3>Forgot PIN?</h3><div class="grid"><label class="f w3"><span>New PIN for this ${isR?'report':'application'} (4 to 6 digits)</span><input type="text" id="newpin" inputmode="numeric" maxlength="6"></label></div><div class="nav" style="justify-content:flex-start"><button class="b2" data-act="resetpin">Reset PIN</button></div>`:''}</div>
-  <div class="card" style="overflow:auto"><div class="doc">${isR?docF(D)+docG(D):docAll(D)}</div></div>`;return}
+  <div class="card" style="overflow:auto"><div class="doc">${isR?withRef(docF(D)+docG(D),D.ref):docAll(D)}</div></div>`;return}
  const rows=tab==='apps'?list:rlist;const mySig=staff.role==='SCHOOLHEAD'?`<div class="card"><h2>My e-signature</h2><p class="sub">Kept <b>only on this device</b>; it is never saved on the server. It is attached to a monthly report (Annex F and G) only when you press Verify, and that copy is deleted 7 days later. You can also put it on Annex C.</p>${sigBox('School Head e-signature',staff.sig,'sig-my','sigrm-my')}</div>`:'';const TABS=[['apps','Applications'],['reps','Monthly reports'],['reg','Annex C and D'],['need','Tutor need']].concat(staff.role==='HRMO'?[['h','Annex H']]:[]);
  let inner='';
  if(tab==='apps'||tab==='reps'){
@@ -673,7 +693,9 @@ async function staffClick(b,a){
   const ev={interview:g('ev_int'),perf:g('ev_perf'),others:g('ev_oth'),remarks:g('ev_rem'),assign};if($('#ev_fund')){ev.fund=g('ev_fund');ev.cFrom=g('ev_cf');ev.cTo=g('ev_ct')}
   const r=await api('saveEval',{code:staff.code,ref:detail.ref,ev});if(r.ok){detail.eval=r.eval;staffMsg='Evaluation saved.'}else staffMsg=r.error;renderStaff()}
  else if(a==='sprint')doPrint(detail.kind==='report'?docR(detail.data):docAll(detail.data));
- else if(a==='sword'){if(detail.kind==='report')doWordR(docR(detail.data),'ARAL_FG_'+(detail.data.name||'report'));else doWord(docAll(detail.data),'ARAL_'+(detail.data.last||'applicant'))}
+ else if(a==='sword')doWord(docAll(detail.data),'ARAL_'+(detail.data.last||'applicant'));
+ else if(a==='swordF')doWordR(docFonly(detail.data),'ARAL_AnnexF_DTR_'+(detail.data.name||'report'));
+ else if(a==='swordG')doWordR(docGonly(detail.data),'ARAL_AnnexG_Accomplishment_'+(detail.data.name||'report'));
  else if(a==='resetpin'){const np=($('#newpin')||{}).value||'';const r=await api('resetPin',{code:staff.code,kind:detail.kind==='report'?'report':'app',ref:detail.ref,pin:np.trim()});staffMsg=r.ok?'PIN reset. Give the new PIN to the applicant.':r.error;renderStaff()}
  else if(a==='cprint')doPrint(docE(detail.data,detail.eval));
  else if(a==='cword')doWordR(docE(detail.data,detail.eval),'ARAL_Contract_'+(detail.data.last||'tutor'));
