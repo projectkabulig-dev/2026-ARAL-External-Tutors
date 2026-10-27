@@ -110,7 +110,7 @@ div.ctr{page:ctr}
 <div id="printArea" class="doc"></div>
 <script>
 /* ================= CONFIG ================= */
-const API_URL = 'https://script.google.com/macros/s/AKfycbxuN2OVcDd3sxaKRWg4GId-nXqSbZ_9K5rOm87x_F2P048e4F99BXcfSuhysSwzgQg/exec';   // <-- paste your Apps Script Web App URL here (ends with /exec)
+const API_URL = '';   // <-- paste your Apps Script Web App URL here (ends with /exec)
 const BOX_YES='☒', BOX_NO='☐';
 
 /* ================= HELPERS ================= */
@@ -311,11 +311,17 @@ const NAVTABS=[['apply','📝 Apply as ARAL Tutor / Aide','go-apply'],['report',
 function drawNav(){const el=document.getElementById('nav2');if(!el)return;const cur=staff!==null?'staff':mode;
  el.innerHTML=NAVTABS.map(t=>`<button data-act="${t[2]}" class="${cur===t[0]?'on':''}">${t[1]}</button>`).join('')}
 function leaveStaff(){if(staff&&typeof staff==='object')staffKeep=staff;staff=null;detail=null}
+const FORMS_FOLDER='https://drive.google.com/drive/folders/1XfmtLzrX1CdDG_xIYFQ3Yf6GyPdRVHPw';
+const folderId=u=>{const m=/\/folders\/([\w-]+)/.exec(u||'');return m?m[1]:''};
 function renderForms(){
  const F=(CFG.forms||[]).filter(f=>/^https:\/\//i.test(f.url));
  const groups=[];F.forEach(f=>{let g=groups.find(x=>x.n===f.group);if(!g){g={n:f.group,items:[]};groups.push(g)}g.items.push(f)});
+ const fl=(F.find(f=>folderId(f.url))||{}).url||FORMS_FOLDER,fid=folderId(fl);
  $('#app').innerHTML=`<div class="card"><h2>📁 ARAL Forms</h2><p class="sub">Blank copies of the memos and annexes, for reference or for filling in by hand. The <b>Apply</b> and <b>Monthly reports</b> tabs are faster and fill in the forms for you.</p>
- ${groups.length?groups.map(g=>`<h3>${esc(g.n)}</h3>${g.items.map(f=>`<div class="frow"><span><b>${esc(f.title)}</b>${f.note?`<small>${esc(f.note)}</small>`:''}</span><a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">Open</a></div>`).join('')}`).join(''):'<div class="msg info">The forms will be posted here soon. Please check again later.</div>'}</div>`;window.scrollTo(0,0)}
+ ${fid?`<div class="nav" style="justify-content:flex-start;margin:0 0 10px"><a class="b1" href="${esc(fl)}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;padding:12px 20px;border-radius:14px;font-weight:700;color:#fff">Open the ARAL Forms folder</a></div>
+ <iframe title="ARAL Forms folder" src="https://drive.google.com/embeddedfolderview?id=${esc(fid)}#list" loading="lazy" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" style="width:100%;height:520px;border:1px solid var(--bd);border-radius:14px;background:#fff"></iframe>
+ <p class="hint">If the list above stays empty, press “Open the ARAL Forms folder”.</p>`:''}
+ ${groups.length?groups.map(g=>`<h3>${esc(g.n)}</h3>${g.items.map(f=>`<div class="frow"><span><b>${esc(f.title)}</b>${f.note?`<small>${esc(f.note)}</small>`:''}</span><a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">Open</a></div>`).join('')}`).join(''):''}</div>`;window.scrollTo(0,0)}
 
 /* ================= CHECK MY APPLICATION / REPORT ================= */
 let LK=null,lkMsg='',lkForgot=false;
