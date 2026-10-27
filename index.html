@@ -3,38 +3,66 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1e40af">
 <title>ARAL Tutor Engagement App – SDO Romblon</title>
 <style>
-:root{--p:#1d4ed8;--p2:#0f766e;--bg:#f1f5f9;--card:#fff;--tx:#0f172a;--mu:#64748b;--bd:#cbd5e1;--err:#dc2626;--ok:#15803d}
+:root{--p:#2563eb;--p2:#0d9488;--ink:#0f172a;--mu:#64748b;--bg:#f3f5fb;--card:#fff;--card2:#f8fafc;--bd:#e2e8f0;--inp:#fff;--err:#dc2626;--ok:#15803d;--sh:0 10px 30px rgba(15,23,42,.07);--ring:rgba(37,99,235,.28)}
+@media(prefers-color-scheme:dark){:root{--p:#60a5fa;--p2:#2dd4bf;--ink:#e6edf7;--mu:#94a3b8;--bg:#0a1020;--card:#121a2d;--card2:#0e1627;--bd:#25314b;--inp:#0d1525;--err:#f87171;--ok:#4ade80;--sh:0 10px 30px rgba(0,0,0,.4);--ring:rgba(96,165,250,.35)}}
 *{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--tx)}
-header{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;padding:18px 16px}
-header h1{margin:0;font-size:20px}header p{margin:4px 0 0;font-size:13px;opacity:.9}
-main{max-width:860px;margin:0 auto;padding:14px}
-.card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:14px}
-h2{margin:0 0 4px;font-size:18px}h3{margin:18px 0 6px;font-size:15px;color:var(--p)}
-.sub{color:var(--mu);font-size:13px;margin:0 0 12px}
-.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+header{position:sticky;top:0;z-index:20;background:linear-gradient(120deg,#1e40af 0%,#0e7490 55%,#0d9488 100%);color:#fff;padding:14px 18px;box-shadow:0 4px 18px rgba(14,116,144,.35)}
+header h1{margin:0;font-size:19px;font-weight:800;letter-spacing:.2px}header p{margin:3px 0 0;font-size:12px;opacity:.88}
+main{max-width:880px;margin:0 auto;padding:16px 14px 40px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:20px;box-shadow:var(--sh);margin-bottom:16px}
+h2{margin:0 0 4px;font-size:20px;font-weight:800}h3{margin:20px 0 8px;font-size:14px;color:var(--p);text-transform:uppercase;letter-spacing:.6px}
+.sub{color:var(--mu);font-size:13px;margin:0 0 14px}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
 .f{display:flex;flex-direction:column;font-size:13px;grid-column:span 6}
 .f.w3{grid-column:span 3}.f.w2{grid-column:span 2}.f.w4{grid-column:span 4}
-.f>span{margin-bottom:3px;font-weight:600}.f b{color:var(--err)}
-input[type=text],input[type=date],input[type=email],input[type=tel],input[type=number],select,textarea{width:100%;padding:9px 10px;border:1px solid var(--bd);border-radius:8px;font:inherit;background:#fff}
-input:focus,select:focus,textarea:focus{outline:2px solid #93c5fd;border-color:var(--p)}
-.bad{border-color:var(--err)!important;background:#fef2f2}
-.rad,.chk{display:flex;flex-wrap:wrap;gap:6px 16px}.rad label,.chk label{font-weight:400;display:flex;align-items:center;gap:6px;font-size:13px}
-.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
-button{font:inherit;border:0;border-radius:10px;padding:10px 18px;cursor:pointer;font-weight:600}
-.b1{background:var(--p);color:#fff}.b2{background:#e2e8f0;color:var(--tx)}.b3{background:var(--p2);color:#fff}.bx{background:#fee2e2;color:var(--err);padding:6px 10px}
-button:disabled{opacity:.5;cursor:not-allowed}
-.prog{height:6px;background:#e2e8f0;border-radius:6px;overflow:hidden;margin-bottom:12px}.prog i{display:block;height:100%;background:var(--p2)}
-.msg{padding:10px 12px;border-radius:8px;font-size:13px;margin:10px 0}.err{background:#fef2f2;color:var(--err)}.ok{background:#f0fdf4;color:var(--ok)}.info{background:#eff6ff;color:#1e3a8a}
-.choice{display:grid;grid-template-columns:1fr 1fr;gap:10px}.choice button{padding:18px;text-align:left;background:#fff;border:2px solid var(--bd)}
-.choice button.on{border-color:var(--p);background:#eff6ff}
-.rowbox{border:1px dashed var(--bd);border-radius:10px;padding:10px;margin-bottom:10px}
-table.list{width:100%;border-collapse:collapse;font-size:13px}table.list th,table.list td{padding:7px;border-bottom:1px solid #e2e8f0;text-align:left}
-table.list tr.cl{cursor:pointer}table.list tr.cl:hover{background:#f8fafc}
-.tag{padding:2px 8px;border-radius:99px;background:#e0e7ff;font-size:11px}
-@media(max-width:640px){.f.w3,.f.w2,.f.w4{grid-column:span 6}.choice{grid-template-columns:1fr}}
+.f>span{margin-bottom:5px;font-weight:600;color:var(--ink)}.f b{color:var(--err)}
+input[type=text],input[type=date],input[type=email],input[type=tel],input[type=number],input[type=month],input[type=time],select,textarea{width:100%;padding:11px 12px;border:1.5px solid var(--bd);border-radius:12px;font:inherit;background:var(--inp);color:var(--ink);transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--p);box-shadow:0 0 0 4px var(--ring)}
+input[type=checkbox],input[type=radio]{accent-color:var(--p);width:18px;height:18px}
+.bad{border-color:var(--err)!important;background:rgba(220,38,38,.07)!important}
+.rad,.chk{display:flex;flex-wrap:wrap;gap:8px 18px}.rad label,.chk label{font-weight:500;display:flex;align-items:center;gap:8px;font-size:14px;padding:6px 0}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:20px}
+button{font:inherit;border:0;border-radius:14px;padding:12px 20px;cursor:pointer;font-weight:700;transition:transform .08s,box-shadow .15s,filter .15s}
+button:hover{filter:brightness(1.05)}button:active{transform:scale(.97)}
+.b1{background:linear-gradient(135deg,var(--p),#1d4ed8);color:#fff;box-shadow:0 6px 16px rgba(37,99,235,.3)}
+.b2{background:var(--card2);color:var(--ink);border:1.5px solid var(--bd)}
+.b3{background:linear-gradient(135deg,var(--p2),#0f766e);color:#fff;box-shadow:0 6px 16px rgba(13,148,136,.28)}
+.bx{background:rgba(220,38,38,.1);color:var(--err);padding:8px 12px;border-radius:10px}
+button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.steps{display:flex;align-items:center;gap:6px;margin-bottom:14px}.steps span{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;background:var(--card2);border:1.5px solid var(--bd);color:var(--mu);flex:none}
+.steps span.done{background:var(--p2);border-color:var(--p2);color:#fff}.steps span.now{background:var(--p);border-color:var(--p);color:#fff;box-shadow:0 0 0 5px var(--ring)}
+.steps i{flex:1;height:2px;background:var(--bd);min-width:4px}
+.msg{padding:12px 14px;border-radius:12px;font-size:13px;margin:12px 0}
+.err{background:rgba(220,38,38,.1);color:var(--err)}.ok{background:rgba(21,128,61,.12);color:var(--ok)}.info{background:rgba(37,99,235,.09);color:var(--ink);border:1px solid var(--bd)}
+.choice{display:grid;grid-template-columns:1fr 1fr;gap:12px}.choice button{padding:18px;text-align:left;background:var(--card2);border:2px solid var(--bd);color:var(--ink);font-weight:500}
+.choice button.on{border-color:var(--p);background:rgba(37,99,235,.09);box-shadow:0 0 0 4px var(--ring)}
+.rowbox,.sessbox{border:1.5px dashed var(--bd);border-radius:16px;padding:14px;margin-bottom:12px;background:var(--card2)}
+.sessbox{border-style:solid}
+table.list{width:100%;border-collapse:collapse;font-size:13px}table.list th{color:var(--mu);font-size:11px;text-transform:uppercase;letter-spacing:.5px}table.list th,table.list td{padding:10px 8px;border-bottom:1px solid var(--bd);text-align:left}
+table.list tr.cl{cursor:pointer}table.list tr.cl:hover{background:var(--card2)}
+.tag{padding:3px 10px;border-radius:99px;background:rgba(37,99,235,.12);color:var(--p);font-size:11px;font-weight:700;white-space:nowrap}
+.tot{font-weight:800;color:var(--p2)}
+.tabs{display:flex;gap:8px;margin:10px 0 4px;flex-wrap:wrap}.tabs button{background:var(--card2);color:var(--ink);border:1.5px solid var(--bd);padding:9px 14px;border-radius:999px;font-size:13px}.tabs button.on{background:var(--p);border-color:var(--p);color:#fff}
+.tiles{display:grid;gap:14px;margin-top:6px}.tile{display:flex;align-items:center;gap:16px;text-align:left;background:var(--card);border:1.5px solid var(--bd);color:var(--ink);padding:18px;border-radius:20px;box-shadow:var(--sh);font-weight:500}
+.tile:hover{border-color:var(--p)}.tile .ic{width:54px;height:54px;border-radius:16px;display:grid;place-items:center;font-size:26px;background:linear-gradient(135deg,rgba(37,99,235,.15),rgba(13,148,136,.2));flex:none}
+.tile b{display:block;font-size:16px;margin-bottom:2px}.tile small{color:var(--mu);font-size:12.5px}
+.hero{background:linear-gradient(135deg,rgba(37,99,235,.1),rgba(13,148,136,.12));border:1px solid var(--bd);border-radius:20px;padding:20px;margin-bottom:16px}.hero h2{font-size:22px}.hero p{margin:6px 0 0;color:var(--mu);font-size:14px}
+.link{background:none;color:var(--mu);font-size:12px;font-weight:600;padding:8px 12px;border-radius:10px}
+.sigprev{border:1.5px dashed var(--bd);border-radius:14px;background:var(--card2);padding:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.sigprev img{height:56px;background:#fff;border-radius:8px;padding:4px;border:1px solid var(--bd)}
+.modal{position:fixed;inset:0;background:rgba(2,6,23,.6);backdrop-filter:blur(3px);z-index:50;display:grid;place-items:center;padding:14px}
+.mbox{background:var(--card);border-radius:22px;padding:18px;width:100%;max-width:560px;max-height:92vh;overflow:auto;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.mbox canvas{width:100%;height:auto;background:#fff;border:2px dashed var(--bd);border-radius:14px;touch-action:none;display:block}
+.hint{font-size:12px;color:var(--mu);margin:6px 0}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:12px 18px;border-radius:14px;font-size:14px;font-weight:600;z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.card .doc{background:#fff;color:#000;padding:14px;border-radius:12px;border:1px solid var(--bd)}
+@media(max-width:640px){.f.w3,.f.w2,.f.w4{grid-column:span 6}.choice{grid-template-columns:1fr}.card{padding:16px;border-radius:18px}.nav button{flex:1}}
+@media(max-width:640px){header h1{font-size:17px}}
 /* ---------- documents ---------- */
 #printArea{display:none}
 .doc{font-family:Arial,Helvetica,sans-serif;font-size:10pt;color:#000;background:#fff}
@@ -49,6 +77,7 @@ table.g td.c{text-align:center;font-weight:bold}table.g td.h{height:20pt}table.g
 .doc .ann{font-style:italic;font-size:7pt;margin-bottom:2pt}
 .sessbox{border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:12px;background:#f8fafc}
 .tot{font-weight:700;color:var(--p2)}
+table.tc td,table.tc th{font-size:6.5pt;padding:2pt}
 .tabs{display:flex;gap:8px;margin:8px 0}.tabs button{background:#e2e8f0}.tabs button.on{background:var(--p);color:#fff}
 div.Section2{page:land}
 .sigbox{width:55%;margin:28pt 0 0 auto;text-align:center}.sigbox div{border-top:1px solid #000;padding-top:2pt}
@@ -61,12 +90,13 @@ div.Section2{page:land}
 </style>
 </head>
 <body>
-<header><h1>ARAL Tutor Engagement App</h1><p>Schools Division Office of Romblon · Applications (Annex A / B, PDS) · Monthly reports (Annex F DTR, Annex G Accomplishment Report)</p></header>
+<header><h1>🎓 ARAL Tutor Engagement</h1><p>Schools Division Office of Romblon · Applications · Monthly reports · Evaluation and registries</p></header>
 <main id="app"></main>
+<datalist id="schl"></datalist>
 <div id="printArea" class="doc"></div>
 <script>
 /* ================= CONFIG ================= */
-const API_URL = 'https://script.google.com/macros/s/AKfycbxuN2OVcDd3sxaKRWg4GId-nXqSbZ_9K5rOm87x_F2P048e4F99BXcfSuhysSwzgQg/exec';   // <-- paste your Apps Script Web App URL here (ends with /exec)
+const API_URL = '';   // <-- paste your Apps Script Web App URL here (ends with /exec)
 const BOX_YES='☒', BOX_NO='☐';
 
 /* ================= HELPERS ================= */
@@ -77,10 +107,10 @@ const setp=(o,p,v)=>{const k=p.split('.');let a=o;for(let i=0;i<k.length-1;i++)a
 const age=d=>{if(!d)return'';const b=new Date(d),n=new Date();let a=n.getFullYear()-b.getFullYear();const m=n.getMonth()-b.getMonth();if(m<0||(m===0&&n.getDate()<b.getDate()))a--;return isNaN(a)?'':a};
 const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const fmtD=d=>{if(!d)return'';const x=new Date(d);return isNaN(x)?d:String(x.getDate()).padStart(2,'0')+' '+MON[x.getMonth()]+' '+x.getFullYear()};
-const fullName=D=>[D.first,D.middle,D.last].filter(Boolean).join(' ').trim();
+const fullName=D=>[D.first,D.middle,D.last,(String(D.ext||'').toUpperCase()==='N/A'?'':D.ext)].filter(Boolean).join(' ').trim();
 
 function fresh(){return{cat:'',sy:'2026-2027',school:'',schoolAddress:'',consent:false,alsoPDS:false,
- last:'',first:'',middle:'',resAddr:'',permSame:true,permAddr:'',birth:'',sex:'',mobile:'',email:'',
+ last:'',first:'',middle:'',ext:'',resAddr:'',permSame:true,permAddr:'',birth:'',sex:'',mobile:'',email:'',
  edu:{primary:{school:'',year:'',degree:''},secondary:{school:'',year:'',degree:''},vocational:{school:'',year:'',degree:''},college:{school:'',year:'',degree:'',major:''},grad:{school:'',year:'',degree:'',major:''}},
  training:[{title:'',provider:'',hours:'',dates:''}],
  work:[{from:'',to:'',position:'',company:'',tutoring:'',session:'',grade:'',hours:''}],
@@ -88,8 +118,9 @@ function fresh(){return{cat:'',sy:'2026-2027',school:'',schoolAddress:'',consent
  highestEdu:'',presentOcc:'',aideConfirm:'',
  areas:{reading:false,math:false,science:false,aide:false},appCat:'',moa:'',
  adminOffense:'',adminDetails:'',charged:'',chargedDetails:'',convicted:'',convictedDetails:'',
- indigenous:'',indigenousSpec:'',pwd:'',pwdId:'',solo:'',soloId:''}}
+ indigenous:'',indigenousSpec:'',pwd:'',pwdId:'',solo:'',soloId:'',sig:'',sigAt:'',ref:''}}
 let S=fresh(), stepIdx=0, saved=null, staff=null, mode='home', R=null, rsaved=null;
+let CFG={settings:{},schools:[]};
 const root=()=>mode==='report'?R:S;
 
 /* ================= FIELD BUILDERS ================= */
@@ -99,6 +130,11 @@ function SEL(label,p,opts,o={}){return `<label class="f ${o.w||''}"><span>${labe
 function RAD(label,p,opts,o={}){return `<div class="f ${o.w||''}"><span>${label}${o.req?' <b>*</b>':''}</span><div class="rad">${opts.map(([v,t])=>`<label><input type="radio" name="${p}" data-p="${p}" ${o.rr?'data-rr':''} value="${v}" ${getp(root(),p)===v?'checked':''}> ${t}</label>`).join('')}</div></div>`}
 function CB(label,p,o={}){return `<label class="f ${o.w||''}" style="flex-direction:row;gap:8px;align-items:center"><input type="checkbox" data-p="${p}" ${o.rr?'data-rr':''} ${getp(root(),p)?'checked':''}><span style="margin:0;font-weight:400">${label}</span></label>`}
 const YN=[['Yes','Yes'],['No','No']];
+function SCH(label,p,o={}){const ph=CFG.schools.length?'Start typing, then choose from the list':'Type the full name of the school';return `<label class="f ${o.w||''}"><span>${label} <b>*</b></span><input type="text" list="schl" data-p="${p}" data-sch value="${esc(getp(root(),p))}" placeholder="${ph}"></label>`}
+const schoolMatch=v=>CFG.schools.find(x=>x.name.toLowerCase()===String(v||'').trim().toLowerCase());
+const schoolOK=v=>!CFG.schools.length||!!schoolMatch(v);
+function fillSchools(){const d=document.getElementById('schl');if(d)d.innerHTML=CFG.schools.map(x=>`<option value="${esc(x.name)}">${esc(x.district)}</option>`).join('')}
+async function loadConfig(){if(!API_URL)return;try{const r=await api('config',{});if(r.ok){CFG=r;fillSchools();const ae=document.activeElement;if(!ae||ae===document.body)render()}}catch(e){}}
 
 /* ================= STEPS ================= */
 const isT=()=>S.cat==='tutor';
@@ -107,12 +143,12 @@ const STEPS=[
   <h2>Start your application</h2><p class="sub">Choose what you are applying for. Annex A or B is generated for you, and the Personal Data Sheet (PDS) for tutors.</p>
   <div class="choice"><button data-cat="tutor" class="${S.cat==='tutor'?'on':''}"><b>ARAL Tutor</b><br><small>Annex A (Expression of Intent) + Personal Data Sheet</small></button>
   <button data-cat="aide" class="${S.cat==='aide'?'on':''}"><b>ARAL Support Aide</b><br><small>Annex B (Expression of Intent); PDS is optional</small></button></div>
-  <div class="grid" style="margin-top:14px">${T('School Year','sy',{w:'w2',req:1})}${T('Name of School (do not abbreviate)','school',{w:'w4',req:1})}${T('Address of the School','schoolAddress',{req:1})}
+  <div class="grid" style="margin-top:14px">${T('School Year','sy',{w:'w2',req:1})}${SCH('Name of School (do not abbreviate)','school',{w:'w4'})}${T('Address of the School','schoolAddress',{req:1})}
   ${S.cat==='aide'?CB('I also want to fill out the Personal Data Sheet','alsoPDS',{rr:1}):''}
   ${CB('I consent to the collection and processing of my personal information by the Department of Education for the engagement of ARAL tutors/support aides, in accordance with the Data Privacy Act of 2012 (RA 10173).','consent')}</div>`},
  {id:'personal',title:'Personal information',req:['last','first','resAddr','birth','sex','mobile','email'],render:()=>`
   <h2>I. Personal Information</h2><p class="sub">Indicate “N/A” if not applicable. Do not abbreviate.</p>
-  <div class="grid">${T('Last Name','last',{w:'w2',req:1})}${T('First Name','first',{w:'w2',req:1})}${T('Middle Name','middle',{w:'w2'})}
+  <div class="grid">${T('Last Name','last',{w:'w2',req:1})}${T('First Name','first',{w:'w2',req:1})}${T('Middle Name','middle',{w:'w2'})}${T('Name Extension (Jr., Sr., III; N/A if none)','ext',{w:'w3'})}<span class="f w3"></span>
   ${TA('Full Residential Address','resAddr',{req:1})}${CB('Permanent address is the same as residential address','permSame',{rr:1})}${S.permSame?'':TA('Full Permanent Address','permAddr')}
   ${T('Birthdate','birth',{type:'date',w:'w2',req:1})}${SEL('Sex at Birth','sex',['Male','Female'],{w:'w2',req:1})}${T('Contact Number (Mobile)','mobile',{type:'tel',w:'w2',req:1})}${T('Email Address','email',{type:'email',req:1})}</div>`},
  {id:'intent',title:'Expression of Intent',get req(){return isT()?['hoursDay','activeApp']:['highestEdu','hoursDay','aideConfirm']},render:()=> isT()?`
@@ -143,6 +179,7 @@ const STEPS=[
  {id:'review',title:'Review & submit',req:[],render:()=>{
   const D=S;return `<h2>Review &amp; submit</h2><p class="sub">Check your details. Submitting saves your application so your School Head can evaluate it.</p>
   <div class="msg info"><b>${esc(fullName(D))}</b> · ${D.cat==='tutor'?'ARAL Tutor':'ARAL Support Aide'} · ${esc(D.school)} (SY ${esc(D.sy)})<br>${esc(D.mobile)} · ${esc(D.email)}</div>
+  ${saved?'':`<div class="grid" style="margin-top:10px">${sigBox('Your e-signature (optional)',S.sig,'sig-s','sigrm-s')}</div>`}
   ${saved?`<div class="msg ok"><b>Saved.</b> Your reference number is <b>${esc(saved)}</b>. Print or download your form(s), sign them by hand, then submit them to your School Head together with your other documents.</div>
   <div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b1" data-act="print">Print / Save as PDF</button><button class="b3" data-act="word">Download Word</button><button class="b2" data-act="newapp">New application</button></div>`:
   `<div id="subMsg"></div><div class="nav" style="justify-content:flex-start"><button class="b1" data-act="submit" id="subBtn">Submit &amp; save</button></div>`}
@@ -156,22 +193,23 @@ function render(){
  if(mode==='home')return renderHome();
  if(mode==='report')return renderReport();
  const st=active();if(stepIdx>=st.length)stepIdx=st.length-1;const s=st[stepIdx];
- $('#app').innerHTML=`<div class="card"><div class="prog"><i style="width:${(stepIdx+1)/st.length*100}%"></i></div>
+ $('#app').innerHTML=`<div class="card"><div class="steps">${st.map((x,i)=>`<span class="${i<stepIdx?'done':i===stepIdx?'now':''}">${i<stepIdx?'✓':i+1}</span>`).join('<i></i>')}</div>
  <div class="sub">Step ${stepIdx+1} of ${st.length} · ${s.title}</div><div id="stage">${s.render()}</div><div id="stMsg"></div>
  <div class="nav"><button class="b2" data-act="back" ${stepIdx===0?'disabled':''}>Back</button>${s.id==='review'?'':`<button class="b1" data-act="next">Next</button>`}</div></div>
- <div style="text-align:center"><button class="b2" data-act="home" style="font-size:12px">Home</button> <button class="b2" data-act="staff" style="font-size:12px">Staff (School Head / SDO HRMO)</button></div>`;
+ <div style="text-align:center"><button class="link" data-act="home">← Home</button> <button class="link" data-act="staff">Staff</button></div>`;
  window.scrollTo(0,0);
 }
 function checkStep(){const st=active()[stepIdx];const miss=[];(st.req||[]).forEach(p=>{const v=getp(root(),p);if(!v)miss.push(p)});
  document.querySelectorAll('.bad').forEach(e=>e.classList.remove('bad'));
  miss.forEach(p=>{document.querySelectorAll(`[data-p="${p}"]`).forEach(e=>e.classList.add('bad'))});
  if(st.id==='start'&&!S.cat)miss.push('cat');
+ if(st.id==='start'&&S.school&&!schoolOK(S.school)){miss.push('school');$('#stMsg')&&0}
  return miss}
 document.addEventListener('click',async e=>{
  const b=e.target.closest('button');if(!b)return;
  if(b.dataset.cat){S.cat=b.dataset.cat;render();return}
  const a=b.dataset.act;if(!a)return;
- if(a==='next'){const m=checkStep();if(m.length){$('#stMsg').innerHTML='<div class="msg err">Please complete the required fields (marked *).'+(m.includes('consent')?' You must tick the consent box.':'')+(m.includes('cat')?' Choose Tutor or Support Aide.':'')+'</div>';return}stepIdx++;render()}
+ if(a==='next'){const m=checkStep();if(m.length){$('#stMsg').innerHTML='<div class="msg err">Please complete the required fields (marked *).'+(m.includes('school')&&S.school&&!schoolOK(S.school)?' Choose your school from the list.':'')+(m.includes('consent')?' You must tick the consent box.':'')+(m.includes('cat')?' Choose Tutor or Support Aide.':'')+'</div>';return}stepIdx++;render()}
  else if(a==='back'){stepIdx=Math.max(0,stepIdx-1);render()}
  else if(a==='addtr'){S.training.push({title:'',provider:'',hours:'',dates:''});render()}
  else if(a==='deltr'){S.training.splice(+b.dataset.i,1);render()}
@@ -183,6 +221,12 @@ document.addEventListener('click',async e=>{
  else if(a==='newapp'){S=fresh();saved=null;stepIdx=0;render()}
  else if(a==='staff'){staff=false;renderStaff()}
  else if(a==='home'){staff=null;mode='home';render()}
+ else if(a==='sig-s'){openSig(u=>{S.sig=u;S.sigAt=new Date().toISOString();render()})}
+ else if(a==='sigrm-s'){S.sig='';S.sigAt='';render()}
+ else if(a==='sig-r'){openSig(u=>{R.sig=u;R.sigAt=new Date().toISOString();renderReport()})}
+ else if(a==='sigrm-r'){R.sig='';R.sigAt='';renderReport()}
+ else if(a==='sig-my'){openSig(async u=>{try{const r=await api('saveMySig',{code:staff.code,sig:u});if(r.ok){staff.sig=u;toast('Your e-signature was saved');renderStaff()}else{staffMsg=r.error;renderStaff()}}catch(err){staffMsg=err.message;renderStaff()}})}
+ else if(a==='sigrm-my'){try{const r=await api('saveMySig',{code:staff.code,sig:''});if(r.ok){staff.sig='';renderStaff()}}catch(err){staffMsg=err.message;renderStaff()}}
  else if(a==='go-apply'){mode='apply';render()}
  else if(a==='go-report'){mode='report';if(!R)R=freshR();render()}
  else if(a==='addses'){R.sessions.push(newSes());renderReport()}
@@ -195,10 +239,54 @@ document.addEventListener('click',async e=>{
  else staffClick(b,a);
 });
 function onField(e){const t=e.target;if(!t.dataset||!t.dataset.p)return;
+ if(t.dataset.sch!==undefined&&e.type==='change'){const m=schoolMatch(t.value);if(m){t.value=m.name;setp(root(),t.dataset.p,m.name);if(mode==='apply'&&m.address&&!S.schoolAddress){S.schoolAddress=m.address;render();return}}}
  const O=root();if(t.type==='checkbox')setp(O,t.dataset.p,t.checked);else if(t.type==='radio'){if(t.checked)setp(O,t.dataset.p,t.value)}else setp(O,t.dataset.p,t.value);
  if(mode==='report'&&staff===null)updTot();
  t.classList.remove('bad');if(t.dataset.rr!==undefined&&(e.type==='change'))render();}
 document.addEventListener('input',onField);document.addEventListener('change',onField);
+
+
+/* ================= E-SIGNATURE ================= */
+const dateOnly=iso=>{if(!iso)return'';const d=new Date(iso);return isNaN(d)?'':MON[d.getMonth()]+' '+String(d.getDate()).padStart(2,'0')+', '+d.getFullYear()};
+const dateTime=iso=>{const d=new Date(iso);if(isNaN(d))return'';let h=d.getHours();const ap=h>=12?'pm':'am';h=h%12||12;return dateOnly(iso)+', '+h+':'+String(d.getMinutes()).padStart(2,'0')+' '+ap};
+const sigImg=(src,h=26)=>src?`<img src="${src}" style="height:${h}pt;max-width:100%">`:'';
+const tala=(at,ref,extra)=>at?`<div style="font-size:6pt;color:#555;margin-top:1pt">E-signed ${esc(dateTime(at))}${ref?' · Ref '+esc(ref):''}${extra?' · '+esc(extra):''}</div>`:'';
+function processSig(src,cb,scale){
+ const img=new Image();img.onload=()=>{
+  const MW=360*(scale||1),MH=140*(scale||1);let w=img.width,h=img.height;const sc=Math.min(1,MW/w,MH/h);w=Math.max(1,Math.round(w*sc));h=Math.max(1,Math.round(h*sc));
+  const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(img,0,0,w,h);
+  const id=x.getImageData(0,0,w,h),d=id.data;const edge=[];for(let i=0;i<w;i++){edge.push(lum(d,(i)*4),lum(d,((h-1)*w+i)*4))}for(let j=0;j<h;j++){edge.push(lum(d,(j*w)*4),lum(d,(j*w+w-1)*4))}
+  edge.sort((a,b)=>a-b);const bg=edge[edge.length>>1]||255,th=Math.min(215,bg*0.78);
+  let x0=w,y0=h,x1=0,y1=0;
+  for(let p=0;p<w*h;p++){const i=p*4,L=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];if(L>th){d[i+3]=0}else{d[i]=8;d[i+1]=18;d[i+2]=60;d[i+3]=Math.round(255*Math.min(1,(th-L)/(th*0.55)+0.35));const px=p%w,py=(p/w)|0;if(px<x0)x0=px;if(px>x1)x1=px;if(py<y0)y0=py;if(py>y1)y1=py}}
+  if(x1<x0){cb(null);return}
+  x.clearRect(0,0,w,h);x.putImageData(id,0,0);const pad=4,cx=Math.max(0,x0-pad),cy=Math.max(0,y0-pad),cw=Math.min(w-cx,x1-x0+2*pad),ch=Math.min(h-cy,y1-y0+2*pad);
+  const o=document.createElement('canvas');o.width=cw;o.height=ch;o.getContext('2d').drawImage(c,cx,cy,cw,ch,0,0,cw,ch);
+  const url=o.toDataURL('image/png');if(url.length>38000&&(scale||1)>0.35)processSig(src,cb,(scale||1)*0.7);else cb(url.length>42000?null:url)};
+ img.onerror=()=>cb(null);img.src=src}
+const lum=(d,i)=>0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
+function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2400)}
+function openSig(cb){
+ const m=document.createElement('div');m.className='modal';
+ m.innerHTML=`<div class="mbox"><h2>E-signature</h2><p class="sub">Draw your signature, or upload a photo of it. It is saved as a transparent image.</p>
+ <div class="tabs"><button data-sg="draw" class="on">Draw</button><button data-sg="up">Upload image</button></div>
+ <div id="sgDraw"><canvas id="sgc" width="760" height="260"></canvas><div class="hint">Sign inside the box with your finger or mouse.</div><button class="b2" data-sg="clear">Clear</button></div>
+ <div id="sgUp" style="display:none"><input type="file" id="sgf" accept="image/*"><div class="hint">Use a clear photo of your signature on plain white paper.</div><div id="sgPrev" class="sigprev" style="display:none"></div></div>
+ <div id="sgMsg"></div><div class="nav"><button class="b2" data-sg="cancel">Cancel</button><button class="b1" data-sg="ok">Use this signature</button></div></div>`;
+ document.body.appendChild(m);
+ const cv=m.querySelector('#sgc'),cx=cv.getContext('2d');let drew=false,down=false,mode='draw',upSrc=null;
+ const clr=()=>{cx.fillStyle='#fff';cx.fillRect(0,0,cv.width,cv.height);cx.strokeStyle='#0b1b4a';cx.lineWidth=5;cx.lineCap='round';cx.lineJoin='round';drew=false};clr();
+ const pt=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height]};
+ cv.addEventListener('pointerdown',e=>{down=true;cv.setPointerCapture(e.pointerId);const[x,y]=pt(e);cx.beginPath();cx.moveTo(x,y);cx.lineTo(x+.1,y+.1);cx.stroke();drew=true;e.preventDefault()});
+ cv.addEventListener('pointermove',e=>{if(!down)return;const[x,y]=pt(e);cx.lineTo(x,y);cx.stroke();e.preventDefault()});
+ const up=()=>{down=false};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+ m.querySelector('#sgf').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{upSrc=r.result;const p=m.querySelector('#sgPrev');p.style.display='flex';p.innerHTML=`<img src="${upSrc}" style="height:70px">`};r.readAsDataURL(f)});
+ m.addEventListener('click',e=>{const b=e.target.closest('[data-sg]');if(!b)return;const k=b.dataset.sg;
+  if(k==='draw'||k==='up'){mode=k;m.querySelector('#sgDraw').style.display=k==='draw'?'':'none';m.querySelector('#sgUp').style.display=k==='up'?'':'none';m.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x.dataset.sg===k))}
+  else if(k==='clear')clr();else if(k==='cancel')m.remove();
+  else if(k==='ok'){const src=mode==='draw'?(drew?cv.toDataURL('image/png'):null):upSrc;if(!src){m.querySelector('#sgMsg').innerHTML='<div class="msg err">Please '+(mode==='draw'?'draw':'choose an image of')+' your signature first.</div>';return}
+   processSig(src,u=>{if(!u){m.querySelector('#sgMsg').innerHTML='<div class="msg err">Could not read a signature from that. Try again with darker strokes on a plain background.</div>';return}m.remove();cb(u)})}})}
+function sigBox(label,url,actSet,actDel){return `<div class="f"><span>${label}</span><div class="sigprev">${url?`<img src="${url}" alt="e-signature">`:'<span class="hint" style="margin:0">No e-signature yet (optional). You can still sign the printed form by hand.</span>'}<button class="${url?'b2':'b3'}" data-act="${actSet}">${url?'Change':'Add e-signature'}</button>${url?`<button class="bx" data-act="${actDel}">Remove</button>`:''}</div></div>`}
 
 /* ================= API ================= */
 async function api(action,payload){
@@ -207,7 +295,7 @@ async function api(action,payload){
  return r.json()}
 async function submit(){
  const btn=$('#subBtn');btn.disabled=true;$('#subMsg').innerHTML='<div class="msg info">Saving…</div>';
- try{const r=await api('submit',{data:S});if(!r.ok)throw new Error(r.error||'Save failed');saved=r.ref;render()}
+ try{const r=await api('submit',{data:S});if(!r.ok)throw new Error(r.error||'Save failed');saved=r.ref;S.ref=r.ref;render()}
  catch(err){$('#subMsg').innerHTML=`<div class="msg err">${esc(err.message)}</div><div class="msg info">You can still print your form: <button class="b2" data-act="print">Print without saving</button></div>`;btn.disabled=false}}
 
 /* ================= DOCUMENTS ================= */
@@ -233,13 +321,13 @@ function docIntent(D){
  <p style="line-height:1.7">I, ${UL(nm,30)} (Complete Name) hereby express my intent to be an ${role} in ${UL(D.school,30)} (Name of School), ${UL(D.schoolAddress,30)} (Address of the School) during the implementation of the ARAL Program for SY ${UL(D.sy,8)}. I am willing to attend an orientation activity on the program implementation.</p>
  <p>Furthermore, I hereby grant the Department of Education the right to collect and process my personal information and profile as provided below, for purposes relevant to the engagement of ${t?'ARAL tutors':'ARAL support aide'} in the Department.</p>
  ${personal}${acad}${other}
- <div class="sigbox"><div style="height:24pt;border:0"></div><div>${esc(nm).toUpperCase()}</div><div style="border:0">Signature Over Printed Name</div><div style="border:0;text-align:center">Date Signed: ________________</div></div></section>`}
+ <div class="sigbox"><div style="height:30pt;border:0;text-align:center">${sigImg(D.sig,28)}</div><div>${esc(nm).toUpperCase()}</div><div style="border:0">Signature Over Printed Name</div><div style="border:0;text-align:center">Date Signed: ${D.sig?esc(dateOnly(D.sigAt)):'________________'}</div>${D.sig?`<div style="border:0">${tala(D.sigAt,D.ref)}</div>`:''}</div></section>`}
 function docPDS(D){
  const E=D.edu,fr=(k,n)=>tr(td(n,3),td(V(E[k].school),3),td(V(E[k].year),2),td(V(E[k].degree),4,'','style="height:24pt"'));
  const p1=[tr(td('<h1>PERSONAL DATA SHEET</h1><h2 style="margin:2pt 0 0">for Academic Recovery and Accessible Learning (ARAL) Program</h2>',12)),
   tr(td('<b class="sm it">WARNING: Any misrepresentation made in this Personal Data Sheet shall cause the filing of administrative/criminal case/s against the person concerned. Indicate “N/A” if not applicable. DO NOT ABBREVIATE.</b>',12)),
   bar('I. PERSONAL INFORMATION'),
-  tr(td('<b>Last Name</b>',3),td(V(D.last),9,'h')),tr(td('<b>First Name</b>',3),td(V(D.first),9,'h')),tr(td('<b>Middle Name</b>',3),td(V(D.middle),9,'h')),
+  tr(td('<b>Last Name</b>',3),td(V(D.last),9,'h')),tr(td('<b>First Name</b>',3),td(V(D.first),9,'h')),tr(td('<b>Middle Name</b>',3),td(V(D.middle),9,'h')),tr(td('<b>Name Extension</b> <i class="sm">(Jr., Sr., III)</i>',3),td(V(D.ext),9,'h')),
   tr(td('<b>Full Residential Address</b>',3),td(V(D.resAddr),9,'h2')),
   tr(td('<b>Full Permanent Address</b>',3),td(cb(D.permSame)+' Same as Residential Address'+(D.permSame?'':'<br>'+V(D.permAddr)),9,'h2')),
   tr(td('<b>Birthdate</b><br><i class="sm">(e.g. 01 Jan 1997)</i>',3),td(fmtD(D.birth),3),td('<b>Sex at Birth</b>',2),td(cb(D.sex==='Male')+' Male &nbsp; '+cb(D.sex==='Female')+' Female',4)),
@@ -270,8 +358,8 @@ function docPDS(D){
  p2.push(tr(td('<b>Pursuant to: (a) Indigenous People’s Act (RA 8371); (b) Magna Carta for Disabled Persons (RA 7277, as amended); and (c) Expanded Solo Parents Welfare Act (RA 11861), please answer the following items:</b>',12,'sm')));
  [['Are you a member of any indigenous groups?','indigenous','If YES, please specify: ','indigenousSpec'],['Are you a person with disability?','pwd','If YES, please specify ID No.: ','pwdId'],['Are you a solo parent?','solo','If YES, please specify ID No.: ','soloId']].forEach(([q,k,l,d])=>p2.push(tr(td('<b>'+q+'</b>',4,'sm'),td(cb(D[k]==='Yes')+' YES '+cb(D[k]==='No')+' NO',2,'sm'),td(l+(D[d]?'<u>'+V(D[d])+'</u>':'____________________'),6,'sm'))));
  const oath=`<table class="k" style="margin-top:8pt"><colgroup><col style="width:58%"><col style="width:42%"></colgroup>
- <tr><td rowspan="2" class="sm"><b>I declare under oath that I have personally accomplished this Personal Data Sheet which is a true, correct, and complete statement pursuant to the provisions of pertinent laws, rules, and regulations of the Republic of the Philippines. I authorize the agency head/authorized representative to verify/validate the contents stated herein.<br><br>I agree that any misrepresentation made in this document and its attachments shall cause the filing of administrative/criminal case/s against me.</b></td><td style="height:34pt;vertical-align:bottom;text-align:center" class="sm"><b>Signature</b></td></tr>
- <tr><td style="height:24pt;vertical-align:bottom;text-align:center" class="sm"><b>Date Accomplished</b></td></tr>
+ <tr><td rowspan="2" class="sm"><b>I declare under oath that I have personally accomplished this Personal Data Sheet which is a true, correct, and complete statement pursuant to the provisions of pertinent laws, rules, and regulations of the Republic of the Philippines. I authorize the agency head/authorized representative to verify/validate the contents stated herein.<br><br>I agree that any misrepresentation made in this document and its attachments shall cause the filing of administrative/criminal case/s against me.</b></td><td style="height:34pt;vertical-align:bottom;text-align:center" class="sm">${sigImg(D.sig,22)}${D.sig?tala(D.sigAt,D.ref):''}<b>Signature</b></td></tr>
+ <tr><td style="height:24pt;vertical-align:bottom;text-align:center" class="sm">${D.sig?esc(dateOnly(D.sigAt))+'<br>':''}<b>Date Accomplished</b></td></tr>
  <tr><td class="sm"><b>SUBSCRIBED AND SWORN to before me this ________________, affiant exhibiting his/her validly issued government ID.</b></td><td style="height:34pt;vertical-align:bottom;text-align:center" class="sm"><b>Person Administering Oath</b></td></tr></table>`;
  return `<section class="page"><div class="ann">Annex A of DM No. ____ s. 2026</div>${G(p1)}</section><section class="page"><div class="ann">Annex A of DM No. ____ s. 2026</div>${G(p2)}${oath}</section>`}
 const docAll=D=>docIntent(D)+((D.cat==='tutor'||D.alsoPDS)?docPDS(D):'');
@@ -284,7 +372,7 @@ function doWord(html,name){
 /* ================= MONTHLY REPORT (Annex F + G) ================= */
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 function newSes(){return{date:'',subject:'Reading',tin:'',tout:'',grade:'',learners:'',acc:'',late:'',remarks:''}}
-function freshR(){return{role:'tutor',name:'',school:'',month:'',period:'',areas:{reading:false,science:false,math:false},sessions:[newSes()]}}
+function freshR(){return{role:'tutor',name:'',school:'',month:'',period:'',areas:{reading:false,science:false,math:false},sessions:[newSes()],sig:'',sigAt:'',ref:'',headSig:'',headSigAt:''}}
 const mins=(a,b)=>{if(!a||!b)return 0;const[h1,m1]=a.split(':').map(Number),[h2,m2]=b.split(':').map(Number);return Math.max(0,(h2*60+m2)-(h1*60+m1))};
 const t12=t=>{if(!t)return'';let[h,m]=t.split(':').map(Number);const ap=h>=12?'pm':'am';h=h%12||12;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+' '+ap};
 const hm=m=>Math.floor(m/60)+' h '+String(m%60).padStart(2,'0')+' min';
@@ -297,10 +385,10 @@ const sessSorted=D=>D.sessions.filter(s=>s.date).slice().sort((a,b)=>(a.date+a.t
 const totMin=D=>sessSorted(D).reduce((n,s)=>n+mins(s.tin,s.tout),0);
 function autoPeriod(D){if(D.period)return D.period;if(!D.month)return'';const[y,mo]=D.month.split('-').map(Number);const last=new Date(y,mo,0).getDate();return MONTHS[mo-1]+' 1–'+last+', '+y}
 function updTot(){const e=$('#tot');if(e)e.textContent=hm(totMin(R))+' ('+sessSorted(R).length+' session'+(sessSorted(R).length===1?'':'s')+')'}
-function renderHome(){$('#app').innerHTML=`<div class="card"><h2>What would you like to do?</h2><p class="sub">Choose below. No login is needed for applicants and tutors.</p>
- <div class="choice" style="grid-template-columns:1fr"><button data-act="go-apply"><b>Apply as ARAL Tutor / Support Aide</b><br><small>Expression of Intent (Annex A or B) and Personal Data Sheet</small></button>
- <button data-act="go-report"><b>Monthly reports: DTR and Accomplishment Report</b><br><small>Annex F and Annex G for ARAL tutors and support aides</small></button></div></div>
- <div style="text-align:center"><button class="b2" data-act="staff" style="font-size:12px">Staff (School Head / SDO HRMO)</button></div>`}
+function renderHome(){$('#app').innerHTML=`<div class="hero"><h2>Mabuhay! Welcome</h2><p>Engage ARAL tutors and support aides faster: fill in once, sign on screen, then print or save as PDF or Word.</p></div>
+ <div class="tiles"><button class="tile" data-act="go-apply"><span class="ic">📝</span><span><b>Apply as ARAL Tutor / Support Aide</b><small>Expression of Intent (Annex A or B) and Personal Data Sheet</small></span></button>
+ <button class="tile" data-act="go-report"><span class="ic">🗓️</span><span><b>Monthly reports</b><small>Daily Time Record (Annex F) and Accomplishment Report (Annex G)</small></span></button>
+ <button class="tile" data-act="staff"><span class="ic">🏫</span><span><b>Staff area</b><small>School Heads, encoders and SDO HRMO: evaluation, registries, contract</small></span></button></div>`}
 function renderReport(){
  const o=R,sess=o.sessions.map((s,i)=>`<div class="sessbox"><b>Session ${i+1}</b>
  <div class="grid" style="margin-top:8px">${T('Date','sessions.'+i+'.date',{type:'date',w:'w2'})}${SEL('Subject','sessions.'+i+'.subject',['Reading','Math','Science','Other support'],{w:'w2'})}${T('Grade Level','sessions.'+i+'.grade',{w:'w2',ph:'e.g. Grade 2'})}
@@ -310,24 +398,25 @@ function renderReport(){
  <div style="margin-top:8px"><button class="b2" data-act="dupses" data-i="${i}">Duplicate</button> <button class="bx" data-act="delses" data-i="${i}">Remove</button></div></div>`).join('');
  $('#app').innerHTML=`<div class="card"><h2>Monthly report: Annex F (DTR) and Annex G (Accomplishment Report)</h2><p class="sub">Type your details and list each session once. The DTR and the Accomplishment Report are both made from this list.</p>
  <div class="grid">${RAD('I am an','role',[['tutor','ARAL Tutor'],['aide','ARAL Support Aide']],{rr:1})}
- ${T('Full Name of ARAL Tutor/Support Aide','name',{w:'w3',req:1})}${T('DepEd School (do not abbreviate)','school',{w:'w3',req:1})}
+ ${T('Full Name of ARAL Tutor/Support Aide','name',{w:'w3',req:1})}${SCH('DepEd School (do not abbreviate)','school',{w:'w3'})}
  ${T('Month','month',{type:'month',w:'w2',req:1})}${T('Inclusive Period (auto if blank)','period',{w:'w4',ph:autoPeriod(o)||'e.g. October 1–31, 2026'})}
  <div class="f"><span>Area of Specialization (check all that applies)</span><div class="chk">${CB('Reading','areas.reading')}${CB('Science','areas.science')}${CB('Mathematics','areas.math')}</div></div></div>
+ <div class="grid" style="margin-top:12px">${sigBox('Your e-signature (optional)',o.sig,'sig-r','sigrm-r')}</div>
  <h3>Sessions</h3>${sess}<button class="b2" data-act="addses">+ Add session</button>
  <div class="msg info" style="margin-top:12px">Total hours rendered: <span class="tot" id="tot"></span></div>
  <div id="rMsg">${rsaved?`<div class="msg ok"><b>Saved.</b> Reference <b>${esc(rsaved)}</b>. Your School Head can now verify it. Print the forms, sign them by hand, and submit the signed copies.</div>`:''}</div>
  <div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b1" data-act="rsubmit" id="rBtn">Save report</button><button class="b3" data-act="rprint">Print / Save as PDF</button><button class="b2" data-act="rword">Download Word</button></div>
  <div class="msg info" style="margin-top:12px">Names of the School Head are left blank on the forms; write them by hand. The signed hard copies are what get submitted for processing of remuneration.</div></div>
- <div style="text-align:center"><button class="b2" data-act="rnew" style="font-size:12px">Start a new report</button> <button class="b2" data-act="home" style="font-size:12px">Home</button> <button class="b2" data-act="staff" style="font-size:12px">Staff</button></div>`;
+ <div style="text-align:center"><button class="link" data-act="rnew">Start a new report</button> <button class="link" data-act="home">← Home</button> <button class="link" data-act="staff">Staff</button></div>`;
  updTot();window.scrollTo(0,0)}
 async function submitReport(){
- const miss=[];if(!R.name.trim())miss.push('name');if(!R.school.trim())miss.push('school');if(!R.month)miss.push('month');
+ const miss=[];if(!R.name.trim())miss.push('name');if(!R.school.trim())miss.push('school');else if(!schoolOK(R.school))miss.push('school (choose it from the list)');if(!R.month)miss.push('month');
  const ok=R.sessions.filter(s=>s.date&&s.tin&&s.tout);if(!ok.length)miss.push('at least one complete session (date, time in, time out)');
  const bad=R.sessions.some(s=>s.tin&&s.tout&&mins(s.tin,s.tout)===0);
  if(miss.length){$('#rMsg').innerHTML='<div class="msg err">Please complete: '+esc(miss.join(', '))+'.</div>';return}
  if(bad){$('#rMsg').innerHTML='<div class="msg err">A session has a Time Out that is not later than its Time In.</div>';return}
  const b=$('#rBtn');b.disabled=true;$('#rMsg').innerHTML='<div class="msg info">Saving…</div>';
- try{const r=await api('submitReport',{data:R});if(!r.ok)throw new Error(r.error||'Save failed');rsaved=r.ref;renderReport()}
+ try{const r=await api('submitReport',{data:R});if(!r.ok)throw new Error(r.error||'Save failed');rsaved=r.ref;R.ref=r.ref;renderReport()}
  catch(err){$('#rMsg').innerHTML=`<div class="msg err">${esc(err.message)}</div>`;b.disabled=false}}
 function docF(D){
  const t=D.role==='tutor',who=t?'ARAL Tutor':'ARAL Support Aide',ss=sessSorted(D),n=Math.max(15,ss.length+1);
@@ -338,9 +427,9 @@ function docF(D){
  <table class="k"><colgroup><col style="width:22%"><col style="width:14%"><col style="width:14%"><col style="width:28%"><col style="width:22%"></colgroup>
  <tr><th>Date</th><th>Time In</th><th>Time Out</th><th>Late/Undertime/Absences<br><i>(Hours and Minutes)</i></th><th>Remarks</th></tr>${rows}</table>
  <p style="margin:10pt 18pt 0">I CERTIFY that the above is true and correct report of the work performed, record of which was made the time of arrival at and from departure from the school.</p>
- <div class="sigbox" style="margin-top:22pt"><div><b>${esc((D.name||'').toUpperCase())}</b></div><div style="border:0">${who}</div></div>
+ <div class="sigbox" style="margin-top:8pt"><div style="height:30pt;border:0;text-align:center">${sigImg(D.sig,28)}</div><div><b>${esc((D.name||'').toUpperCase())}</b></div><div style="border:0">${who}</div>${D.sig?`<div style="border:0">${tala(D.sigAt,D.ref)}</div>`:''}</div>
  <p style="text-align:center;margin:12pt 0 0">VERIFIED as to the prescribed number of hours of engagement</p>
- <div class="sigbox" style="margin-top:22pt"><div><b>&nbsp;</b></div><div style="border:0">School Head</div></div></section>`}
+ <div class="sigbox" style="margin-top:8pt"><div style="height:30pt;border:0;text-align:center">${sigImg(D.headSig,28)}</div><div><b>&nbsp;</b></div><div style="border:0">School Head</div>${D.headSig?`<div style="border:0">${tala(D.headSigAt,D.ref,'verified')}</div>`:''}</div></section>`}
 function docG(D){
  const t=D.role==='tutor',ss=sessSorted(D),A=D.areas;
  const sp=['reading','science','math'].filter(k=>A[k]).map(k=>({reading:'Reading',science:'Science',math:'Mathematics'}[k])).join(', ');
@@ -355,52 +444,208 @@ function docG(D){
  <p style="margin:2pt 0">Area of Specialization: <u>Reading/Science/Mathematics</u> <i>(indicate all that applies)</i>${sp?': <b>'+esc(sp)+'</b>':''}</p><p style="margin:2pt 0 8pt">Inclusive Period: ${UL(autoPeriod(D),30)}</p>
  <table class="k"><colgroup><col style="width:7%"><col style="width:17%"><col style="width:9%"><col style="width:24%"><col style="width:9%"><col style="width:34%"></colgroup>
  <tr><th>Week</th><th>Date and Time</th><th>Subject</th><th>Learners Served</th><th>Grade Level</th><th>Accomplishments<br><i style="font-size:7pt;font-weight:normal">(For tutors, include learning sessions conducted, and progress or feedback on the tutorial session. For support aides, include types of support provided)</i></th></tr>${rows}</table>
- <table style="width:100%;margin-top:16pt;border:0"><tr><td style="width:50%;vertical-align:top"><i>Prepared by:</i><br><br><b>${esc(D.name||'')}</b><br>${t?'ARAL Tutor':'ARAL Support Aide'}</td><td style="vertical-align:top"><i>Attested by:</i><br><br><b>&nbsp;</b><br>School Head<br>Date of Signing: ______________________</td></tr></table></section>`}
+ <table style="width:100%;margin-top:16pt;border:0"><tr><td style="width:50%;vertical-align:top"><i>Prepared by:</i><br>${D.sig?sigImg(D.sig,26):'<br>'}<br><b>${esc(D.name||'')}</b><br>${t?'ARAL Tutor':'ARAL Support Aide'}${D.sig?tala(D.sigAt,D.ref):''}</td><td style="vertical-align:top"><i>Attested by:</i><br>${D.headSig?sigImg(D.headSig,26):'<br>'}<br><b>&nbsp;</b><br>School Head<br>Date of Signing: ${D.headSig?esc(dateOnly(D.headSigAt)):'______________________'}${D.headSig?tala(D.headSigAt,D.ref,'attested'):''}</td></tr></table></section>`}
 const docR=D=>`<div class="Section1">${docF(D)}</div><div class="Section2">${docG(D)}</div>`;
 function doWordR(html,name){
  const css=document.querySelector('style').textContent.split('/* ---------- documents ---------- */')[1].split('@media print')[0].replace('page:land','page:Section2');
  const full=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${esc(name)}</title><!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]--><style>@page Section1{size:595.3pt 841.9pt;margin:31pt}@page Section2{size:841.9pt 595.3pt;mso-page-orientation:landscape;margin:31pt}div.Section1{page:Section1}${css}</style></head><body class="doc">${html}</body></html>`;
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+full],{type:'application/msword'}));a.download=name.replace(/[^\w-]+/g,'_')+'.doc';document.body.appendChild(a);a.click();a.remove()}
 
+/* ================= MODULE 3 DOCUMENTS (Annex C, D, H, E) ================= */
+const AREAS=['Reading','Mathematics','Science'],GRP=['1-3','4-6','7-10','3-6'];
+const ENGAGED=['Selected','Approved by SDS','Engaged'],RECD=['Recommended','Selected','Approved by SDS','Engaged'];
+const LETCATS=['DepEd teaching personnel','Remaining LET-eligible applicants in the recent and/or previous RQAs','Other LET-eligible teacher applicants in the RQAs','Other LET-eligible in the locality','Retired professional teachers','Other licensed professionals'];
+const st0=(x)=>x||'';
+const setg=k=>CFG.settings&&CFG.settings[k]||'';
+const schoolInfo=n=>schoolMatch(n)||{id:'',name:n,district:'',address:''};
+function docC(rep){
+ let rs=rep.records.filter(r=>r.cat==='tutor'&&r.appCat!=='DepEd teaching personnel');
+ if(rep.onlyRec)rs=rs.filter(r=>RECD.includes(r.status));
+ rs.sort((a,b)=>a.name.localeCompare(b.name));
+ const n=Math.max(5,rs.length);let rows='';
+ for(let i=0;i<n;i++){const r=rs[i];rows+=r?`<tr><td>${i+1}</td><td>${esc(r.name)}</td><td>${esc(r.address)}</td><td>${esc(r.sex)}</td><td>${LETCATS.includes(r.appCat)?'Yes':'No'}</td><td>${esc(r.highest)}</td><td>${esc(r.training)}</td><td>${esc(r.exp)}</td><td>${esc((r.eval||{}).perf)}</td><td>${esc((r.eval||{}).others)}</td><td>${esc((r.eval||{}).interview)}</td><td>${esc((r.eval||{}).remarks)}</td><td>${RECD.includes(r.status)?'Recommended':''}</td><td>${esc((r.eval||{}).fund)}</td><td></td></tr>`:`<tr><td style="height:22pt">${i+1}</td>${'<td></td>'.repeat(14)}</tr>`}
+ const W=[3,11,9,4,6,8,10,9,6,8,5,7,8,6,6];
+ return `<div class="Section2"><section class="page"><div class="ann">Annex C: Registry of External (non-DepEd) ARAL Tutor Applicants</div>
+ <h2 style="text-align:left;margin:4pt 0 0">DEPARTMENT OF EDUCATION</h2><h2 style="text-align:left">REGISTRY OF ARAL TUTOR APPLICANTS</h2>
+ <p style="margin:1pt 0">Name of Schools Division: ${UL(setg('SDO_NAME').replace('Schools Division Office of','Schools Division of'),30)}</p><p style="margin:1pt 0">Name of School: ${UL(rep.school,40)}</p><p style="margin:1pt 0 6pt">Total Number of applicants ${UL(String(rs.length),8)}</p>
+ <table class="k tc"><colgroup>${W.map(w=>`<col style="width:${w}%">`).join('')}</colgroup>
+ <tr><th rowspan="2" colspan="2">NAME OF APPLICANT</th><th colspan="2">BASIC INFORMATION</th><th colspan="6">QUALIFICATIONS</th><th>ASSESSMENT RESULTS</th><th rowspan="2">REMARKS</th><th rowspan="2">RECOMMENDATION OF THE SCHOOL HEAD<br><i>(Indicate ‘Recommended’ if applicant is deemed qualified for hiring based on the set parameters)</i></th><th rowspan="2">FUND SOURCE<br><i>(To be accomplished by the SDO)</i></th><th rowspan="2">APPROVAL<br><i>(To be accomplished by the SDS; Affix signature if approved)</i></th></tr>
+ <tr><th>ADDRESS</th><th>SEX<br><i>(by birth)</i></th><th>LET/ PBET/ Other Licenses<br><i>(Yes or No)</i></th><th>EDUCATION<br><i>(highest attainment)</i></th><th>TRAINING<br><i>(relevant, if any)</i></th><th>EXPERIENCE<br><i>(relevant, if any)</i></th><th>PERFORMANCE<br><i>(rating, if any)</i></th><th>OTHERS<br><i>(other qualifications)</i></th><th>INTERVIEW<br><i>(Score)</i></th></tr>${rows}</table>
+ <p style="margin-top:6pt;font-size:8pt"><b><i>Note:</i></b> <i>Attach the assessment criteria, tool, and rubrics used in the interview, learning facilitation demonstration/exercise, and written examination</i></p>
+ <div class="sigbox" style="margin-left:0;width:30%"><div style="height:30pt;border:0">${sigImg(rep.sig,28)}</div><div style="border-top:1px solid #000">School Head</div>${rep.sig?tala(new Date().toISOString(),'','Annex C'):''}</div></section></div>`}
+function docD(rep){
+ const info=schoolInfo(rep.school);let tables='';
+ const eng=rep.records.filter(r=>r.cat==='tutor'&&ENGAGED.includes(r.status));
+ const tb=(area,grp,items)=>{const dc=items.filter(r=>r.appCat==='DepEd teaching personnel').length,nd=items.length-dc;
+  let rows=items.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.major||r.bachelor)}</td><td style="text-align:center">${r.appCat==='DepEd teaching personnel'?'':'✓'}</td><td style="text-align:center">${r.appCat==='DepEd teaching personnel'?'✓':''}</td></tr>`).join('');
+  for(let i=items.length;i<3;i++)rows+='<tr><td style="height:17pt">&nbsp;</td><td></td><td></td><td></td></tr>';
+  return `<table class="k" style="margin-bottom:12pt"><colgroup><col style="width:38%"><col style="width:34%"><col style="width:14%"><col style="width:14%"></colgroup><tr><th colspan="4" style="text-align:left">Registry of ARAL Tutors for ${area} for ${grp?'Grades '+grp:'Grade ____'}</th></tr>
+  <tr><th rowspan="2">Name</th><th rowspan="2">Specialization</th><th colspan="2">Tick (√) the Tutor Category</th></tr><tr><th>Non-DepEd</th><th>DepEd</th></tr>${rows}
+  <tr><td colspan="2" style="text-align:right"><b>Total</b></td><td style="text-align:center">${items.length?nd:''}</td><td style="text-align:center">${items.length?dc:''}</td></tr></table>`};
+ AREAS.forEach(a=>{let any=false;GRP.forEach(g=>{const it=eng.filter(r=>((r.eval||{}).assign||[]).some(x=>x.area===a&&x.group===g));if(it.length){any=true;tables+=tb(a,g,it)}});if(!any)tables+=tb(a,'',[])});
+ return `<div class="Section1"><section class="page"><div class="ann">Annex D. Registry of Aral Tutors Per Learning Area</div>
+ <p style="margin:6pt 0 2pt">School: ${UL(rep.school,30)} &nbsp; School ID: ${UL(info.id,12)}</p><p style="margin:2pt 0">Complete School Address: ${UL(info.address,40)}</p><p style="margin:2pt 0 10pt">SDO: ${UL('Romblon',12)} &nbsp; Region: ${UL(setg('REGION'),12)}</p>
+ ${tables}<div class="sigbox" style="margin-top:14pt"><div>Prepared by:</div><div style="border:0;margin-top:20pt;border-top:1px solid #000">SDO HRMO</div></div></section></div>`}
+const NEEDK=[['Reading','Grades 1-3','r13'],['Reading','Grades 4-6','r46'],['Reading','Grades 7-10','r710'],['Mathematics','Grades 1 to 3','m13'],['Mathematics','Grades 4 to 6','m46'],['Mathematics','Grades 7-10','m710'],['Science','Grades 3 to 6','s36'],['Science','Grades 7 to 10','s710']];
+function hData(rep){
+ const needs=rep.needs.slice().sort((a,b)=>a.school.localeCompare(b.school));
+ const tot={},dep={},non={};NEEDK.forEach(k=>{tot[k[2]]=0;dep[k[2]]=0;non[k[2]]=0});
+ needs.forEach(n=>NEEDK.forEach(k=>tot[k[2]]+=+((n.counts||{})[k[2]])||0));
+ rep.records.filter(r=>r.cat==='tutor'&&ENGAGED.includes(r.status)).forEach(r=>((r.eval||{}).assign||[]).forEach(x=>{const key=({Reading:'r',Mathematics:'m',Science:'s'})[x.area]+x.group.replace('-','');if(key in dep){if(r.appCat==='DepEd teaching personnel')dep[key]++;else non[key]++}}));
+ return{needs,tot,dep,non}}
+function docH(rep){
+ const{needs,tot,dep,non}=hData(rep);
+ const cells=o=>NEEDK.map(k=>`<td style="text-align:center">${o[k[2]]===0?'0':o[k[2]]}</td>`).join('');
+ let rows=needs.map(n=>`<tr><td>${esc(n.school)}</td>${NEEDK.map(k=>`<td style="text-align:center">${+((n.counts||{})[k[2]])||0}</td>`).join('')}</tr>`).join('');
+ for(let i=needs.length;i<6;i++)rows+=`<tr><td style="height:17pt">&nbsp;</td>${'<td></td>'.repeat(8)}</tr>`;
+ return `<div class="Section2"><section class="page"><div class="ann">Annex H: SDO Consolidated Data of Tutors for Hiring, by Grade Groups and Specialization</div>
+ <table style="width:100%;border:0"><tr><td style="width:60%;vertical-align:top;border:0">SDO: ${UL(setg('SDO_NAME'),30)}<br>Specialization of Tutors: <u>READING/ENGLISH, SCIENCE, MATH</u></td><td style="border:0;vertical-align:top">Address: ${UL(setg('SDO_ADDRESS'),20)}<br>SDS : ${UL(setg('SDS_NAME'),20)}</td></tr></table>
+ <h2 style="margin:8pt 0 4pt">SDO Consolidated Data of No. of Tutors to be Engaged By Grade Groups and Specialization</h2>
+ <table class="k"><colgroup><col style="width:28%">${'<col style="width:9%">'.repeat(8)}</colgroup>
+ <tr><th rowspan="2">Schools</th><th colspan="3">Reading</th><th colspan="3">Mathematics</th><th colspan="2">Science</th></tr>
+ <tr>${NEEDK.map(k=>`<th style="font-size:8pt">${k[1]}</th>`).join('')}</tr>${rows}
+ <tr><td style="text-align:right"><b>TOTAL</b></td>${cells(tot)}</tr><tr><td style="text-align:right"><b>DepEd Tutors</b></td>${cells(dep)}</tr><tr><td style="text-align:right"><b>Non-DepEd Tutors</b></td>${cells(non)}</tr></table>
+ <div class="sigbox" style="margin-left:0;width:30%;margin-top:18pt"><div style="border:0">Prepared by:</div><div style="margin-top:20pt">SDO HRMO</div></div></section></div>`}
+function csvH(rep){const{needs,tot,dep,non}=hData(rep);const q=x=>'"'+String(x).replace(/"/g,'""')+'"';const hd=['School'].concat(NEEDK.map(k=>k[0]+' '+k[1]));
+ const rows=needs.map(n=>[n.school].concat(NEEDK.map(k=>+((n.counts||{})[k[2]])||0)));rows.push(['TOTAL'].concat(NEEDK.map(k=>tot[k[2]])),['DepEd Tutors'].concat(NEEDK.map(k=>dep[k[2]])),['Non-DepEd Tutors'].concat(NEEDK.map(k=>non[k[2]])));
+ return [hd].concat(rows).map(r=>r.map(q).join(',')).join('\n')}
+function docE(D,ev){
+ ev=ev||{};const nm=fullName(D).toUpperCase(),sds=setg('SDS_NAME'),sdsT=setg('SDS_TITLE'),sdo=setg('SDO_NAME'),addr=setg('SDO_ADDRESS'),fund=ev.fund||setg('DEFAULT_FUND');
+ const p=(t,o='')=>`<p style="text-align:justify;${o}">${t}</p>`,n=(i,t)=>`<p style="text-align:justify;margin-left:26pt;text-indent:-26pt">${i}.&nbsp;&nbsp;&nbsp;${t}</p>`,sb=(i,t)=>`<p style="text-align:justify;margin-left:52pt;text-indent:-18pt">${i}.&nbsp;&nbsp;${t}</p>`,hd=t=>`<p style="margin:10pt 0 4pt"><b>${t}</b></p>`;
+ const fd=x=>x?longD(x):'____________________';
+ const ack=(who,lbl)=>`<section class="page"><p style="text-align:center;margin-top:30pt"><b>ACKNOWLEDGMENT</b></p><p>REPUBLIC OF THE PHILIPPINES) ______________________________) S.S.</p>
+  <p style="text-indent:36pt">BEFORE ME, a Notary Public for and in the City of __________, this __________ personally came and appeared:</p>
+  <table class="k"><tr><th>Name</th><th>Competent Evidence of Identity</th><th>Date and Place of Issue</th></tr><tr><td style="height:24pt"><i>${lbl}</i><br>${esc(who)}</td><td></td><td></td></tr></table>
+  <p style="margin-top:8pt;text-indent:36pt">known to me and to me known to be the same person who executed the foregoing Agreement, and acknowledged to me that the same is his free and voluntary act and deed and that of the entity he represents.</p>
+  <p style="text-indent:36pt">IN WITNESS WHEREOF, I have hereunto set my hand and affixed my notarial seal, this __________, at ____________.</p><p style="margin-top:14pt">NOTARY PUBLIC</p><p>Doc. No. ____;<br>Page No. ____;<br>Book No. ____;<br>Series of 202___.</p></section>`;
+ return `<div class="Section1"><section class="page"><div class="ann">Annex E</div><h2 style="margin:8pt 0">ARAL TUTOR ENGAGEMENT CONTRACT</h2><p><b>KNOW ALL MEN BY THESE PRESENTS:</b></p>
+ ${p('This Agreement, made and entered into by and between:','text-indent:36pt')}
+ ${p(`The Department of Education - (Schools Division, DepEd Region NO. ${UL(setg('REGION'),6)}), a government agency with office address at ${UL(addr,30)}, represented by ${UL(sds,24)}, ${esc(sdT(sdsT))}, ${esc(sdo)}, herein referred to as the “FIRST PARTY”,`,'text-indent:36pt')}
+ <p style="text-align:center">-and-</p>
+ ${p(`${UL(nm,28)}, of legal age, Filipino and with residence address at ${UL(D.resAddr,34)}, hereinafter referred to as the “SECOND PARTY”.`,'text-indent:36pt')}
+ ${p('Collectively referred to as “Parties” and individually as a “Party”.','text-indent:36pt')}
+ ${p('WHEREAS, Article XIV, Section 1 of the 1987 Constitution provides that “the State shall protect and promote the right of all citizens to quality education at all levels, and shall take appropriate steps to make such education accessible to all”;','text-indent:36pt')}
+ ${p('WHEREAS, Article XIV Section 2(1) of the 1987 Constitution states that “The State shall: (1) Establish, maintain, and support a complete, adequate, integrated system of education relevant to the needs of the people and society”;','text-indent:36pt')}
+ ${p('WHEREAS, the Department of Education (DepEd) has implemented the Academic-Recovery and Accessible Learning (ARAL) Program to ensure that learners who are struggling in their lessons, especially in Reading, Mathematics, and Science, will be able to attain the competencies set by DepEd in their respective levels, as mandated by Republic Act No. 12028; and','text-indent:36pt')}
+ ${p('WHEREAS, DepEd may engage tutors and support aides deemed qualified, competent, and of good moral character for the effective implementation of the ARAL Program.','text-indent:36pt')}
+ <p style="text-align:center">-WITNESSETH-</p>${hd('I. General Provisions')}
+ ${n(1,'That the FIRST PARTY, in the exigency of the service, engages the services of the SECOND PARTY to facilitate the effective and efficient implementation of the ARAL Program;')}
+ ${n(2,'That the SECOND PARTY has signified his/her intention, to which the FIRST PARTY has accepted, to provide the services needed by the latter;')}
+ ${n(3,'That the SECOND PARTY hereby possesses the education, experience, training, skills and other qualifications and/or skills required to perform the job as described herein, as represented by the SECOND PARTY in his/her Personal Data Sheet, interview, and other qualification documents submitted to the FIRST PARTY;')}
+ ${n(4,'That the SECOND PARTY hereby attests that he/she has not been previously dismissed from government service by reason of an administrative offense; and that he/she has not already reached the compulsory retirement age of sixty-five (65);')}
+ ${hd('II. Duties and Responsibilities of FIRST PARTY')}${n(5,'That the FIRST PARTY is expected to perform the following functions:')}
+ ${sb('a','Conduct onboarding and orientation for the SECOND PARTY on the ARAL Program goals, curriculum, reporting requirements, and performance standards;')}
+ ${sb('b','Provide access to instructional materials, ARAL resource packages, learner profiles, and any other relevant documents necessary for the conduct of tutorial sessions;')}
+ ${sb('c','Assign the SECOND PARTY to designated learners, learning areas, and tutorial schedules based on the school’s learner needs;')}
+ ${sb('d','Monitor the implementation of tutorial sessions, including learner progress and compliance with ARAL standards and guidelines;')}
+ ${sb('e','Validate and review the SECOND PARTY’s Daily Time Record (DTR), Accomplishment Reports, and other required documentation;')}
+ ${sb('f','Ensure that remuneration or incentives due to the SECOND PARTY are processed in accordance with existing government rules, funding availability, and documentary requirements; and')}
+ ${sb('g','Ensure compliance with DepEd Child Protection Policy and other relevant laws, rules, and regulations to provide a safe and conducive tutorial environment.')}
+ ${hd('III. Duties and Responsibilities of SECOND PARTY')}${n(6,'That the SECOND PARTY is expected to perform the following functions:')}
+ ${sb('a','Deliver structured and developmentally appropriate tutorial sessions in Reading, Mathematics, and Science based on the ARAL Program curriculum and learner needs.')}
+ ${sb('b','Contextualize lesson plans and other ARAL resources to facilitate learning through relevant, appropriate, and responsive teaching strategies;')}
+ ${sb('c','Track learners’ progress, update learners’ records;')}${sb('d','Coordinate with the teacher-adviser before and after the tutorial session;')}
+ ${sb('e','Implements appropriate delivery modes and duration of tutorial sessions pursuant to Sections 16 and 17, Rule VI of the IRR of RA 12028; and')}
+ ${sb('f','Prepare and submit a monthly Accomplishment Report using the prescribed form, which shall include learners served, learning sessions conducted, and progress or feedback on the tutorial session.')}
+ ${n(7,'That the frequency of engagement of the SECOND PARTY during the contracting period shall be based on the needs of learner participants, as determined by the FIRST PARTY based on assessments, due to the number of learners during a cycle of ARAL (i.e. one (1) quarter or two to three (2-3) months of the SY), may increase or decrease during the subsequent cycles;')}
+ ${n(8,'That the SECOND PARTY may be engaged within the duration of the SY and Summer Classes; whereas the engagement may be conducted before, during, or after the regular class hours;')}
+ ${n(9,'That the SECOND PARTY shall observe the standards of personal conduct in the discharge and execution of functions/services in accordance with the Code of Conduct and Ethical Standards for Public Officials and Employees under RA 6713;')}
+ ${hd('IV. Data Privacy, Confidentiality, and Non-Disclosure Clause')}
+ ${n(10,'Each Party in the performance of their respective duties and responsibilities under this Agreement and in the implementation thereof shall adhere to Republic Act No. 10173, otherwise known as the “Data Privacy Act of 2012.”')}
+ ${n(11,'Any gathered data and information should be protected and respected during the term and even after the termination of this Agreement. The processing of any gathered data and information should be in compliance with the confidentiality and privacy requirements under the said law and applicable regulations.')}
+ ${n(12,'The other Party shall not reproduce, share, distribute data and information derived by reason of this Agreement, to any third party, both local and international, without the express approval of DepEd.')}
+ ${hd('V. Remuneration and Funding')}
+ ${n(13,`That in view hereof, the Second Party is hereby engaged to render service as ARAL Tutor for the period ${UL(ev.cFrom?longD(ev.cFrom):'',16)} to ${UL(ev.cTo?longD(ev.cTo):'',16)}, and shall be provided remuneration based on the prime hourly teaching rate of a Teacher I position, computed based on the number of actual teaching hours to be given <u>on a monthly basis</u>; subject to existing rules and guidelines and subject to applicable taxes and liabilities, if any, and corresponding deductions for tardiness, undertime and absence incurred during the engagement;`)}
+ ${n(14,`That the engagement between the FIRST PARTY and SECOND PARTY shall be funded through ${UL(fund,26)} for the fiscal year covering the effectivity period of this Agreement.`)}
+ ${hd('VI. Termination of Agreement')}
+ ${n(15,'Either Party may pre-terminate this Agreement, by sending written notice to the other Party, at least thirty (30) days prior to the intended date of termination. The receiving Party may expressly waive the 30-day waiting period and opt for the immediate termination of this Agreement;')}
+ ${n(16,'The FIRST PARTY may immediately terminate this Agreement, at any period upon written notice to the SECOND PARTY, for unsatisfactory performance, conflict of interest, or for any of the grounds determined by the FIRST PARTY. In addition, any violation of the warranties or provisions under this Agreement is a ground for termination.')}
+ ${hd('VII. Amendments')}${n(17,'This Agreement may not be amended for any purpose, and no modifications or supplements may be made except in writing and properly executed by the Parties. The Agreement shall remain in full force and effect unless duly amended, or until its expiration or termination.')}
+ ${hd('VIII. Separability')}${n(18,'In the event that any of the provisions of this Agreement or any document that may be executed in connection therewith shall be declared invalid, illegal, or unenforceable in any respect by a competent authority, the validity, legality, and enforceability of the remaining provisions of this Agreement or any document that may be executed in connection therewith shall not in any way be affected or impaired and shall remain in full force and effect.')}
+ ${hd('IX. Settlement of Differences')}${n(19,'The Parties shall exert their best efforts to properly resolve any differences or disagreements with respect to any issue that may arise in connection with this Agreement. It shall be settled through amicable means, such as but not limited to, mutual consultation and negotiation.')}
+ ${p('IN WITNESS WHEREOF, both parties have hereunto set their hands this ___ day of ______________, 20___ at ____________ City, Philippines.','text-indent:36pt;margin-top:10pt')}
+ <table style="width:100%;border:0;margin-top:26pt"><tr><td style="width:50%;text-align:center;border:0"><div style="border-top:1px solid #000;width:80%;margin:auto"><b>${esc(sds)}</b><br>${esc(sdT(sdsT))}<br>FIRST PARTY</div></td><td style="text-align:center;border:0"><div style="border-top:1px solid #000;width:80%;margin:auto"><b>${esc(nm)}</b><br>ARAL Tutor<br>SECOND PARTY</div></td></tr></table></section>
+ ${ack(sds,'(Name of DepEd Representative)')}${ack(nm,'(Name of Tutor)')}</div>`}
+const sdT=x=>x||'Schools Division Superintendent';
+
 /* ================= STAFF ================= */
-let list=[],rlist=[],detail=null,staffMsg='',tab='apps';
+let list=[],rlist=[],detail=null,staffMsg='',tab='apps',reg=null,needMsg='';
+const statOpts=role=>role==='ENCODER'?[]:role==='SCHOOLHEAD'?['Received','Under evaluation','Recommended','Selected','Not selected']:['Received','Under evaluation','Recommended','Selected','Not selected','Approved by SDS','Engaged'];
+const roleName=r=>({HRMO:'SDO HRMO (all schools)',SCHOOLHEAD:'School Head',ENCODER:'Encoder (AO / Selection Committee)'})[r]||r;
+const schOpts=sel=>`<option value="">-- choose school --</option>`+CFG.schools.map(x=>`<option ${x.name===sel?'selected':''}>${esc(x.name)}</option>`).join('');
+function schPicker(id){return staff.role==='HRMO'?(CFG.schools.length?`<label class="f"><span>School</span><select id="${id}">${schOpts('')}</select></label>`:`<label class="f"><span>School (exact name)</span><input type="text" id="${id}"></label>`):`<p class="sub">School: <b>${esc(staff.school)}</b></p><input type="hidden" id="${id}" value="${esc(staff.school)}">`}
+function evalPanel(d){const ev=d.eval||{},as=(ev.assign||[]).concat([{},{},{}]).slice(0,3),H=staff.role==='HRMO';
+ return `<h3>Evaluation (used in Annex C and D)</h3><div class="grid">
+ <label class="f w2"><span>Interview score</span><input type="text" id="ev_int" value="${esc(ev.interview||'')}"></label><label class="f w2"><span>Performance rating (if any)</span><input type="text" id="ev_perf" value="${esc(ev.perf||'')}"></label><label class="f w2"><span>Other qualifications</span><input type="text" id="ev_oth" value="${esc(ev.others||'')}"></label>
+ <label class="f"><span>Remarks</span><input type="text" id="ev_rem" value="${esc(ev.remarks||'')}"></label>
+ ${as.map((a,i)=>`<label class="f w3"><span>Assigned learning area ${i+1}</span><select id="ev_a${i}"><option value="">--</option>${AREAS.map(x=>`<option ${a.area===x?'selected':''}>${x}</option>`).join('')}</select></label><label class="f w3"><span>Grade group ${i+1}</span><select id="ev_g${i}"><option value="">--</option>${GRP.map(x=>`<option value="${x}" ${a.group===x?'selected':''}>Grades ${x}${x==='3-6'?' (Science only)':''}</option>`).join('')}</select></label>`).join('')}
+ ${H?`<label class="f"><span>Fund source (SDO)</span><input type="text" id="ev_fund" value="${esc(ev.fund||setg('DEFAULT_FUND'))}"></label><label class="f w3"><span>Contract: from</span><input type="date" id="ev_cf" value="${esc(ev.cFrom||'')}"></label><label class="f w3"><span>Contract: to</span><input type="date" id="ev_ct" value="${esc(ev.cTo||'')}"></label>`:''}
+ </div><div class="nav" style="justify-content:flex-start"><button class="b1" data-act="saveeval">Save evaluation</button></div>`}
 function renderStaff(){
- if(staff===false){$('#app').innerHTML=`<div class="card"><h2>Staff access</h2><p class="sub">School Heads see their own school only. SDO HRMO sees all schools.</p>
+ if(staff===false){$('#app').innerHTML=`<div class="card"><h2>Staff access</h2><p class="sub">School Heads, encoders (AO / selection committee) see their own school only. SDO HRMO sees all schools.</p>
   <div class="grid"><label class="f"><span>Access code</span><input type="text" id="code" autocomplete="off"></label></div>${staffMsg?`<div class="msg err">${esc(staffMsg)}</div>`:''}
   <div class="nav"><button class="b2" data-act="home">Back</button><button class="b1" data-act="login">Log in</button></div></div>`;return}
  if(detail){const d=detail,isR=d.kind==='report',D=d.data;
-  const opts=isR?['Submitted','Verified','For correction']:['Received','Under evaluation','Recommended','Selected','Not selected'];
+  const opts=isR?(staff.role==='ENCODER'?[]:['Submitted','Verified','For correction']):statOpts(staff.role);
+  const canC=!isR&&staff.role==='HRMO'&&D.cat==='tutor'&&['Selected','Approved by SDS','Engaged'].includes(d.status);
   $('#app').innerHTML=`<div class="card"><button class="b2" data-act="closedetail">← Back to list</button>
-  <h2 style="margin-top:12px">${esc(d.ref)} · ${esc(isR?D.name:fullName(D))}</h2><p class="sub">${isR?esc(mLabel(D.month))+' · '+esc(D.school)+' · '+hm(totMin(D)):esc(D.cat==='tutor'?'ARAL Tutor':'ARAL Support Aide')+' · '+esc(D.school)} · Status: <span class="tag">${esc(d.status||opts[0])}</span></p>
-  <div class="grid"><label class="f w3"><span>Status</span><select id="stat">${opts.map(s=>`<option ${s===(d.status||opts[0])?'selected':''}>${s}</option>`).join('')}</select></label><label class="f w3"><span>Remarks</span><input type="text" id="rem" value="${esc(d.remarks||'')}"></label></div>
+  <h2 style="margin-top:12px">${esc(d.ref)} · ${esc(isR?D.name:fullName(D))}</h2><p class="sub">${isR?esc(mLabel(D.month))+' · '+esc(D.school)+' · '+hm(totMin(D)):esc(D.cat==='tutor'?'ARAL Tutor':'ARAL Support Aide')+' · '+esc(D.school)} · Status: <span class="tag">${esc(d.status||(isR?'Submitted':'Received'))}</span></p>
+  ${opts.length?`<div class="grid"><label class="f w3"><span>Status</span><select id="stat">${opts.map(s=>`<option ${s===(d.status||opts[0])?'selected':''}>${s}</option>`).join('')}</select></label><label class="f w3"><span>Remarks</span><input type="text" id="rem" value="${esc(d.remarks||'')}"></label></div>`:'<p class="sub">Encoders cannot change the status.</p>'}
   ${staffMsg?`<div class="msg ok">${esc(staffMsg)}</div>`:''}
-  <div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b1" data-act="setstat">Save status</button><button class="b3" data-act="sprint">Print forms</button><button class="b2" data-act="sword">Download Word</button></div></div>
+  <div class="nav" style="justify-content:flex-start;flex-wrap:wrap">${opts.length?'<button class="b1" data-act="setstat">Save status</button>':''}<button class="b3" data-act="sprint">Print forms</button><button class="b2" data-act="sword">Download Word</button>${canC?'<button class="b3" data-act="cprint">Print contract (Annex E)</button><button class="b2" data-act="cword">Contract as Word</button>':''}</div>
+  ${!isR?evalPanel(d):''}</div>
   <div class="card" style="overflow:auto"><div class="doc">${isR?docF(D)+docG(D):docAll(D)}</div></div>`;return}
- const rows=tab==='apps'?list:rlist;
- const head=tab==='apps'?'<tr><th>Ref</th><th>Name</th><th>Type</th><th>School</th><th>Date</th><th>Status</th></tr>':'<tr><th>Ref</th><th>Name</th><th>Month</th><th>School</th><th>Hours</th><th>Status</th></tr>';
- const body=rows.map(r=>tab==='apps'?`<tr class="cl" data-act="open" data-ref="${esc(r.ref)}"><td>${esc(r.ref)}</td><td>${esc(r.name)}</td><td>${r.cat==='tutor'?'Tutor':'Support Aide'}</td><td>${esc(r.school)}</td><td>${esc((r.ts||'').slice(0,10))}</td><td><span class="tag">${esc(r.status||'Received')}</span></td></tr>`
-  :`<tr class="cl" data-act="openr" data-ref="${esc(r.ref)}"><td>${esc(r.ref)}</td><td>${esc(r.name)}</td><td>${esc(mLabel(r.month))}</td><td>${esc(r.school)}</td><td>${esc(r.hours)}</td><td><span class="tag">${esc(r.status||'Submitted')}</span></td></tr>`).join('');
- $('#app').innerHTML=`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><div><h2>${tab==='apps'?'Applicants':'Monthly reports'}</h2><p class="sub">${esc(staff.name||'')} · ${staff.role==='HRMO'?'SDO HRMO (all schools)':'School Head: '+esc(staff.school)}</p></div><div><button class="b2" data-act="refresh">Refresh</button> <button class="b2" data-act="logout">Log out</button></div></div>
-  <div class="tabs"><button class="${tab==='apps'?'on':''}" data-act="tab-apps">Applications</button><button class="${tab==='reps'?'on':''}" data-act="tab-reps">Monthly reports</button></div>
-  ${staffMsg?`<div class="msg err">${esc(staffMsg)}</div>`:''}
-  <div style="overflow:auto"><table class="list">${head}${body||'<tr><td colspan="6" style="color:#64748b">Nothing yet.</td></tr>'}</table></div></div>`}
+ const rows=tab==='apps'?list:rlist;const mySig=staff.role==='SCHOOLHEAD'?`<div class="card"><h2>My e-signature</h2><p class="sub">Saved once and used automatically when you verify a monthly report (Annex F and G) and, if you tick it, on Annex C.</p>${sigBox('School Head e-signature',staff.sig,'sig-my','sigrm-my')}</div>`:'';const TABS=[['apps','Applications'],['reps','Monthly reports'],['reg','Annex C and D'],['need','Tutor need']].concat(staff.role==='HRMO'?[['h','Annex H']]:[]);
+ let inner='';
+ if(tab==='apps'||tab==='reps'){
+  const head=tab==='apps'?'<tr><th>Ref</th><th>Name</th><th>Type</th><th>School</th><th>Date</th><th>Status</th></tr>':'<tr><th>Ref</th><th>Name</th><th>Month</th><th>School</th><th>Hours</th><th>Status</th></tr>';
+  const body=rows.map(r=>tab==='apps'?`<tr class="cl" data-act="open" data-ref="${esc(r.ref)}"><td>${esc(r.ref)}</td><td>${esc(r.name)}</td><td>${r.cat==='tutor'?'Tutor':'Support Aide'}</td><td>${esc(r.school)}</td><td>${esc((r.ts||'').slice(0,10))}</td><td><span class="tag">${esc(r.status||'Received')}</span></td></tr>`
+   :`<tr class="cl" data-act="openr" data-ref="${esc(r.ref)}"><td>${esc(r.ref)}</td><td>${esc(r.name)}</td><td>${esc(mLabel(r.month))}</td><td>${esc(r.school)}</td><td>${esc(r.hours)}</td><td><span class="tag">${esc(r.status||'Submitted')}</span></td></tr>`).join('');
+  inner=`<div style="overflow:auto"><table class="list">${head}${body||'<tr><td colspan="6" style="color:#64748b">Nothing yet.</td></tr>'}</table></div>`}
+ else if(tab==='reg'){inner=`<p class="sub">Annex C and D are made from the applications and the evaluation you saved on each applicant.</p>${schPicker('regsch')}
+  <div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b1" data-act="regC">Annex C (all external applicants)</button><button class="b1" data-act="regC2">Annex C (recommended / selected only)</button><button class="b3" data-act="regD">Annex D (selected tutors)</button></div>${staff.role==='SCHOOLHEAD'&&staff.sig?'<label class="f" style="flex-direction:row;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="useSig"><span style="margin:0;font-weight:500">Put my e-signature on Annex C</span></label>':''}`}
+ else if(tab==='need'){inner=`<p class="sub">Number of ARAL tutors the school needs (DM 061, items 6 to 8). The SDO HRMO uses these in Annex H.</p>${schPicker('needsch')}
+  <div class="grid"><label class="f w3"><span>School Year</span><input type="text" id="needsy" value="${esc(setg('SY')||'2026-2027')}"></label><span class="f w3"></span>
+  ${NEEDK.map(k=>`<label class="f w2"><span>${k[0]} · ${k[1]}</span><input type="number" min="0" max="999" id="nd_${k[2]}" value="0"></label>`).join('')}</div>
+  ${needMsg?`<div class="msg ok">${esc(needMsg)}</div>`:''}<div class="nav" style="justify-content:flex-start"><button class="b2" data-act="needload">Load saved numbers</button><button class="b1" data-act="needsave">Save</button></div>`}
+ else if(tab==='h'){inner=`<p class="sub">Combines all schools’ need reports and the engaged tutors (Selected, Approved by SDS, Engaged).</p><div class="nav" style="justify-content:flex-start"><button class="b1" data-act="buildH">Build Annex H</button></div>`}
+ const prev=(tab==='reg'||tab==='h')&&reg?`<div class="card"><div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b3" data-act="regprint">Print / Save as PDF</button><button class="b2" data-act="regword">Download Word</button>${reg.csv?'<button class="b2" data-act="regcsv">Download CSV</button>':''}</div></div><div class="card" style="overflow:auto"><div class="doc">${reg.html}</div></div>`:'';
+ $('#app').innerHTML=`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><div><h2>${TABS.find(t=>t[0]===tab)[1]}</h2><p class="sub">${esc(staff.name||'')} · ${roleName(staff.role)}${staff.role==='HRMO'?'':': '+esc(staff.school)}</p></div><div><button class="b2" data-act="refresh">Refresh</button> <button class="b2" data-act="logout">Log out</button></div></div>
+  <div class="tabs" style="flex-wrap:wrap">${TABS.map(t=>`<button class="${tab===t[0]?'on':''}" data-act="tab-${t[0]}">${t[1]}</button>`).join('')}</div>
+  ${staffMsg?`<div class="msg err">${esc(staffMsg)}</div>`:''}${inner}</div>${tab==='apps'||tab==='reg'?mySig:''}${prev}`}
 async function loadLists(){const a=await api('list',{code:staff.code});list=a.rows||[];const r=await api('listReports',{code:staff.code});rlist=r.rows||[]}
+const schVal=id=>{const e=$('#'+id);return e?e.value.trim():''};
+function dl(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+text],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove()}
 async function staffClick(b,a){
  try{
- if(a==='login'){const code=$('#code').value.trim();const r=await api('list',{code});if(!r.ok){staffMsg=r.error||'Invalid code';renderStaff();return}staff={code,role:r.role,name:r.name,school:r.school};list=r.rows;const q=await api('listReports',{code});rlist=q.rows||[];staffMsg='';renderStaff()}
- else if(a==='logout'){staff=false;list=[];rlist=[];detail=null;staffMsg='';renderStaff()}
+ if(a==='login'){const code=$('#code').value.trim();const r=await api('list',{code});if(!r.ok){staffMsg=r.error||'Invalid code';renderStaff();return}staff={code,role:r.role,name:r.name,school:r.school,sig:''};list=r.rows;try{const ms=await api('mySig',{code});staff.sig=ms.sig||''}catch(e){}const q=await api('listReports',{code});rlist=q.rows||[];staffMsg='';tab='apps';reg=null;renderStaff()}
+ else if(a==='logout'){staff=false;list=[];rlist=[];detail=null;reg=null;staffMsg='';renderStaff()}
  else if(a==='refresh'){await loadLists();renderStaff()}
- else if(a==='tab-apps'){tab='apps';renderStaff()}
- else if(a==='tab-reps'){tab='reps';renderStaff()}
- else if(a==='open'){const ref=(b.closest('[data-ref]')||b).dataset.ref;const r=await api('get',{code:staff.code,ref});if(!r.ok){staffMsg=r.error;renderStaff();return}detail=Object.assign(r,{kind:'app'});staffMsg='';renderStaff()}
- else if(a==='openr'){const ref=(b.closest('[data-ref]')||b).dataset.ref;const r=await api('getReport',{code:staff.code,ref});if(!r.ok){staffMsg=r.error;renderStaff();return}detail=Object.assign(r,{kind:'report'});staffMsg='';renderStaff()}
+ else if(a.startsWith('tab-')){tab=a.slice(4);reg=null;staffMsg='';needMsg='';renderStaff()}
+ else if(a==='open'){const ref=(b.closest('[data-ref]')||b).dataset.ref;const r=await api('get',{code:staff.code,ref});if(!r.ok){staffMsg=r.error;renderStaff();return}r.data.ref=r.ref;detail=Object.assign(r,{kind:'app'});staffMsg='';renderStaff()}
+ else if(a==='openr'){const ref=(b.closest('[data-ref]')||b).dataset.ref;const r=await api('getReport',{code:staff.code,ref});if(!r.ok){staffMsg=r.error;renderStaff();return}r.data.ref=r.ref;r.data.headSig=r.headSig||'';r.data.headSigAt=r.headSigAt||'';detail=Object.assign(r,{kind:'report'});staffMsg='';renderStaff()}
  else if(a==='closedetail'){detail=null;staffMsg='';await loadLists();renderStaff()}
  else if(a==='setstat'){const act=detail.kind==='report'?'verifyReport':'setStatus';const r=await api(act,{code:staff.code,ref:detail.ref,status:$('#stat').value,remarks:$('#rem').value});if(r.ok){detail.status=$('#stat').value;detail.remarks=$('#rem').value;staffMsg='Status saved.'}else staffMsg=r.error;renderStaff()}
+ else if(a==='saveeval'){const g=id=>{const e=$('#'+id);return e?e.value.trim():''};const assign=[0,1,2].map(i=>({area:g('ev_a'+i),group:g('ev_g'+i)})).filter(x=>x.area&&x.group);
+  const bad=assign.find(x=>x.area==='Science'?(x.group!=='3-6'&&x.group!=='7-10'):x.group==='3-6');if(bad){staffMsg='Check the grade group: Science uses Grades 3-6 or 7-10; Reading and Mathematics use 1-3, 4-6 or 7-10.';renderStaff();return}
+  const ev={interview:g('ev_int'),perf:g('ev_perf'),others:g('ev_oth'),remarks:g('ev_rem'),assign};if($('#ev_fund')){ev.fund=g('ev_fund');ev.cFrom=g('ev_cf');ev.cTo=g('ev_ct')}
+  const r=await api('saveEval',{code:staff.code,ref:detail.ref,ev});if(r.ok){detail.eval=r.eval;staffMsg='Evaluation saved.'}else staffMsg=r.error;renderStaff()}
  else if(a==='sprint')doPrint(detail.kind==='report'?docR(detail.data):docAll(detail.data));
  else if(a==='sword'){if(detail.kind==='report')doWordR(docR(detail.data),'ARAL_FG_'+(detail.data.name||'report'));else doWord(docAll(detail.data),'ARAL_'+(detail.data.last||'applicant'))}
+ else if(a==='cprint')doPrint(docE(detail.data,detail.eval));
+ else if(a==='cword')doWordR(docE(detail.data,detail.eval),'ARAL_Contract_'+(detail.data.last||'tutor'));
+ else if(a==='regC'||a==='regC2'||a==='regD'){const sc=schVal('regsch');if(!sc){staffMsg='Choose a school first.';renderStaff();return}const r=await api('registry',{code:staff.code,school:sc});if(!r.ok){staffMsg=r.error;renderStaff();return}staffMsg='';
+  const rep={school:sc,records:r.records,onlyRec:a==='regC2',sig:($('#useSig')&&$('#useSig').checked)?staff.sig:''};reg=a==='regD'?{html:docD(rep),title:'AnnexD_'+sc}:{html:docC(rep),title:'AnnexC_'+sc};renderStaff();const e=$('#regsch');if(e&&staff.role==='HRMO')e.value=sc}
+ else if(a==='needload'||a==='needsave'){const sc=schVal('needsch');if(!sc){needMsg='';staffMsg='Choose a school first.';renderStaff();return}staffMsg='';
+  if(a==='needload'){const r=await api('registry',{code:staff.code,school:sc});const sy=schVal('needsy');const n=(r.needs||[]).find(x=>x.sy===sy)||(r.needs||[])[0];NEEDK.forEach(k=>{const e=$('#nd_'+k[2]);if(e)e.value=n&&n.counts?(n.counts[k[2]]||0):0});needMsg=n?'Loaded.':'No saved numbers yet.';const m=$('.msg.ok');if(m)m.textContent=needMsg;else{const d=document.createElement('div');d.className='msg ok';d.textContent=needMsg;$('.nav').before(d)}}
+  else{const counts={};NEEDK.forEach(k=>counts[k[2]]=parseInt(($('#nd_'+k[2])||{}).value,10)||0);const r=await api('saveNeed',{code:staff.code,school:sc,sy:schVal('needsy'),counts});if(r.ok){toast('Saved')}else{staffMsg=r.error;renderStaff()}}}
+ else if(a==='buildH'){const r=await api('registry',{code:staff.code,school:''});if(!r.ok){staffMsg=r.error;renderStaff();return}staffMsg='';const rep={records:r.records,needs:r.needs};reg={html:docH(rep),title:'AnnexH_SDO_Consolidated',csv:csvH(rep)};renderStaff()}
+ else if(a==='regprint')doPrint(reg.html);
+ else if(a==='regword')doWordR(reg.html,reg.title);
+ else if(a==='regcsv')dl(reg.title+'.csv',reg.csv,'text/csv');
  }catch(err){staffMsg=err.message;renderStaff()}}
 document.addEventListener('click',e=>{const tr=e.target.closest('tr[data-act]');if(tr&&!e.target.closest('button')){staffClick(tr,tr.dataset.act)}});
-render();
+render();loadConfig();
 </script>
 </body>
 </html>
