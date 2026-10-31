@@ -111,7 +111,7 @@ div.ctr{page:ctr}
 <div id="printArea" class="doc"></div>
 <script>
 /* ================= CONFIG ================= */
-const API_URL = 'https://script.google.com/macros/s/AKfycbxuN2OVcDd3sxaKRWg4GId-nXqSbZ_9K5rOm87x_F2P048e4F99BXcfSuhysSwzgQg/exec';   // <-- paste your Apps Script Web App URL here (ends with /exec)
+const API_URL = '';   // <-- paste your Apps Script Web App URL here (ends with /exec)
 const BOX_YES='☒', BOX_NO='☐';
 
 /* ================= HELPERS ================= */
@@ -747,9 +747,9 @@ ${pool.length?'':(rep.official&&all.length?`<p style="border:1px solid #999;padd
 function summarize(records){
  const T=records.filter(r=>r.cat==='tutor'&&r.status!=='Not selected');
  const mk=()=>({total:0,off:0,dr:0,dep:0,non:0});const add=(o,r)=>{o.total++;ENGAGED.includes(r.status)?o.off++:o.dr++;r.appCat==='DepEd teaching personnel'?o.dep++:o.non++};
- const R={ks1:mk(),ks2:mk(),r3:mk(),m3:mk(),s3:mk(),un:mk(),all:mk()};
+ const R={ks1:mk(),ks2:mk(),ks3:mk(),r3:mk(),m3:mk(),s3:mk(),un:mk(),all:mk()};
  T.forEach(r=>{add(R.all,r);const as=assignOf(r);if(!as.length){add(R.un,r);return}
-  if(as.some(x=>x.group==='1-3'))add(R.ks1,r);if(as.some(x=>x.group==='4-6'||x.group==='3-6'))add(R.ks2,r);
+  if(as.some(x=>x.group==='1-3'))add(R.ks1,r);if(as.some(x=>x.group==='7-10'))add(R.ks3,r);if(as.some(x=>x.group==='4-6'||x.group==='3-6'))add(R.ks2,r);
   ['Reading','Mathematics','Science'].forEach((ar,i)=>{if(as.some(x=>x.group==='7-10'&&x.area===ar))add([R.r3,R.m3,R.s3][i],r)})});
  return R}
 function docSummary(rep){
@@ -760,9 +760,18 @@ function docSummary(rep){
  if(rep.byDistrict){const T=rep.records.filter(r=>r.cat==='tutor'&&r.status!=='Not selected'),ds={};T.forEach(r=>{const d=districtOf(r.school);(ds[d]=ds[d]||[]).push(r)});
   const names=Object.keys(ds).sort();const c=n=>`<td style="text-align:center">${n}</td>`;
   const line=(label,recs,bold)=>{const x=summarize(recs);const b=t=>bold?`<b>${t}</b>`:t;return `<tr><td>${b(esc(label))}</td>${c(b(x.all.total))}${c(x.ks1.total)}${c(x.ks2.total)}${c(x.r3.total)}${c(x.m3.total)}${c(x.all.off)}${c(x.all.dr)}</tr>`};
-  byD=`<h2 style="margin:14pt 0 6pt">SUMMARY BY DISTRICT</h2><table class="k"><colgroup><col style="width:24%"><col style="width:10%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:9%"><col style="width:9%"></colgroup>
+  byD=`<h2 style="margin:14pt 0 6pt">SUMMARY BY DISTRICT</h2><table class="k"><colgroup><col style="width:22%"><col style="width:9%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:11%"><col style="width:10%"></colgroup>
   <tr><th>District</th><th>Tutors</th><th>Key Stage 1<br><span style="font-weight:normal;font-size:7pt">Grades 1–3</span></th><th>Key Stage 2<br><span style="font-weight:normal;font-size:7pt">Grades 4–6</span></th><th>Key Stage 3<br><span style="font-weight:normal;font-size:7pt">Reading</span></th><th>Key Stage 3<br><span style="font-weight:normal;font-size:7pt">Mathematics</span></th><th>Selected</th><th>Draft</th></tr>
   ${names.map(d=>line(d,ds[d])).join('')||'<tr><td colspan="8" style="height:18pt"></td></tr>'}${line('ALL DISTRICTS',T,true)}</table>`}
+let byS='';
+ if(rep.bySchool){const T=rep.records.filter(r=>r.cat==='tutor'&&r.status!=='Not selected'),ss={};T.forEach(r=>{(ss[r.school]=ss[r.school]||[]).push(r)});
+  const names=Object.keys(ss).sort((a,b)=>(districtOf(a)+'|'+a).localeCompare(districtOf(b)+'|'+b));const c=n=>`<td style="text-align:center">${n}</td>`;
+  const ln=(n,recs)=>{const x=summarize(recs);return `<tr><td>${esc(n)}</td><td style="font-size:8pt">${esc(districtOf(n))}</td>${c('<b>'+x.all.total+'</b>')}${c(x.all.off)}${c(x.all.dr)}${c(x.all.dep)}${c(x.all.non)}${c(x.ks1.total)}${c(x.ks2.total)}${c(x.ks3.total)}</tr>`};
+  const tot=summarize(T);
+  byS=`<h2 style="margin:14pt 0 6pt">SUMMARY BY SCHOOL</h2><p style="font-size:8pt;color:#444;margin:0 0 4pt">Total = applicants of the school (each counted once). KS = key stage. Schools with at least one applicant. ${names.length} school${names.length===1?'':'s'}.</p><table class="k"><colgroup><col style="width:25%"><col style="width:14%"><col style="width:8%"><col style="width:11%"><col style="width:8%"><col style="width:8%"><col style="width:10%"><col style="width:5%"><col style="width:5%"><col style="width:6%"></colgroup>
+  <thead><tr><th>School</th><th>District</th><th>Total</th><th>Selected</th><th>Draft</th><th>DepEd</th><th>Non-DepEd</th><th>KS 1</th><th>KS 2</th><th>KS 3</th></tr></thead><tbody>
+  ${names.map(n=>ln(n,ss[n])).join('')||'<tr><td colspan="10" style="height:18pt"></td></tr>'}<tr><td colspan="2"><b>ALL SCHOOLS</b></td>${c('<b>'+tot.all.total+'</b>')}${c('<b>'+tot.all.off+'</b>')}${c('<b>'+tot.all.dr+'</b>')}${c('<b>'+tot.all.dep+'</b>')}${c('<b>'+tot.all.non+'</b>')}${c('<b>'+tot.ks1.total+'</b>')}${c('<b>'+tot.ks2.total+'</b>')}${c('<b>'+tot.ks3.total+'</b>')}</tr></tbody></table>`}
+ const aides=rep.records.filter(r=>r.cat==='aide').length;
  return `<div class="Section1"><section class="page"><div class="ann">Summary of ARAL tutor applicants</div>
  <h2 style="margin:6pt 0 2pt">SUMMARY BY KEY STAGE</h2><p style="text-align:center;margin:0 0 8pt">${esc(rep.school)}</p>
  <table class="k"><colgroup><col style="width:42%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:11%"><col style="width:11%"></colgroup>
@@ -771,13 +780,13 @@ function docSummary(rep){
  ${grp('JUNIOR HIGH SCHOOL: by specialization')}${row('Key Stage 3: Reading (Grades 7–10)',R.r3,1)}${row('Key Stage 3: Mathematics (Grades 7–10)',R.m3,1)}${R.s3.total?row('Key Stage 3: Science (Grades 7–10)',R.s3,1):''}
  ${R.un.total?grp('NOT YET ASSIGNED')+row('No learning area or school level yet',R.un):''}
  <tr><td><b>All tutors (each counted once)</b></td><td style="text-align:center"><b>${R.all.total}</b></td><td style="text-align:center"><b>${R.all.off}</b></td><td style="text-align:center"><b>${R.all.dr}</b></td><td style="text-align:center"><b>${R.all.dep}</b></td><td style="text-align:center"><b>${R.all.non}</b></td></tr></table>
- ${byD}
- <p style="font-size:8pt;color:#444;margin-top:6pt">Counts are applicants except those marked Not selected and support aides. A tutor is counted once per row, so one tutor can appear in more than one row (for example Key Stage 1 and Key Stage 3 in an integrated school). Selected = Selected, Approved by SDS or Engaged.</p></section></div>`}
+${byD}${byS}
+ <p style="font-size:8pt;color:#444;margin-top:6pt">${aides?`Support aides who applied: ${aides} (not in the counts above). `:''}Counts are applicants except those marked Not selected and support aides. A tutor is counted once per row, so one tutor can appear in more than one row (for example Key Stage 1 and Key Stage 3 in an integrated school). Selected = Selected, Approved by SDS or Engaged.</p></section></div>`}
 // One official Annex C and Annex D page for every school, with the summary in front (for endorsement and contracts).
 function docBundle(rep){
  const by={};rep.records.filter(r=>r.cat==='tutor'&&r.status!=='Not selected').forEach(r=>(by[r.school]=by[r.school]||[]).push(r));
  const schools=Object.keys(by).sort((a,b)=>(districtOf(a)+'|'+a).localeCompare(districtOf(b)+'|'+b));
- return docSummary({school:rep.label,records:rep.records,byDistrict:true})+schools.map(sc=>{
+ return docSummary({school:rep.label,records:rep.records,byDistrict:true,bySchool:true})+schools.map(sc=>{
   const ext=by[sc].filter(r=>r.appCat!=='DepEd teaching personnel'&&(!rep.onlyRec||RECD.includes(r.status)));
   return (ext.length?docC({school:sc,records:by[sc],onlyRec:rep.onlyRec}):'')+docD({school:sc,records:by[sc],official:rep.official})}).join('')}
 const NEEDK=[['Reading','Grades 1-3','r13'],['Reading','Grades 4-6','r46'],['Reading','Grades 7-10','r710'],['Mathematics','Grades 1 to 3','m13'],['Mathematics','Grades 4 to 6','m46'],['Mathematics','Grades 7-10','m710'],['Science','Grades 3 to 6','s36'],['Science','Grades 7 to 10','s710']];
@@ -884,7 +893,7 @@ function scopeRecords(){const rs=regData?regData.records:[];if(!isH())return rs;
 const scopeSingle=()=>!isH()||!!regSel.school;
 function scopeLabel(){if(!isH())return regData?regData.school:'';return regSel.school||(regSel.district?'District: '+regSel.district:'All schools (SDO)')}
 function regDoc(kind){const recs=scopeRecords(),label=scopeLabel(),one=scopeSingle(),sig=regOpt.sig?staff.sig:'';
- if(kind==='S')return docSummary({school:label,records:recs,byDistrict:!one});
+ if(kind==='S')return docSummary({school:label,records:recs,byDistrict:!one,bySchool:!one});
  if(kind==='C')return docC({school:label,records:recs,onlyRec:regOpt.onlyRec,sig,multi:!one});
  if(kind==='D')return docD({school:label,records:recs,official:regOpt.official,multi:!one});
  return docBundle({label,records:recs,onlyRec:regOpt.onlyRec,official:regOpt.official})}
@@ -922,10 +931,11 @@ function renderStaff(){
  const rows=tab==='apps'?list:rlist;const mySig=staff.role==='SCHOOLHEAD'?`<div class="card"><h2>My e-signature</h2><p class="sub">Kept <b>only on this device</b>; it is never saved on the server. It is attached to a monthly report (Annex F and G) only when you press Verify, and that copy is deleted 7 days later. You can also put it on Annex C.</p>${sigBox('School Head e-signature',staff.sig,'sig-my','sigrm-my')}</div>`:'';const TABS=[['apps','Applications'],['reps','Monthly reports'],['reg','Annex C and D'],['need','Tutor need']].concat(staff.role==='HRMO'?[['h','Annex H']]:[]);
  let inner='';
  if(tab==='apps'||tab==='reps'){
+  const cnt=(arr,f)=>arr.filter(f).length;const chips=tab==='apps'?(()=>{const st={};list.forEach(r=>{const k=r.status||'Received';st[k]=(st[k]||0)+1});return `<div class="chk" style="margin:8px 0;gap:6px 8px"><span class="tag" style="background:rgba(13,148,136,.15);color:var(--p2)">Total ${list.length}</span><span class="tag">Tutors ${cnt(list,r=>r.cat==='tutor')}</span><span class="tag">Support aides ${cnt(list,r=>r.cat==='aide')}</span>${Object.keys(st).map(k=>`<span class="tag" style="background:var(--card2);color:var(--ink);border:1px solid var(--bd)">${esc(k)} ${st[k]}</span>`).join('')}</div>`})():`<div class="chk" style="margin:8px 0"><span class="tag" style="background:rgba(13,148,136,.15);color:var(--p2)">Total ${rlist.length}</span></div>`;
   const head=tab==='apps'?'<tr><th>Ref</th><th>Name</th><th>Type</th><th>School</th><th>Date</th><th>Status</th></tr>':'<tr><th>Ref</th><th>Name</th><th>Month</th><th>School</th><th>Hours</th><th>Status</th></tr>';
   const body=rows.map(r=>tab==='apps'?`<tr class="cl" data-act="open" data-ref="${esc(r.ref)}"><td>${esc(r.ref)}</td><td>${esc(r.name)}</td><td>${r.cat==='tutor'?'Tutor':'Support Aide'}</td><td>${esc(r.school)}</td><td>${esc((r.ts||'').slice(0,10))}</td><td><span class="tag">${esc(r.status||'Received')}</span></td></tr>`
    :`<tr class="cl" data-act="openr" data-ref="${esc(r.ref)}"><td>${esc(r.ref)}</td><td>${esc(r.name)}</td><td>${esc(mLabel(r.month))}</td><td>${esc(r.school)}</td><td>${esc(r.hours)}</td><td><span class="tag">${esc(r.status||'Submitted')}</span></td></tr>`).join('');
-  inner=`<div style="overflow:auto"><table class="list">${head}${body||'<tr><td colspan="6" style="color:#64748b">Nothing yet.</td></tr>'}</table></div>`}
+  inner=chips+`<div style="overflow:auto"><table class="list">${head}${body||'<tr><td colspan="6" style="color:#64748b">Nothing yet.</td></tr>'}</table></div>`}
  else if(tab==='reg'){const ic=regOpt.onlyRec?'checked':'',io=regOpt.official?'checked':'';
   const H=isH(),inScope=H?allSchools().filter(n=>!regSel.district||districtOf(n)===regSel.district):[];
   const picker=H?`<div class="grid"><label class="f w3"><span>District</span><select id="regdist"><option value="">All districts</option>${districts().concat(['Other (not in the list)']).map(d=>`<option ${d===regSel.district?'selected':''}>${esc(d)}</option>`).join('')}</select></label><label class="f w3"><span>School</span><select id="regsch"><option value="">All schools${regSel.district?' in '+esc(regSel.district):' (whole SDO)'}</option>${inScope.map(n=>`<option ${n===regSel.school?'selected':''}>${esc(n)}</option>`).join('')}</select></label></div>`:schPicker('regsch',regData&&regData.school);
