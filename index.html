@@ -111,7 +111,7 @@ div.ctr{page:ctr}
 <div id="printArea" class="doc"></div>
 <script>
 /* ================= CONFIG ================= */
-const API_URL = 'https://script.google.com/macros/s/AKfycbxuN2OVcDd3sxaKRWg4GId-nXqSbZ_9K5rOm87x_F2P048e4F99BXcfSuhysSwzgQg/exec';   // <-- paste your Apps Script Web App URL here (ends with /exec)
+const API_URL = '';   // <-- paste your Apps Script Web App URL here (ends with /exec)
 const BOX_YES='☒', BOX_NO='☐';
 
 /* ================= HELPERS ================= */
@@ -151,7 +151,12 @@ const YN=[['Yes','Yes'],['No','No']];
 const SCIENCE_ON=false; // Science is hidden for now: only Reading and Mathematics are tutored. Set to true to offer it again.
 const areaOpts=()=>S.cat==='aide'?[['aide','Applying as Support Aide']]:[['reading','Reading'],['math','Mathematics']].concat(SCIENCE_ON?[['science','Science']]:[]);
 function SCH(label,p,o={}){const ph='Start typing and pick from the list, or type the full name';return `<label class="f ${o.w||''}"><span>${label} <b>*</b></span><input type="text" list="schl" data-p="${p}" data-sch value="${esc(getp(root(),p))}" placeholder="${ph}"></label>`}
-const schoolMatch=v=>CFG.schools.find(x=>x.name.toLowerCase()===String(v||'').trim().toLowerCase());
+// "Agnay Elementary School" and "Agnay ES" are the same school: both get the same key.
+function schoolKey(n){let s=String(n||'').toLowerCase().replace(/[.,()]/g,' ').replace(/&/g,' and ').replace(/\s+/g,' ').trim();
+ [[/\bcentral elementary school\b/g,'ces'],[/\bmemorial elementary school\b/g,'mes'],[/\bnational high school\b/g,'nhs'],[/\bintegrated school\b/g,'is'],[/\bcentral school\b/g,'cs'],[/\bprimary school\b/g,'ps'],[/\bmemorial school\b/g,'ms'],[/\belementary school\b/g,'es'],[/\bhigh school\b/g,'hs']].forEach(r=>{s=s.replace(r[0],r[1])});return s.replace(/\s+/g,' ').trim()}
+const schoolMatch=v=>{const t=String(v||'').trim().toLowerCase();return CFG.schools.find(x=>x.name.toLowerCase()===t)||CFG.schools.find(x=>schoolKey(x.name)===schoolKey(v))};
+const canonSchool=n=>{const m=schoolMatch(n);return m?m.name:String(n||'').trim()};
+const normRecs=rs=>(rs||[]).map(r=>Object.assign({},r,{school:canonSchool(r.school)}));
 const schoolOK=v=>true; // schools that are not in the list are allowed: the user types the full name
 function fillSchools(){const d=document.getElementById('schl');if(d)d.innerHTML=CFG.schools.map(x=>`<option value="${esc(x.name)}">${esc(x.district)}</option>`).join('')}
 async function loadConfig(){if(!API_URL)return;try{const r=await api('config',{});if(r.ok){CFG={settings:r.settings,forms:Array.isArray(r.forms)?r.forms:[],schools:(r.schools&&r.schools.length>3)?r.schools:CFG.schools};fillSchools();const ae=document.activeElement;if(!ae||ae===document.body)render()}}catch(e){}}
@@ -682,7 +687,7 @@ const docFonly=D=>`<div class="Section1">${withRef(docF(D),D.ref)}</div>`,docGon
 const AREAS=['Reading','Mathematics','Science'],GRP=['1-3','4-6','7-10','3-6'];
 const KS={'1-3':' (Key Stage 1)','4-6':' (Key Stage 2)','7-10':' (Key Stage 3)'};
 // School level comes from the Schools sheet (Level column) or, if blank, from the end of the school's name.
-function levelOf(name){const m=schoolMatch(name);let lv=m&&m.level;if(!lv){const suf=(String(name||'').trim().split(/\s+/).pop()||'').toUpperCase();lv=({ES:'Elementary',CES:'Elementary',CS:'Elementary',PS:'Elementary',MES:'Elementary',MS:'Elementary',NHS:'High School',HS:'High School',MMMNHS:'High School',AHS:'High School',NTS:'High School',IS:'Integrated'})[suf]||''}return lv}
+function levelOf(name){const m=schoolMatch(name);let lv=m&&m.level;if(!lv){const suf=(schoolKey(name).split(' ').pop()||'').toUpperCase();lv=({ES:'Elementary',CES:'Elementary',CS:'Elementary',PS:'Elementary',MES:'Elementary',MS:'Elementary',NHS:'High School',HS:'High School',MMMNHS:'High School',AHS:'High School',NTS:'High School',IS:'Integrated'})[suf]||''}return lv}
 // Focus for now: Elementary -> Key Stage 1 (Grades 1-3, generalists); High School -> Key Stage 3 (Grades 7-10, by specialization); Integrated -> both. Reading and Mathematics only.
 function autoAssign(r){const lv=levelOf(r.school),a=r.areas||{},sel=[];if(a.reading)sel.push('Reading');if(a.math)sel.push('Mathematics');const out=[];if(!sel.length)return out;
  // Elementary tutors are generalists: whoever can teach Reading can also teach Mathematics, so both areas are given in Key Stage 1.
@@ -778,32 +783,37 @@ function docBundle(rep){
 const NEEDK=[['Reading','Grades 1-3','r13'],['Reading','Grades 4-6','r46'],['Reading','Grades 7-10','r710'],['Mathematics','Grades 1 to 3','m13'],['Mathematics','Grades 4 to 6','m46'],['Mathematics','Grades 7-10','m710'],['Science','Grades 3 to 6','s36'],['Science','Grades 7 to 10','s710']];
 function hData(rep){
  const src=rep.source||'apps';const tot={},dep={},non={};NEEDK.forEach(k=>{tot[k[2]]=0;dep[k[2]]=0;non[k[2]]=0});
- const keyOf=x=>({Reading:'r',Mathematics:'m',Science:'s'})[x.area]+x.group.replace('-','');let rows=[],nTut=0,nOff=0;
+ const keyOf=x=>({Reading:'r',Mathematics:'m',Science:'s'})[x.area]+x.group.replace('-','');let rows=[],nTut=0,nOff=0,nUn=0;
  if(src==='apps'){const by={};
   rep.records.filter(r=>r.cat==='tutor'&&r.status!=='Not selected').forEach(r=>{nTut++;if(ENGAGED.includes(r.status))nOff++;
+   const as=assignOf(r);if(!as.length){nUn++;return}
    const row=by[r.school]=by[r.school]||{school:r.school,counts:Object.fromEntries(NEEDK.map(k=>[k[2],0]))};
-   assignOf(r).forEach(x=>{const k=keyOf(x);if(k in row.counts){row.counts[k]++;tot[k]++;(r.appCat==='DepEd teaching personnel'?dep:non)[k]++}})});
+   as.forEach(x=>{const k=keyOf(x);if(k in row.counts){row.counts[k]++;tot[k]++;(r.appCat==='DepEd teaching personnel'?dep:non)[k]++}})});
   rows=Object.values(by).sort((a,b)=>a.school.localeCompare(b.school))}
  else{rows=(rep.needs||[]).slice().sort((a,b)=>a.school.localeCompare(b.school)).map(n=>({school:n.school,counts:n.counts||{}}));
   rows.forEach(n=>NEEDK.forEach(k=>tot[k[2]]+=+n.counts[k[2]]||0));
   rep.records.filter(r=>r.cat==='tutor'&&ENGAGED.includes(r.status)).forEach(r=>assignOf(r).forEach(x=>{const k=keyOf(x);if(k in dep){(r.appCat==='DepEd teaching personnel'?dep:non)[k]++}}))}
- return{rows,tot,dep,non,nTut,nOff,src}}
+ if(rep.all){const have=new Set(rows.map(r=>r.school));CFG.schools.forEach(sc=>{if(!have.has(sc.name))rows.push({school:sc.name,counts:Object.fromEntries(NEEDK.map(k=>[k[2],0])),none:true})});
+  rows.sort((a,b)=>(districtOf(a.school)+'|'+a.school).localeCompare(districtOf(b.school)+'|'+b.school))}
+ return{rows,tot,dep,non,nTut,nOff,nUn,src}}
 function docH(rep){
- const{rows:R,tot,dep,non,nTut,nOff,src}=hData(rep);
+ const{rows:R,tot,dep,non,nTut,nOff,nUn,src}=hData(rep);
  const cells=o=>NEEDK.map(k=>`<td style="text-align:center">${o[k[2]]}</td>`).join('');
- let rows=R.map(n=>`<tr><td>${esc(n.school)}</td>${NEEDK.map(k=>`<td style="text-align:center">${+((n.counts||{})[k[2]])||0}</td>`).join('')}</tr>`).join('');
- for(let i=R.length;i<6;i++)rows+=`<tr><td style="height:17pt">&nbsp;</td>${'<td></td>'.repeat(8)}</tr>`;
+ let rows='',curD=null;
+ R.forEach(n=>{if(rep.all){const d=districtOf(n.school);if(d!==curD){curD=d;rows+=`<tr><td colspan="9" style="background:#eee;font-weight:bold;-webkit-print-color-adjust:exact;print-color-adjust:exact">${esc(d.toUpperCase())}</td></tr>`}}
+  rows+=`<tr${n.none?' style="color:#888"':''}><td>${esc(n.school)}</td>${NEEDK.map(k=>`<td style="text-align:center">${+((n.counts||{})[k[2]])||0}</td>`).join('')}</tr>`});
+ for(let i=R.length;i<(rep.all?0:6);i++)rows+=`<tr><td style="height:17pt">&nbsp;</td>${'<td></td>'.repeat(8)}</tr>`;
  return `<div class="Section2"><section class="page"><div class="ann">Annex H: SDO Consolidated Data of Tutors for Hiring, by Grade Groups and Specialization</div>
  <table style="width:100%;border:0"><tr><td style="width:60%;vertical-align:top;border:0">SDO: ${UL(setg('SDO_NAME'),30)}<br>Specialization of Tutors: <u>READING/ENGLISH, SCIENCE, MATH</u></td><td style="border:0;vertical-align:top">Address: ${UL(setg('SDO_ADDRESS'),20)}<br>SDS : ${UL(setg('SDS_NAME'),20)}</td></tr></table>
  <h2 style="margin:8pt 0 4pt">SDO Consolidated Data of No. of Tutors to be Engaged By Grade Groups and Specialization</h2>
- <table class="k"><colgroup><col style="width:28%">${'<col style="width:9%">'.repeat(8)}</colgroup>
+ <table class="k"><colgroup><col style="width:28%">${'<col style="width:9%">'.repeat(8)}</colgroup><thead>
  <tr><th rowspan="2">Schools</th><th colspan="3">Reading</th><th colspan="3">Mathematics</th><th colspan="2">Science</th></tr>
- <tr>${NEEDK.map(k=>`<th style="font-size:8pt">${k[1]}</th>`).join('')}</tr>${rows}
- <tr><td style="text-align:right"><b>TOTAL</b></td>${cells(tot)}</tr><tr><td style="text-align:right"><b>DepEd Tutors</b></td>${cells(dep)}</tr><tr><td style="text-align:right"><b>Non-DepEd Tutors</b></td>${cells(non)}</tr></table>
- ${src==='apps'?`<p style="font-size:8pt;color:#444;margin:6pt 0 0">Counted from the applications submitted (${nTut} tutor${nTut===1?'':'s'}, ${nOff} already Selected; Not selected and support aides are left out). An elementary tutor is a generalist and is counted under both Reading and Mathematics.</p>`:''}
+ <tr>${NEEDK.map(k=>`<th style="font-size:8pt">${k[1]}</th>`).join('')}</tr></thead><tbody>${rows}
+ <tr><td style="text-align:right"><b>TOTAL</b></td>${cells(tot)}</tr><tr><td style="text-align:right"><b>DepEd Tutors</b></td>${cells(dep)}</tr><tr><td style="text-align:right"><b>Non-DepEd Tutors</b></td>${cells(non)}</tr></tbody></table>
+ ${rep.all?`<p style="font-size:8pt;color:#444;margin:6pt 0 0">All schools of the Division are listed, grouped by district. Schools in grey have no ${src==='apps'?'applicants':'need report'} yet.</p>`:''}${src==='apps'?`<p style="font-size:8pt;color:#444;margin:6pt 0 0">Counted from the applications submitted (${nTut} tutor${nTut===1?'':'s'}, ${nOff} already Selected; Not selected and support aides are left out). An elementary tutor is a generalist and is counted under both Reading and Mathematics.${nUn?` ${nUn} tutor${nUn===1?' is':'s are'} not counted yet because the school level or the learning area is not set (see “Not yet assigned” in Annex D).`:''}</p>`:''}
  <div class="sigbox" style="margin-left:0;width:30%;margin-top:18pt"><div style="border:0">Prepared by:</div><div style="margin-top:20pt">SDO HRMO</div></div></section></div>`}
-function csvH(rep){const{rows:R,tot,dep,non}=hData(rep);const q=x=>'"'+String(x).replace(/"/g,'""')+'"';const hd=['School'].concat(NEEDK.map(k=>k[0]+' '+k[1]));
- const rows=R.map(n=>[n.school].concat(NEEDK.map(k=>+((n.counts||{})[k[2]])||0)));rows.push(['TOTAL'].concat(NEEDK.map(k=>tot[k[2]])),['DepEd Tutors'].concat(NEEDK.map(k=>dep[k[2]])),['Non-DepEd Tutors'].concat(NEEDK.map(k=>non[k[2]])));
+function csvH(rep){const{rows:R,tot,dep,non}=hData(rep);const q=x=>'"'+String(x).replace(/"/g,'""')+'"';const hd=(rep.all?['District']:[]).concat(['School']).concat(NEEDK.map(k=>k[0]+' '+k[1]));
+ const rows=R.map(n=>(rep.all?[districtOf(n.school)]:[]).concat([n.school]).concat(NEEDK.map(k=>+((n.counts||{})[k[2]])||0)));const pre=rep.all?['']:[];rows.push(pre.concat(['TOTAL']).concat(NEEDK.map(k=>tot[k[2]])),pre.concat(['DepEd Tutors']).concat(NEEDK.map(k=>dep[k[2]])),pre.concat(['Non-DepEd Tutors']).concat(NEEDK.map(k=>non[k[2]])));
  return [hd].concat(rows).map(r=>r.map(q).join(',')).join('\n')}
 function docE(D,ev){
  ev=ev||{};const nm=fullName(D).toUpperCase(),sds=setg('SDS_NAME'),sdsT=setg('SDS_TITLE'),sdo=setg('SDO_NAME'),addr=setg('SDO_ADDRESS'),fund=ev.fund||setg('DEFAULT_FUND');
@@ -865,9 +875,10 @@ function docE(D,ev){
 const sdT=x=>x||'Schools Division Superintendent';
 
 /* ================= STAFF ================= */
-let hSrc='apps',hLoading=false;
+let hSrc='apps',hAll=false,hLoading=false,hRep=null;
 let list=[],rlist=[],detail=null,staffMsg='',tab='apps',reg=null,needMsg='',regData=null,regLoading=false,regOpt={onlyRec:false,official:false,sig:false},regSel={district:'',school:''},regView='S';
-async function buildH(){hLoading=true;renderStaff();try{const r=await api('registry',{code:staff.code,school:''});hLoading=false;if(!r.ok){staffMsg=r.error;reg=null}else{staffMsg='';const rep={records:r.records,needs:r.needs,source:hSrc};reg={html:docH(rep),title:'AnnexH_SDO_Consolidated',csv:csvH(rep)}}}catch(err){hLoading=false;staffMsg=err.message}renderStaff()}
+function mkH(){if(!hRep){reg=null;return}const rep={records:hRep.records,needs:hRep.needs,source:hSrc,all:hAll};reg={html:docH(rep),title:'AnnexH_SDO_Consolidated',csv:csvH(rep)}}
+async function buildH(){hLoading=true;renderStaff();try{const r=await api('registry',{code:staff.code,school:''});hLoading=false;if(!r.ok){staffMsg=r.error;hRep=null}else{staffMsg='';hRep={records:normRecs(r.records),needs:(r.needs||[]).map(n=>Object.assign({},n,{school:canonSchool(n.school)}))}}mkH()}catch(err){hLoading=false;staffMsg=err.message}renderStaff()}
 const isH=()=>staff&&staff.role==='HRMO';
 function scopeRecords(){const rs=regData?regData.records:[];if(!isH())return rs;return rs.filter(r=>(!regSel.district||districtOf(r.school)===regSel.district)&&(!regSel.school||r.school===regSel.school))}
 const scopeSingle=()=>!isH()||!!regSel.school;
@@ -878,10 +889,10 @@ function regDoc(kind){const recs=scopeRecords(),label=scopeLabel(),one=scopeSing
  if(kind==='D')return docD({school:label,records:recs,official:regOpt.official,multi:!one});
  return docBundle({label,records:recs,onlyRec:regOpt.onlyRec,official:regOpt.official})}
 async function loadReg(){const sc=isH()?'':schVal('regsch');if(!isH()&&!sc){regData=null;renderStaff();return}regLoading=true;renderStaff();
- try{const r=await api('registry',{code:staff.code,school:sc});regLoading=false;if(!r.ok){staffMsg=r.error;regData=null}else{staffMsg='';regData={school:sc,records:r.records}}}catch(err){regLoading=false;staffMsg=err.message}renderStaff()}
+ try{const r=await api('registry',{code:staff.code,school:sc});regLoading=false;if(!r.ok){staffMsg=r.error;regData=null}else{staffMsg='';regData={school:sc,records:normRecs(r.records)}}}catch(err){regLoading=false;staffMsg=err.message}renderStaff()}
 const statOpts=role=>role==='ENCODER'?[]:role==='SCHOOLHEAD'?['Received','Under evaluation','Recommended','Selected','Not selected']:['Received','Under evaluation','Recommended','Selected','Not selected','Approved by SDS','Engaged'];
 const roleName=r=>({HRMO:'SDO HRMO (all schools)',SCHOOLHEAD:'School Head',ENCODER:'Encoder (AO / Selection Committee)'})[r]||r;
-const allSchools=()=>Array.from(new Set(CFG.schools.map(x=>x.name).concat(list.map(r=>r.school),rlist.map(r=>r.school)).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
+const allSchools=()=>Array.from(new Set(CFG.schools.map(x=>x.name).concat(list.map(r=>canonSchool(r.school)),rlist.map(r=>canonSchool(r.school))).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
 const schOpts=sel=>`<option value="">-- choose school --</option>`+allSchools().map(n=>`<option ${n===sel?'selected':''}>${esc(n)}</option>`).join('');
 function schPicker(id,sel){return staff.role==='HRMO'?(CFG.schools.length?`<label class="f"><span>School</span><select id="${id}">${schOpts(sel||'')}</select></label>`:`<label class="f"><span>School (exact name)</span><input type="text" id="${id}"></label>`):`<p class="sub">School: <b>${esc(staff.school)}</b></p><input type="hidden" id="${id}" value="${esc(staff.school)}">`}
 function evalPanel(d){const ev=d.eval||{},hasOv=(ev.assign||[]).length>0,base=hasOv?ev.assign:autoAssign(d.data),as=base.concat([{},{},{}]).slice(0,3),H=staff.role==='HRMO';
@@ -927,7 +938,7 @@ function renderStaff(){
   ${needMsg?`<div class="msg ok">${esc(needMsg)}</div>`:''}<div class="nav" style="justify-content:flex-start"><button class="b2" data-act="needload">Load saved numbers</button><button class="b1" data-act="needsave">Save</button></div>`}
  else if(tab==='h'){inner=`<p class="sub">Annex H counts tutors by school, grade group and specialization for the whole Division.</p>
   <label class="f w4"><span>Count from</span><select id="hsrc"><option value="apps" ${hSrc==='apps'?'selected':''}>Applications already submitted (all except Not selected)</option><option value="need" ${hSrc==='need'?'selected':''}>Tutor need reports of the schools</option></select></label>
-  <div class="nav" style="justify-content:flex-start"><button class="b2" data-act="buildH">Refresh</button></div>${hLoading?'<div class="msg info">Loading…</div>':''}`}
+  <div class="chk" style="margin:8px 0"><label><input type="checkbox" id="hall" ${hAll?'checked':''}> Include all schools (also those with no applicants, grouped by district)</label></div><div class="nav" style="justify-content:flex-start"><button class="b2" data-act="buildH">Refresh</button></div>${hLoading?'<div class="msg info">Loading…</div>':''}`}
  const one=regData?scopeSingle():true,nSch=regData?new Set(scopeRecords().filter(r=>r.cat==='tutor'&&r.status!=='Not selected').map(r=>r.school)).size:0;
  const card=(k,t,note)=>`<div class="card"><div class="nav" style="justify-content:flex-start;flex-wrap:wrap;margin-top:0"><b style="align-self:center">${t}</b><button class="b3" data-act="reg${k}print">Print / Save as PDF</button><button class="b2" data-act="reg${k}word">Download Word</button></div>${note||''}</div>`;
  const views=one?[['S','Summary'],['C','Annex C'],['D','Annex D']]:[['S','Summary'],['C','Annex C'],['D','Annex D'],['B','One page per school']];
@@ -981,7 +992,7 @@ else if(a==='logout'){staffKeep=null;staff=false;list=[];rlist=[];detail=null;re
  else if(a==='regword')doWordR(reg.html,reg.title);
  else if(a==='regcsv')dl(reg.title+'.csv',reg.csv,'text/csv');
  }catch(err){staffMsg=err.message;renderStaff()}}
-document.addEventListener('change',e=>{const t=e.target;if(!t||!staff||typeof staff!=='object')return;if(t.id==='regdist'){regSel.district=t.value;regSel.school='';renderStaff()}else if(t.id==='regsch'){if(isH()){regSel.school=t.value;renderStaff()}else loadReg()}else if(t.id==='hsrc'){hSrc=t.value;buildH()}else if(t.dataset&&t.dataset.reg!==undefined){regOpt={onlyRec:!!($('#optC')||{}).checked,official:!!($('#optD')||{}).checked,sig:!!($('#useSig')||{}).checked};renderStaff()}});
+document.addEventListener('change',e=>{const t=e.target;if(!t||!staff||typeof staff!=='object')return;if(t.id==='regdist'){regSel.district=t.value;regSel.school='';renderStaff()}else if(t.id==='regsch'){if(isH()){regSel.school=t.value;renderStaff()}else loadReg()}else if(t.id==='hsrc'){hSrc=t.value;buildH()}else if(t.id==='hall'){hAll=t.checked;mkH();renderStaff()}else if(t.dataset&&t.dataset.reg!==undefined){regOpt={onlyRec:!!($('#optC')||{}).checked,official:!!($('#optD')||{}).checked,sig:!!($('#useSig')||{}).checked};renderStaff()}});
 document.addEventListener('click',e=>{const tr=e.target.closest('tr[data-act]');if(tr&&!e.target.closest('button')){staffClick(tr,tr.dataset.act)}});
 render();loadConfig();
 </script>
