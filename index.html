@@ -87,7 +87,8 @@ table.g td.c{text-align:center;font-weight:bold}table.g td.h{height:20pt}table.g
 table.tc td,table.tc th{font-size:6.5pt;padding:2pt}
 .tabs{display:flex;gap:8px;margin:8px 0}.tabs button{background:#e2e8f0}.tabs button.on{background:var(--p);color:#fff}
 div.Section2{page:land}
-.sigbox{width:55%;margin:28pt 0 0 auto;text-align:center}.sigbox div{border-top:1px solid #000;padding-top:2pt}
+.sigbox{width:55%;margin:28pt auto 0;text-align:center}.sigbox div{border-top:1px solid #000;padding-top:2pt}
+table.dtr td,table.dtr th{font-size:8.5pt;padding:.5pt 4pt}
 div.ctr{page:ctr}
 .ctr{font-family:"Bookman Old Style","Book Antiqua",Georgia,"Times New Roman",serif;font-size:11.5pt;line-height:1.3;color:#000}
 .ctr p{margin:0 0 7pt;text-align:justify}
@@ -110,7 +111,7 @@ div.ctr{page:ctr}
 <div id="printArea" class="doc"></div>
 <script>
 /* ================= CONFIG ================= */
-const API_URL = 'https://script.google.com/macros/s/AKfycbxuN2OVcDd3sxaKRWg4GId-nXqSbZ_9K5rOm87x_F2P048e4F99BXcfSuhysSwzgQg/exec';   // <-- paste your Apps Script Web App URL here (ends with /exec)
+const API_URL = '';   // <-- paste your Apps Script Web App URL here (ends with /exec)
 const BOX_YES='☒', BOX_NO='☐';
 
 /* ================= HELPERS ================= */
@@ -536,7 +537,7 @@ function buildDocx(html,D){
   if(tag==='SECTION'){if(st0.pages++>0)st0.pending=true;blocks(el,ctx,out,scope);return}
   if(cl.contains('sigbox')){const st=styleOf(el),wp=parseFloat((st.width||'55%'))||55,leftZero=/margin-left:\s*0/.test(el.getAttribute('style')||'');const W=st0.W;
    const gapPt=W*(100-wp)/100/20;const top=(st['margin-top']!=null?ptOf(st['margin-top']):(st.margin?ptOf(st.margin.split(/\s+/)[0]):28))||0;
-   blocks(el,Object.assign({},ctx),out,{sig:{left:leftZero?0:gapPt,right:leftZero?gapPt:0,top,first:true}});return}
+   blocks(el,Object.assign({},ctx),out,{sig:{left:leftZero?0:gapPt/2,right:leftZero?gapPt:gapPt/2,top,first:true}});return}
   const hasBlock=[...el.children].some(c=>BLOCK.has(c.tagName));
   if(tag==='DIV'&&hasBlock){blocks(el,inlineCtx(el,ctx),out,scope);return}
   const c2=inlineCtx(el,ctx);out.push(inlinePara(el.childNodes,c2,paraOpts(el,ctx,scope)))}
@@ -549,7 +550,7 @@ function buildDocx(html,D){
   const NB={style:BorderStyle.NONE,size:0,color:'FFFFFF'},B1={style:BorderStyle.SINGLE,size:4,color:'000000'};
   const trs=rows.map((r,ri)=>{let rowH=0;const cells=[...r.cells].map(td=>{const p=td._p,tst2=styleOf(td),cl=td.classList,isTh=td.tagName==='TH';
     let w=0;for(let i=0;i<p.cs;i++)w+=colW[p.c+i];
-    let c2=Object.assign({},ctx,{inCell:true,cellW:w/20-8});if(t.classList.contains('tc'))c2.size=6.5;else if(ctx.ctr&&t.classList.contains('k'))c2.size=11;
+    let c2=Object.assign({},ctx,{inCell:true,cellW:w/20-8});if(t.classList.contains('tc'))c2.size=6.5;else if(t.classList.contains('dtr'))c2.size=8.5;else if(ctx.ctr&&t.classList.contains('k'))c2.size=11;
     c2=inlineCtx(td,c2);
     let align=tst2['text-align']||(isTh?'center':(cl.contains('c')?'center':'left'));if(cl.contains('c'))c2.bold=true;c2.cellAlign=align;
     let fill;if(cl.contains('bar')){fill='000000';c2.color='FFFFFF';c2.bold=true;c2.size=11}
@@ -557,7 +558,7 @@ function buildDocx(html,D){
     let h=ptOf(tst2.height);if(h==null){if(cl.contains('h'))h=20;else if(cl.contains('h2'))h=32}if(h)rowH=Math.max(rowH,h);
     const va=/top/.test(tst2['vertical-align']||'')?VerticalAlign.TOP:/bottom/.test(tst2['vertical-align']||'')?VerticalAlign.BOTTOM:VerticalAlign.CENTER;
     const noB=!bordered||/border:\s*0/.test(td.getAttribute('style')||'');const bd=noB?{top:NB,bottom:NB,left:NB,right:NB}:{top:B1,bottom:B1,left:B1,right:B1};
-    return new TableCell({children:paras,columnSpan:p.cs>1?p.cs:undefined,rowSpan:p.rs>1?p.rs:undefined,width:{size:w,type:WidthType.DXA},verticalAlign:va,borders:bd,shading:fill?{type:ShadingType.CLEAR,color:'auto',fill}:undefined,margins:{top:40,bottom:40,left:80,right:80}})});
+    return new TableCell({children:paras,columnSpan:p.cs>1?p.cs:undefined,rowSpan:p.rs>1?p.rs:undefined,width:{size:w,type:WidthType.DXA},verticalAlign:va,borders:bd,shading:fill?{type:ShadingType.CLEAR,color:'auto',fill}:undefined,margins:{top:t.classList.contains('dtr')?20:40,bottom:t.classList.contains('dtr')?20:40,left:80,right:80}})});
    return new TableRow({children:cells,cantSplit:true,height:rowH?{value:tw(rowH),rule:HeightRule.ATLEAST}:undefined})});
   out.push(new Table({rows:trs,width:{size:W,type:WidthType.DXA},columnWidths:colW,layout:TableLayoutType.FIXED}));
   out.push(new Paragraph({children:[],spacing:{before:0,after:0,line:40,lineRule:LineRuleType.EXACT}}))}
@@ -628,23 +629,32 @@ async function submitReport(){
  const miss=[];if(!/^\d{4,6}$/.test(R.pin||''))miss.push('a PIN of 4 to 6 digits');if(!R.name.trim())miss.push('name');if(!R.school.trim())miss.push('school');if(!R.month)miss.push('month');
  const ok=R.sessions.filter(s=>s.date&&s.tin&&s.tout);if(!ok.length)miss.push('at least one complete session (date, time in, time out)');
  const bad=R.sessions.some(s=>s.tin&&s.tout&&mins(s.tin,s.tout)===0);
+ const outM=R.month&&R.sessions.some(s=>s.date&&s.date.slice(0,7)!==R.month);
+ if(outM){$('#rMsg').innerHTML='<div class="msg err">A session date is outside the month you chose. Change the month or fix the date.</div>';return}
  if(miss.length){$('#rMsg').innerHTML='<div class="msg err">Please complete: '+esc(miss.join(', '))+'.</div>';return}
  if(bad){$('#rMsg').innerHTML='<div class="msg err">A session has a Time Out that is not later than its Time In.</div>';return}
  const b=$('#rBtn');b.disabled=true;$('#rMsg').innerHTML='<div class="msg info">Saving…</div>';
  try{const r=await api('submitReport',{data:R,pin:R.pin,ref:R.ref||''});if(!r.ok)throw new Error(r.error||'Save failed');rsaved=r.ref;R.ref=r.ref;rsavedMail=r.emailed;renderReport();showRefModal(r.ref,'monthly report',R.email,r.emailed)}
  catch(err){$('#rMsg').innerHTML=`<div class="msg err">${esc(err.message)}</div>`;b.disabled=false}}
 function docF(D){
- const t=D.role==='tutor',who=t?'ARAL Tutor':'ARAL Support Aide',ss=sessSorted(D),n=Math.max(15,ss.length+1);
- let rows='';for(let i=0;i<n;i++){const s=ss[i];rows+=s?`<tr><td>${esc(longD(s.date).replace(/, \d{4}$/,''))} (${esc(wkday(s.date).slice(0,3))})</td><td style="text-align:center">${t12(s.tin)}</td><td style="text-align:center">${t12(s.tout)}</td><td style="text-align:center">${V(s.late)}</td><td>${V(s.remarks)}</td></tr>`:`<tr><td style="height:17pt">&nbsp;</td><td></td><td></td><td></td><td></td></tr>`}
+ const t=D.role==='tutor',who=t?'ARAL Tutor':'ARAL Support Aide',ss=sessSorted(D);
+ const pad=n=>String(n).padStart(2,'0'),WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+ let rows='';
+ if(D.month){const[y,m]=D.month.split('-').map(Number),days=new Date(y,m,0).getDate(),by={};ss.forEach(x=>{(by[x.date]=by[x.date]||[]).push(x)});
+  for(let d=1;d<=days;d++){const iso=y+'-'+pad(m)+'-'+pad(d),wd=new Date(y,m-1,d).getDay(),arr=by[iso]||[];
+   const tin=arr.map(x=>t12(x.tin)).join('<br>'),tout=arr.map(x=>t12(x.tout)).join('<br>'),late=arr.map(x=>V(x.late)).filter(Boolean).join('<br>');
+   const rem=arr.map(x=>V(x.remarks)).filter(Boolean).join('<br>')||(arr.length?'':(wd===6?'SATURDAY':wd===0?'SUNDAY':''));
+   rows+=`<tr><td style="height:12pt">${MON[m-1]} ${pad(d)} (${WD[wd]})</td><td style="text-align:center">${tin}</td><td style="text-align:center">${tout}</td><td style="text-align:center">${late}</td><td${!arr.length&&rem?' style="color:#444;font-size:8pt"':''}>${rem}</td></tr>`}}
+ else{for(let i=0;i<15;i++)rows+='<tr><td style="height:17pt">&nbsp;</td><td></td><td></td><td></td><td></td></tr>'}
  return `<section class="page"><div class="ann">Annex F. Daily Time Record of ARAL Tutors and Support Aides</div>
- <h2 style="margin:8pt 0 0">DAILY TIME RECORD OF ARAL ${t?'TUTOR':'SUPPORT AIDE'}</h2><h2>For the month of ${D.month?'<u>&nbsp;'+esc(mLabel(D.month))+'&nbsp;</u>':'______________ 2026'}</h2>
- <p style="margin:2pt 0">Full Name of ARAL Tutor/Support Aide: ${UL(D.name,40)}</p><p style="margin:2pt 0">DepEd School: ${UL(D.school,50)}</p><p style="margin:2pt 0 8pt">Inclusive Period: ${UL(autoPeriod(D),40)}</p>
- <table class="k"><colgroup><col style="width:22%"><col style="width:14%"><col style="width:14%"><col style="width:28%"><col style="width:22%"></colgroup>
+ <h2 style="margin:4pt 0 0">DAILY TIME RECORD OF ARAL ${t?'TUTOR':'SUPPORT AIDE'}</h2><h2>For the month of ${D.month?'<u>&nbsp;'+esc(mLabel(D.month))+'&nbsp;</u>':'______________ 2026'}</h2>
+ <p style="margin:2pt 0">Full Name of ARAL Tutor/Support Aide: ${UL(D.name,40)}</p><p style="margin:2pt 0">DepEd School: ${UL(D.school,50)}</p><p style="margin:2pt 0 5pt">Inclusive Period: ${UL(autoPeriod(D),40)}</p>
+ <table class="k dtr"><colgroup><col style="width:22%"><col style="width:14%"><col style="width:14%"><col style="width:28%"><col style="width:22%"></colgroup>
  <tr><th>Date</th><th>Time In</th><th>Time Out</th><th>Late/Undertime/Absences<br><i>(Hours and Minutes)</i></th><th>Remarks</th></tr>${rows}</table>
- <p style="margin:10pt 18pt 0">I CERTIFY that the above is true and correct report of the work performed, record of which was made the time of arrival at and from departure from the school.</p>
- <div class="sigbox" style="margin-top:8pt"><div style="height:30pt;border:0;text-align:center">${sigImg(D.sig,28)}</div><div><b>${esc((D.name||'').toUpperCase())}</b></div><div style="border:0">${who}</div>${D.sigAt?`<div style="border:0">${tala(D.sigAt,D.ref,D.sig?'':'image removed after 7 days')}</div>`:''}</div>
- <p style="text-align:center;margin:12pt 0 0">VERIFIED as to the prescribed number of hours of engagement</p>
- <div class="sigbox" style="margin-top:8pt"><div style="height:30pt;border:0;text-align:center">${sigImg(D.headSig,28)}</div><div><b>&nbsp;</b></div><div style="border:0">School Head</div>${D.headSigAt?`<div style="border:0">${tala(D.headSigAt,D.ref,'verified'+(D.headSig?'':' · image removed after 7 days'))}</div>`:''}</div></section>`}
+ <p style="margin:5pt 18pt 0">I CERTIFY that the above is true and correct report of the work performed, record of which was made the time of arrival at and from departure from the school.</p>
+ <div class="sigbox" style="margin-top:4pt"><div style="height:22pt;border:0;text-align:center">${sigImg(D.sig,20)}</div><div><b>${esc((D.name||'').toUpperCase())}</b></div><div style="border:0">${who}</div>${D.sigAt?`<div style="border:0">${tala(D.sigAt,D.ref,D.sig?'':'image removed after 7 days')}</div>`:''}</div>
+ <p style="text-align:center;margin:4pt 0 0">VERIFIED as to the prescribed number of hours of engagement</p>
+ <div class="sigbox" style="margin-top:4pt"><div style="height:22pt;border:0;text-align:center">${sigImg(D.headSig,20)}</div><div><b>&nbsp;</b></div><div style="border:0">School Head</div>${D.headSigAt?`<div style="border:0">${tala(D.headSigAt,D.ref,'verified'+(D.headSig?'':' · image removed after 7 days'))}</div>`:''}</div></section>`}
 function docG(D){
  const t=D.role==='tutor',ss=sessSorted(D),A=D.areas;
  const sp=['reading','science','math'].filter(k=>A[k]).map(k=>({reading:'Reading',science:'Science',math:'Mathematics'}[k])).join(', ');
@@ -666,6 +676,13 @@ const docFonly=D=>`<div class="Section1">${withRef(docF(D),D.ref)}</div>`,docGon
 
 /* ================= MODULE 3 DOCUMENTS (Annex C, D, H, E) ================= */
 const AREAS=['Reading','Mathematics','Science'],GRP=['1-3','4-6','7-10','3-6'];
+const KS={'1-3':' (Key Stage 1)','4-6':' (Key Stage 2)','7-10':' (Key Stage 3)'};
+// School level comes from the Schools sheet (Level column) or, if blank, from the end of the school's name.
+function levelOf(name){const m=schoolMatch(name);let lv=m&&m.level;if(!lv){const suf=(String(name||'').trim().split(/\s+/).pop()||'').toUpperCase();lv=({ES:'Elementary',CES:'Elementary',CS:'Elementary',PS:'Elementary',MES:'Elementary',MS:'Elementary',NHS:'High School',HS:'High School',MMMNHS:'High School',AHS:'High School',NTS:'High School',IS:'Integrated'})[suf]||''}return lv}
+// Focus for now: Elementary -> Key Stage 1 (Grades 1-3); High School -> Key Stage 3 (Grades 7-10); Integrated -> both. Reading and Mathematics only.
+function autoAssign(r){const lv=levelOf(r.school),a=r.areas||{},areas=[];if(a.reading)areas.push('Reading');if(a.math)areas.push('Mathematics');
+ const gs=lv==='Elementary'?['1-3']:lv==='High School'?['7-10']:lv==='Integrated'?['1-3','7-10']:[];const out=[];areas.forEach(ar=>gs.forEach(g=>out.push({area:ar,group:g})));return out}
+const assignOf=r=>((r.eval||{}).assign||[]).length?r.eval.assign:autoAssign(r);
 const ENGAGED=['Selected','Approved by SDS','Engaged'],RECD=['Recommended','Selected','Approved by SDS','Engaged'];
 const LETCATS=['DepEd teaching personnel','Remaining LET-eligible applicants in the recent and/or previous RQAs','Other LET-eligible teacher applicants in the RQAs','Other LET-eligible in the locality','Retired professional teachers','Other licensed professionals'];
 const st0=(x)=>x||'';
@@ -688,23 +705,34 @@ function docC(rep){
  <div class="sigbox" style="margin-left:0;width:30%"><div style="height:30pt;border:0">${sigImg(rep.sig,28)}</div><div style="border-top:1px solid #000">School Head</div>${rep.sig?tala(new Date().toISOString(),'','Annex C'):''}</div></section></div>`}
 function docD(rep){
  const info=schoolInfo(rep.school);let tables='';
- const eng=rep.records.filter(r=>r.cat==='tutor'&&ENGAGED.includes(r.status));
- const tb=(area,grp,items)=>{const dc=items.filter(r=>r.appCat==='DepEd teaching personnel').length,nd=items.length-dc;
-  let rows=items.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.major||r.bachelor)}</td><td style="text-align:center">${r.appCat==='DepEd teaching personnel'?'':'✓'}</td><td style="text-align:center">${r.appCat==='DepEd teaching personnel'?'✓':''}</td></tr>`).join('');
+ const all=rep.records.filter(r=>r.cat==='tutor'&&r.status!=='Not selected');
+ const pool=rep.official?all.filter(r=>ENGAGED.includes(r.status)):all;
+ const isOff=r=>ENGAGED.includes(r.status);
+ const tb=(area,grp,items)=>{const off=items.filter(isOff),dr=items.filter(r=>!isOff(r));
+  const cnt=(arr,dep)=>arr.filter(r=>(r.appCat==='DepEd teaching personnel')===dep).length;
+  let rows=items.map(r=>{const dep=r.appCat==='DepEd teaching personnel',d=!isOff(r);return `<tr${d?' style="color:#666"':''}><td>${esc(r.name)}${d?' <i style="font-size:7pt">(Draft)</i>':''}</td><td>${esc(r.major||r.bachelor)}</td><td style="text-align:center">${dep?'':'✓'}</td><td style="text-align:center">${dep?'✓':''}</td></tr>`}).join('');
   for(let i=items.length;i<3;i++)rows+='<tr><td style="height:17pt">&nbsp;</td><td></td><td></td><td></td></tr>';
-  return `<table class="k" style="margin-bottom:12pt"><colgroup><col style="width:38%"><col style="width:34%"><col style="width:14%"><col style="width:14%"></colgroup><tr><th colspan="4" style="text-align:left">Registry of ARAL Tutors for ${area} for ${grp?'Grades '+grp:'Grade ____'}</th></tr>
+  const tot=(dep)=>items.length?`${cnt(off,dep)}${cnt(dr,dep)?` <span style="font-size:7pt">(+${cnt(dr,dep)} draft)</span>`:''}`:'';
+  return `<table class="k" style="margin-bottom:12pt"><colgroup><col style="width:38%"><col style="width:34%"><col style="width:14%"><col style="width:14%"></colgroup><tr><th colspan="4" style="text-align:left">Registry of ARAL Tutors for ${area} for ${grp?'Grades '+grp+(KS[grp]||''):'Grade ____'}</th></tr>
   <tr><th rowspan="2">Name</th><th rowspan="2">Specialization</th><th colspan="2">Tick (√) the Tutor Category</th></tr><tr><th>Non-DepEd</th><th>DepEd</th></tr>${rows}
-  <tr><td colspan="2" style="text-align:right"><b>Total</b></td><td style="text-align:center">${items.length?nd:''}</td><td style="text-align:center">${items.length?dc:''}</td></tr></table>`};
- AREAS.forEach(a=>{let any=false;GRP.forEach(g=>{const it=eng.filter(r=>((r.eval||{}).assign||[]).some(x=>x.area===a&&x.group===g));if(it.length){any=true;tables+=tb(a,g,it)}});if(!any)tables+=tb(a,'',[])});
+  <tr><td colspan="2" style="text-align:right"><b>Total</b></td><td style="text-align:center">${tot(false)}</td><td style="text-align:center">${tot(true)}</td></tr></table>`};
+ const un=[];
+ pool.forEach(r=>{if(!assignOf(r).length)un.push(r)});
+ ['Reading','Mathematics'].forEach(a=>{let any=false;['1-3','7-10','4-6'].forEach(g=>{const it=pool.filter(r=>assignOf(r).some(x=>x.area===a&&x.group===g));if(it.length){any=true;tables+=tb(a,g,it)}});if(!any)tables+=tb(a,'',[])});
+ const sciItems=pool.filter(r=>assignOf(r).some(x=>x.area==='Science'));
+ if(sciItems.length)['3-6','7-10'].forEach(g=>{const it=sciItems.filter(r=>assignOf(r).some(x=>x.area==='Science'&&x.group===g));if(it.length)tables+=tb('Science',g,it)});
+ const hasDraft=pool.some(r=>!isOff(r));
+ const unTable=un.length?`<table class="k" style="margin-bottom:12pt"><colgroup><col style="width:45%"><col style="width:55%"></colgroup><tr><th colspan="2" style="text-align:left">Not yet assigned to a learning area and grade group</th></tr>${un.map(r=>`<tr><td>${esc(r.name)}</td><td style="font-size:8pt">${(r.areas&&(r.areas.reading||r.areas.math))?'Set the school level in the Schools sheet, or assign in Evaluation':'No Reading or Mathematics chosen in the PDS'}</td></tr>`).join('')}</table>`:'';
  return `<div class="Section1"><section class="page"><div class="ann">Annex D. Registry of Aral Tutors Per Learning Area</div>
  <p style="margin:6pt 0 2pt">School: ${UL(rep.school,30)} &nbsp; School ID: ${UL(info.id,12)}</p><p style="margin:2pt 0">Complete School Address: ${UL(info.address,40)}</p><p style="margin:2pt 0 10pt">SDO: ${UL('Romblon',12)} &nbsp; Region: ${UL(setg('REGION'),12)}</p>
- ${tables}<div class="sigbox" style="margin-top:14pt"><div>Prepared by:</div><div style="border:0;margin-top:20pt;border-top:1px solid #000">SDO HRMO</div></div></section></div>`}
+ ${hasDraft?'<p style="font-size:8pt;color:#555;margin:0 0 8pt"><i>Names in grey marked “Draft” are applicants who are not yet Selected. They become official when the School Head sets their status to Selected.</i></p>':''}
+ ${tables}${unTable}<div class="sigbox" style="margin-top:14pt"><div>Prepared by:</div><div style="border:0;margin-top:20pt;border-top:1px solid #000">SDO HRMO</div></div></section></div>`}
 const NEEDK=[['Reading','Grades 1-3','r13'],['Reading','Grades 4-6','r46'],['Reading','Grades 7-10','r710'],['Mathematics','Grades 1 to 3','m13'],['Mathematics','Grades 4 to 6','m46'],['Mathematics','Grades 7-10','m710'],['Science','Grades 3 to 6','s36'],['Science','Grades 7 to 10','s710']];
 function hData(rep){
  const needs=rep.needs.slice().sort((a,b)=>a.school.localeCompare(b.school));
  const tot={},dep={},non={};NEEDK.forEach(k=>{tot[k[2]]=0;dep[k[2]]=0;non[k[2]]=0});
  needs.forEach(n=>NEEDK.forEach(k=>tot[k[2]]+=+((n.counts||{})[k[2]])||0));
- rep.records.filter(r=>r.cat==='tutor'&&ENGAGED.includes(r.status)).forEach(r=>((r.eval||{}).assign||[]).forEach(x=>{const key=({Reading:'r',Mathematics:'m',Science:'s'})[x.area]+x.group.replace('-','');if(key in dep){if(r.appCat==='DepEd teaching personnel')dep[key]++;else non[key]++}}));
+ rep.records.filter(r=>r.cat==='tutor'&&ENGAGED.includes(r.status)).forEach(r=>assignOf(r).forEach(x=>{const key=({Reading:'r',Mathematics:'m',Science:'s'})[x.area]+x.group.replace('-','');if(key in dep){if(r.appCat==='DepEd teaching personnel')dep[key]++;else non[key]++}}));
  return{needs,tot,dep,non}}
 function docH(rep){
  const{needs,tot,dep,non}=hData(rep);
@@ -782,19 +810,22 @@ function docE(D,ev){
 const sdT=x=>x||'Schools Division Superintendent';
 
 /* ================= STAFF ================= */
-let list=[],rlist=[],detail=null,staffMsg='',tab='apps',reg=null,needMsg='';
+let list=[],rlist=[],detail=null,staffMsg='',tab='apps',reg=null,needMsg='',regData=null,regLoading=false,regOpt={onlyRec:false,official:false,sig:false};
+async function loadReg(){const sc=schVal('regsch');if(!sc){regData=null;renderStaff();return}regLoading=true;renderStaff();
+ try{const r=await api('registry',{code:staff.code,school:sc});regLoading=false;if(!r.ok){staffMsg=r.error;regData=null}else{staffMsg='';regData={school:sc,records:r.records}}}catch(err){regLoading=false;staffMsg=err.message}renderStaff()}
 const statOpts=role=>role==='ENCODER'?[]:role==='SCHOOLHEAD'?['Received','Under evaluation','Recommended','Selected','Not selected']:['Received','Under evaluation','Recommended','Selected','Not selected','Approved by SDS','Engaged'];
 const roleName=r=>({HRMO:'SDO HRMO (all schools)',SCHOOLHEAD:'School Head',ENCODER:'Encoder (AO / Selection Committee)'})[r]||r;
 const allSchools=()=>Array.from(new Set(CFG.schools.map(x=>x.name).concat(list.map(r=>r.school),rlist.map(r=>r.school)).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
 const schOpts=sel=>`<option value="">-- choose school --</option>`+allSchools().map(n=>`<option ${n===sel?'selected':''}>${esc(n)}</option>`).join('');
-function schPicker(id){return staff.role==='HRMO'?(CFG.schools.length?`<label class="f"><span>School</span><select id="${id}">${schOpts('')}</select></label>`:`<label class="f"><span>School (exact name)</span><input type="text" id="${id}"></label>`):`<p class="sub">School: <b>${esc(staff.school)}</b></p><input type="hidden" id="${id}" value="${esc(staff.school)}">`}
-function evalPanel(d){const ev=d.eval||{},as=(ev.assign||[]).concat([{},{},{}]).slice(0,3),H=staff.role==='HRMO';
- return `<h3>Evaluation (used in Annex C and D)</h3><div class="grid">
+function schPicker(id,sel){return staff.role==='HRMO'?(CFG.schools.length?`<label class="f"><span>School</span><select id="${id}">${schOpts(sel||'')}</select></label>`:`<label class="f"><span>School (exact name)</span><input type="text" id="${id}"></label>`):`<p class="sub">School: <b>${esc(staff.school)}</b></p><input type="hidden" id="${id}" value="${esc(staff.school)}">`}
+function evalPanel(d){const ev=d.eval||{},hasOv=(ev.assign||[]).length>0,base=hasOv?ev.assign:autoAssign(d.data),as=base.concat([{},{},{}]).slice(0,3),H=staff.role==='HRMO';
+ const auto=autoAssign(d.data),lvl=levelOf(d.data.school);
+ return `<h3>Evaluation (used in Annex C and D)</h3><p class="hint">Level of ${esc(d.data.school||'the school')}: <b>${esc(lvl||'not set')}</b>. Automatic assignment: <b>${auto.length?auto.map(x=>x.area+' · Grades '+x.group+(KS[x.group]||'')).join('; '):'none (set the level in the Schools sheet, or choose below)'}</b>. ${hasOv?'<b>Changed by the school.</b> Press “Use automatic” to go back.':'The boxes below already show the automatic one; change them to override.'}</p><div class="grid">
  <label class="f w2"><span>Interview score</span><input type="text" id="ev_int" value="${esc(ev.interview||'')}"></label><label class="f w2"><span>Performance rating (if any)</span><input type="text" id="ev_perf" value="${esc(ev.perf||'')}"></label><label class="f w2"><span>Other qualifications</span><input type="text" id="ev_oth" value="${esc(ev.others||'')}"></label>
  <label class="f"><span>Remarks</span><input type="text" id="ev_rem" value="${esc(ev.remarks||'')}"></label>
- ${as.map((a,i)=>`<label class="f w3"><span>Assigned learning area ${i+1}</span><select id="ev_a${i}"><option value="">--</option>${AREAS.map(x=>`<option ${a.area===x?'selected':''}>${x}</option>`).join('')}</select></label><label class="f w3"><span>Grade group ${i+1}</span><select id="ev_g${i}"><option value="">--</option>${GRP.map(x=>`<option value="${x}" ${a.group===x?'selected':''}>Grades ${x}${x==='3-6'?' (Science only)':''}</option>`).join('')}</select></label>`).join('')}
+ ${as.map((a,i)=>`<label class="f w3"><span>Assigned learning area ${i+1}</span><select id="ev_a${i}"><option value="">--</option>${AREAS.map(x=>`<option ${a.area===x?'selected':''}>${x}</option>`).join('')}</select></label><label class="f w3"><span>Grade group ${i+1}</span><select id="ev_g${i}"><option value="">--</option>${GRP.map(x=>`<option value="${x}" ${a.group===x?'selected':''}>Grades ${x}${KS[x]||''}${x==='3-6'?' (Science only)':''}</option>`).join('')}</select></label>`).join('')}
  ${H?`<label class="f"><span>Fund source (SDO)</span><input type="text" id="ev_fund" value="${esc(ev.fund||setg('DEFAULT_FUND'))}"></label><label class="f w3"><span>Contract: from</span><input type="date" id="ev_cf" value="${esc(ev.cFrom||'')}"></label><label class="f w3"><span>Contract: to</span><input type="date" id="ev_ct" value="${esc(ev.cTo||'')}"></label>`:''}
- </div><div class="nav" style="justify-content:flex-start"><button class="b1" data-act="saveeval">Save evaluation</button></div>`}
+ </div><div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b1" data-act="saveeval">Save evaluation</button>${hasOv?'<button class="b2" data-act="useauto">Use automatic key stage</button>':''}</div>`}
 function renderStaff(){
  drawNav();
  if(staff===false){$('#app').innerHTML=`<div class="card"><h2>Staff access</h2><p class="sub">School Heads, encoders (AO / selection committee) see their own school only. SDO HRMO sees all schools.</p>
@@ -818,17 +849,20 @@ function renderStaff(){
   const body=rows.map(r=>tab==='apps'?`<tr class="cl" data-act="open" data-ref="${esc(r.ref)}"><td>${esc(r.ref)}</td><td>${esc(r.name)}</td><td>${r.cat==='tutor'?'Tutor':'Support Aide'}</td><td>${esc(r.school)}</td><td>${esc((r.ts||'').slice(0,10))}</td><td><span class="tag">${esc(r.status||'Received')}</span></td></tr>`
    :`<tr class="cl" data-act="openr" data-ref="${esc(r.ref)}"><td>${esc(r.ref)}</td><td>${esc(r.name)}</td><td>${esc(mLabel(r.month))}</td><td>${esc(r.school)}</td><td>${esc(r.hours)}</td><td><span class="tag">${esc(r.status||'Submitted')}</span></td></tr>`).join('');
   inner=`<div style="overflow:auto"><table class="list">${head}${body||'<tr><td colspan="6" style="color:#64748b">Nothing yet.</td></tr>'}</table></div>`}
- else if(tab==='reg'){inner=`<p class="sub">Annex C and D are made from the applications and the evaluation you saved on each applicant.</p>${schPicker('regsch')}
-  <div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b1" data-act="regC">Annex C (all external applicants)</button><button class="b1" data-act="regC2">Annex C (recommended / selected only)</button><button class="b3" data-act="regD">Annex D (selected tutors)</button></div>${staff.role==='SCHOOLHEAD'&&staff.sig?'<label class="f" style="flex-direction:row;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="useSig"><span style="margin:0;font-weight:500">Put my e-signature on Annex C</span></label>':''}`}
+ else if(tab==='reg'){const cD=regOpt.draftOnly?'':'',ic=regOpt.onlyRec?'checked':'',io=regOpt.official?'checked':'';
+  inner=`<p class="sub">Annex C and D appear automatically from the applications of the school${staff.role==='HRMO'?' you choose':''}. The level of the school sets the key stage: Elementary → Key Stage 1 (Grades 1–3), High School → Key Stage 3 (Grades 7–10), Reading and Mathematics.</p>${schPicker('regsch',regData&&regData.school)}
+  <div class="chk" style="margin:6px 0"><label><input type="checkbox" id="optC" data-reg ${ic}> Annex C: only recommended / selected</label><label><input type="checkbox" id="optD" data-reg ${io}> Annex D: official only (hide drafts)</label>${staff.role==='SCHOOLHEAD'&&staff.sig?`<label><input type="checkbox" id="useSig" data-reg ${regOpt.sig?'checked':''}> Put my e-signature on Annex C</label>`:''}</div>
+  <div class="nav" style="justify-content:flex-start"><button class="b2" data-act="regrefresh">Refresh</button></div>${regLoading?'<div class="msg info">Loading…</div>':''}`}
  else if(tab==='need'){inner=`<p class="sub">Number of ARAL tutors the school needs (DM 061, items 6 to 8). The SDO HRMO uses these in Annex H.</p>${schPicker('needsch')}
   <div class="grid"><label class="f w3"><span>School Year</span><input type="text" id="needsy" value="${esc(setg('SY')||'2026-2027')}"></label><span class="f w3"></span>
   ${NEEDK.map(k=>`<label class="f w2"><span>${k[0]} · ${k[1]}</span><input type="number" min="0" max="999" id="nd_${k[2]}" value="0"></label>`).join('')}</div>
   ${needMsg?`<div class="msg ok">${esc(needMsg)}</div>`:''}<div class="nav" style="justify-content:flex-start"><button class="b2" data-act="needload">Load saved numbers</button><button class="b1" data-act="needsave">Save</button></div>`}
  else if(tab==='h'){inner=`<p class="sub">Combines all schools’ need reports and the engaged tutors (Selected, Approved by SDS, Engaged).</p><div class="nav" style="justify-content:flex-start"><button class="b1" data-act="buildH">Build Annex H</button></div>`}
- const prev=(tab==='reg'||tab==='h')&&reg?`<div class="card"><div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b3" data-act="regprint">Print / Save as PDF</button><button class="b2" data-act="regword">Download Word</button>${reg.csv?'<button class="b2" data-act="regcsv">Download CSV</button>':''}</div></div><div class="card" style="overflow:auto"><div class="doc">${reg.html}</div></div>`:'';
+ const regPrev=tab==='reg'&&regData&&!regLoading?[['C','Annex C',docC({school:regData.school,records:regData.records,onlyRec:regOpt.onlyRec,sig:regOpt.sig?staff.sig:''})],['D','Annex D',docD({school:regData.school,records:regData.records,official:regOpt.official})]].map(x=>`<div class="card"><div class="nav" style="justify-content:flex-start;flex-wrap:wrap;margin-top:0"><b style="align-self:center">${x[1]}</b><button class="b3" data-act="reg${x[0]}print">Print / Save as PDF</button><button class="b2" data-act="reg${x[0]}word">Download Word</button></div></div><div class="card" style="overflow:auto"><div class="doc">${x[2]}</div></div>`).join(''):'';
+ const prev=(tab==='h')&&reg?`<div class="card"><div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b3" data-act="regprint">Print / Save as PDF</button><button class="b2" data-act="regword">Download Word</button>${reg.csv?'<button class="b2" data-act="regcsv">Download CSV</button>':''}</div></div><div class="card" style="overflow:auto"><div class="doc">${reg.html}</div></div>`:'';
  $('#app').innerHTML=`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><div><h2>${TABS.find(t=>t[0]===tab)[1]}</h2><p class="sub">${esc(staff.name||'')} · ${roleName(staff.role)}${staff.role==='HRMO'?'':': '+esc(staff.school)}</p></div><div><button class="b2" data-act="refresh">Refresh</button> <button class="b2" data-act="logout">Log out</button></div></div>
   <div class="tabs" style="flex-wrap:wrap">${TABS.map(t=>`<button class="${tab===t[0]?'on':''}" data-act="tab-${t[0]}">${t[1]}</button>`).join('')}</div>
-  ${staffMsg?`<div class="msg err">${esc(staffMsg)}</div>`:''}${inner}</div>${tab==='apps'||tab==='reg'?mySig:''}${prev}`}
+  ${staffMsg?`<div class="msg err">${esc(staffMsg)}</div>`:''}${inner}</div>${tab==='apps'||tab==='reg'?mySig:''}${prev}${regPrev}`}
 async function loadLists(){const a=await api('list',{code:staff.code});list=a.rows||[];const r=await api('listReports',{code:staff.code});rlist=r.rows||[]}
 const schVal=id=>{const e=$('#'+id);return e?e.value.trim():''};
 function dl(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+text],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove()}
@@ -837,22 +871,27 @@ async function staffClick(b,a){
  if(a==='login'){const code=$('#code').value.trim();const r=await api('list',{code});if(!r.ok){staffMsg=r.error||'Invalid code';renderStaff();return}staff={code,role:r.role,name:r.name,school:r.school,sig:''};try{staff.sig=localStorage.getItem('aralHeadSig')||''}catch(e){}list=r.rows;const q=await api('listReports',{code});rlist=q.rows||[];staffMsg='';tab='apps';reg=null;renderStaff()}
 else if(a==='logout'){staffKeep=null;staff=false;list=[];rlist=[];detail=null;reg=null;staffMsg='';renderStaff()}
  else if(a==='refresh'){await loadLists();renderStaff()}
- else if(a.startsWith('tab-')){tab=a.slice(4);reg=null;staffMsg='';needMsg='';renderStaff()}
+ else if(a.startsWith('tab-')){tab=a.slice(4);reg=null;staffMsg='';needMsg='';renderStaff();if(tab==='reg'&&staff.role!=='HRMO'&&!regData)await loadReg()}
  else if(a==='open'){const ref=(b.closest('[data-ref]')||b).dataset.ref;const r=await api('get',{code:staff.code,ref});if(!r.ok){staffMsg=r.error;renderStaff();return}r.data.ref=r.ref;detail=Object.assign(r,{kind:'app'});staffMsg='';renderStaff()}
  else if(a==='openr'){const ref=(b.closest('[data-ref]')||b).dataset.ref;const r=await api('getReport',{code:staff.code,ref});if(!r.ok){staffMsg=r.error;renderStaff();return}r.data.ref=r.ref;r.data.headSig=r.headSig||'';r.data.headSigAt=r.headSigAt||'';detail=Object.assign(r,{kind:'report'});staffMsg='';renderStaff()}
  else if(a==='closedetail'){detail=null;staffMsg='';await loadLists();renderStaff()}
  else if(a==='setstat'){const act=detail.kind==='report'?'verifyReport':'setStatus';const stv=$('#stat').value;const payload={code:staff.code,ref:detail.ref,status:stv,remarks:$('#rem').value};if(detail.kind==='report'&&stv==='Verified'&&staff.role==='SCHOOLHEAD')payload.sig=staff.sig||'';const r=await api(act,payload);if(r.ok){detail.status=stv;detail.remarks=$('#rem').value;if(detail.kind==='report'){const q=await api('getReport',{code:staff.code,ref:detail.ref});if(q.ok){q.data.ref=q.ref;q.data.headSig=q.headSig||'';q.data.headSigAt=q.headSigAt||'';detail=Object.assign(q,{kind:'report'})}}staffMsg=r.signed?'Verified and e-signed.':(detail.kind==='report'&&stv==='Verified'&&staff.role==='SCHOOLHEAD'?'Verified. No e-signature was attached; add yours under “My e-signature” and verify again.':'Status saved.')}else staffMsg=r.error;renderStaff()}
  else if(a==='saveeval'){const g=id=>{const e=$('#'+id);return e?e.value.trim():''};const assign=[0,1,2].map(i=>({area:g('ev_a'+i),group:g('ev_g'+i)})).filter(x=>x.area&&x.group);
   const bad=assign.find(x=>x.area==='Science'?(x.group!=='3-6'&&x.group!=='7-10'):x.group==='3-6');if(bad){staffMsg='Check the grade group: Science uses Grades 3-6 or 7-10; Reading and Mathematics use 1-3, 4-6 or 7-10.';renderStaff();return}
-  const ev={interview:g('ev_int'),perf:g('ev_perf'),others:g('ev_oth'),remarks:g('ev_rem'),assign};if($('#ev_fund')){ev.fund=g('ev_fund');ev.cFrom=g('ev_cf');ev.cTo=g('ev_ct')}
+  const key=a=>a.map(x=>x.area+'|'+x.group).sort().join(';');const sameAuto=key(assign)===key(autoAssign(detail.data));
+  const ev={interview:g('ev_int'),perf:g('ev_perf'),others:g('ev_oth'),remarks:g('ev_rem'),assign:sameAuto?[]:assign};if($('#ev_fund')){ev.fund=g('ev_fund');ev.cFrom=g('ev_cf');ev.cTo=g('ev_ct')}
   const r=await api('saveEval',{code:staff.code,ref:detail.ref,ev});if(r.ok){detail.eval=r.eval;staffMsg='Evaluation saved.'}else staffMsg=r.error;renderStaff()}
+ else if(a==='useauto'){const ev={interview:($('#ev_int')||{}).value||'',perf:($('#ev_perf')||{}).value||'',others:($('#ev_oth')||{}).value||'',remarks:($('#ev_rem')||{}).value||'',assign:[]};if($('#ev_fund')){ev.fund=$('#ev_fund').value;ev.cFrom=$('#ev_cf').value;ev.cTo=$('#ev_ct').value}const r=await api('saveEval',{code:staff.code,ref:detail.ref,ev});if(r.ok){detail.eval=r.eval;staffMsg='Back to the automatic key stage.'}else staffMsg=r.error;renderStaff()}
  else if(a==='sprint')doPrint(detail.kind==='report'?docR(detail.data):docAll(detail.data));
  else if(a==='sword'){if(detail.kind==='report')doWordR(docR(detail.data),'ARAL_AnnexF_G_'+(detail.data.name||'report'));else doWord(docAll(detail.data),'ARAL_'+(detail.data.last||'applicant'))}
  else if(a==='resetpin'){const np=($('#newpin')||{}).value||'';const r=await api('resetPin',{code:staff.code,kind:detail.kind==='report'?'report':'app',ref:detail.ref,pin:np.trim()});staffMsg=r.ok?'PIN reset. Give the new PIN to the applicant.':r.error;renderStaff()}
  else if(a==='cprint')doPrint(docE(detail.data,detail.eval));
  else if(a==='cword')doWordR(docE(detail.data,detail.eval),'ARAL_Contract_'+(detail.data.last||'tutor'));
- else if(a==='regC'||a==='regC2'||a==='regD'){const sc=schVal('regsch');if(!sc){staffMsg='Choose a school first.';renderStaff();return}const r=await api('registry',{code:staff.code,school:sc});if(!r.ok){staffMsg=r.error;renderStaff();return}staffMsg='';
-  const rep={school:sc,records:r.records,onlyRec:a==='regC2',sig:($('#useSig')&&$('#useSig').checked)?staff.sig:''};reg=a==='regD'?{html:docD(rep),title:'AnnexD_'+sc}:{html:docC(rep),title:'AnnexC_'+sc};renderStaff();const e=$('#regsch');if(e&&staff.role==='HRMO')e.value=sc}
+ else if(a==='regrefresh')await loadReg();
+ else if(a==='regCprint')doPrint(docC({school:regData.school,records:regData.records,onlyRec:regOpt.onlyRec,sig:regOpt.sig?staff.sig:''}));
+ else if(a==='regCword')doWordR(docC({school:regData.school,records:regData.records,onlyRec:regOpt.onlyRec,sig:regOpt.sig?staff.sig:''}),'AnnexC_'+regData.school);
+ else if(a==='regDprint')doPrint(docD({school:regData.school,records:regData.records,official:regOpt.official}));
+ else if(a==='regDword')doWordR(docD({school:regData.school,records:regData.records,official:regOpt.official}),'AnnexD_'+regData.school);
  else if(a==='needload'||a==='needsave'){const sc=schVal('needsch');if(!sc){needMsg='';staffMsg='Choose a school first.';renderStaff();return}staffMsg='';
   if(a==='needload'){const r=await api('registry',{code:staff.code,school:sc});const sy=schVal('needsy');const n=(r.needs||[]).find(x=>x.sy===sy)||(r.needs||[])[0];NEEDK.forEach(k=>{const e=$('#nd_'+k[2]);if(e)e.value=n&&n.counts?(n.counts[k[2]]||0):0});needMsg=n?'Loaded.':'No saved numbers yet.';const m=$('.msg.ok');if(m)m.textContent=needMsg;else{const d=document.createElement('div');d.className='msg ok';d.textContent=needMsg;$('.nav').before(d)}}
   else{const counts={};NEEDK.forEach(k=>counts[k[2]]=parseInt(($('#nd_'+k[2])||{}).value,10)||0);const r=await api('saveNeed',{code:staff.code,school:sc,sy:schVal('needsy'),counts});if(r.ok){toast('Saved')}else{staffMsg=r.error;renderStaff()}}}
@@ -861,6 +900,7 @@ else if(a==='logout'){staffKeep=null;staff=false;list=[];rlist=[];detail=null;re
  else if(a==='regword')doWordR(reg.html,reg.title);
  else if(a==='regcsv')dl(reg.title+'.csv',reg.csv,'text/csv');
  }catch(err){staffMsg=err.message;renderStaff()}}
+document.addEventListener('change',e=>{const t=e.target;if(!t||!staff||typeof staff!=='object')return;if(t.id==='regsch')loadReg();else if(t.dataset&&t.dataset.reg!==undefined){regOpt={onlyRec:!!($('#optC')||{}).checked,official:!!($('#optD')||{}).checked,sig:!!($('#useSig')||{}).checked};renderStaff()}});
 document.addEventListener('click',e=>{const tr=e.target.closest('tr[data-act]');if(tr&&!e.target.closest('button')){staffClick(tr,tr.dataset.act)}});
 render();loadConfig();
 </script>
