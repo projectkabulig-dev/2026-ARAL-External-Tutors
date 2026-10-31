@@ -111,7 +111,7 @@ div.ctr{page:ctr}
 <div id="printArea" class="doc"></div>
 <script>
 /* ================= CONFIG ================= */
-const API_URL = 'https://script.google.com/macros/s/AKfycbxuN2OVcDd3sxaKRWg4GId-nXqSbZ_9K5rOm87x_F2P048e4F99BXcfSuhysSwzgQg/exec';   // <-- paste your Apps Script Web App URL here (ends with /exec)
+const API_URL = '';   // <-- paste your Apps Script Web App URL here (ends with /exec)
 const BOX_YES='☒', BOX_NO='☐';
 
 /* ================= HELPERS ================= */
@@ -884,7 +884,8 @@ function docE(D,ev){
 const sdT=x=>x||'Schools Division Superintendent';
 
 /* ================= STAFF ================= */
-let hSrc='apps',hAll=false,hLoading=false,hRep=null;
+let hSrc='apps',hAll=false,hLoading=false,hRep=null,appF={type:'',status:'',q:''};
+const appRows=()=>list.filter(r=>(!appF.type||r.cat===appF.type)&&(!appF.status||(r.status||'Received')===appF.status)&&(!appF.q||(r.name+' '+r.school+' '+r.ref+' '+(r.mobile||'')+' '+(r.email||'')).toLowerCase().includes(appF.q.toLowerCase())));
 let list=[],rlist=[],detail=null,staffMsg='',tab='apps',reg=null,needMsg='',regData=null,regLoading=false,regOpt={onlyRec:false,official:false,sig:false},regSel={district:'',school:''},regView='S';
 function mkH(){if(!hRep){reg=null;return}const rep={records:hRep.records,needs:hRep.needs,source:hSrc,all:hAll};reg={html:docH(rep),title:'AnnexH_SDO_Consolidated',csv:csvH(rep)}}
 async function buildH(){hLoading=true;renderStaff();try{const r=await api('registry',{code:staff.code,school:''});hLoading=false;if(!r.ok){staffMsg=r.error;hRep=null}else{staffMsg='';hRep={records:normRecs(r.records),needs:(r.needs||[]).map(n=>Object.assign({},n,{school:canonSchool(n.school)}))}}mkH()}catch(err){hLoading=false;staffMsg=err.message}renderStaff()}
@@ -931,11 +932,17 @@ function renderStaff(){
  const rows=tab==='apps'?list:rlist;const mySig=staff.role==='SCHOOLHEAD'?`<div class="card"><h2>My e-signature</h2><p class="sub">Kept <b>only on this device</b>; it is never saved on the server. It is attached to a monthly report (Annex F and G) only when you press Verify, and that copy is deleted 7 days later. You can also put it on Annex C.</p>${sigBox('School Head e-signature',staff.sig,'sig-my','sigrm-my')}</div>`:'';const TABS=[['apps','Applications'],['reps','Monthly reports'],['reg','Annex C and D'],['need','Tutor need']].concat(staff.role==='HRMO'?[['h','Annex H']]:[]);
  let inner='';
  if(tab==='apps'||tab==='reps'){
-  const cnt=(arr,f)=>arr.filter(f).length;const chips=tab==='apps'?(()=>{const st={};list.forEach(r=>{const k=r.status||'Received';st[k]=(st[k]||0)+1});return `<div class="chk" style="margin:8px 0;gap:6px 8px"><span class="tag" style="background:rgba(13,148,136,.15);color:var(--p2)">Total ${list.length}</span><span class="tag">Tutors ${cnt(list,r=>r.cat==='tutor')}</span><span class="tag">Support aides ${cnt(list,r=>r.cat==='aide')}</span>${Object.keys(st).map(k=>`<span class="tag" style="background:var(--card2);color:var(--ink);border:1px solid var(--bd)">${esc(k)} ${st[k]}</span>`).join('')}</div>`})():`<div class="chk" style="margin:8px 0"><span class="tag" style="background:rgba(13,148,136,.15);color:var(--p2)">Total ${rlist.length}</span></div>`;
-  const head=tab==='apps'?'<tr><th>Ref</th><th>Name</th><th>Type</th><th>School</th><th>Date</th><th>Status</th></tr>':'<tr><th>Ref</th><th>Name</th><th>Month</th><th>School</th><th>Hours</th><th>Status</th></tr>';
-  const body=rows.map(r=>tab==='apps'?`<tr class="cl" data-act="open" data-ref="${esc(r.ref)}"><td>${esc(r.ref)}</td><td>${esc(r.name)}</td><td>${r.cat==='tutor'?'Tutor':'Support Aide'}</td><td>${esc(r.school)}</td><td>${esc((r.ts||'').slice(0,10))}</td><td><span class="tag">${esc(r.status||'Received')}</span></td></tr>`
+  const cnt=(arr,f)=>arr.filter(f).length;const chips=tab==='apps'?(()=>{const st={};list.forEach(r=>{const k=r.status||'Received';st[k]=(st[k]||0)+1});const nA=cnt(list,r=>r.cat==='aide');
+   const ch=(t,on,act)=>`<button class="tag" data-act="${act}" style="border:1.5px solid ${on?'var(--p)':'var(--bd)'};background:${on?'var(--p)':'var(--card2)'};color:${on?'#fff':'var(--ink)'};padding:5px 11px;border-radius:99px;font-size:12px;font-weight:700">${t}</button>`;
+   const sts=['Received','Under evaluation','Recommended','Selected','Not selected','Approved by SDS','Engaged'];
+   return `<div class="chk" style="margin:8px 0;gap:6px 8px">${ch('All '+list.length,!appF.type&&!appF.status,'appf-all')}${ch('Tutors '+cnt(list,r=>r.cat==='tutor'),appF.type==='tutor','appf-tutor')}${ch('Support aides '+nA,appF.type==='aide','appf-aide')}${Object.keys(st).map(k=>ch(esc(k)+' '+st[k],appF.status===k,'appf-st-'+sts.indexOf(k))).join('')}</div>
+   ${nA&&appF.type!=='aide'?`<div class="msg info" style="margin:6px 0">${nA} applicant${nA===1?'':'s'} applied as <b>Support Aide</b>. Some may have chosen this by mistake. <button class="link" data-act="appf-aide" style="padding:2px 6px;text-decoration:underline">Show them with their contact details</button></div>`:''}
+   <div class="grid" style="margin:6px 0"><label class="f w3"><span>Search (name, school, ref, phone or email)</span><input type="text" id="aq" value="${esc(appF.q)}" placeholder="Type and press Enter"></label><div class="f w3" style="justify-content:flex-end"><div class="nav" style="margin:0;justify-content:flex-start"><button class="b2" data-act="appcsv">Download this list (CSV)</button></div></div></div>
+   ${appF.type==='aide'?'<div class="msg info" style="margin:6px 0"><b>Support aides.</b> Call or message the applicant or the School Head if this was a mistake. An application cannot be changed after it is saved, so the applicant needs to apply again as <b>ARAL Tutor</b>. You can set the old one to <b>Not selected</b> and write the reason in Remarks.</div>':''}`})():`<div class="chk" style="margin:8px 0"><span class="tag" style="background:rgba(13,148,136,.15);color:var(--p2)">Total ${rlist.length}</span></div>`;
+  const head=tab==='apps'?'<tr><th>Ref</th><th>Name</th><th>Type</th><th>School</th><th>Contact</th><th>Date</th><th>Status</th></tr>':'<tr><th>Ref</th><th>Name</th><th>Month</th><th>School</th><th>Hours</th><th>Status</th></tr>';
+  const body=(tab==='apps'?appRows():rows).map(r=>tab==='apps'?`<tr class="cl" data-act="open" data-ref="${esc(r.ref)}"><td>${esc(r.ref)}</td><td>${esc(r.name)}</td><td>${r.cat==='tutor'?'Tutor':'<b>Support Aide</b>'}</td><td>${esc(canonSchool(r.school))}</td><td style="font-size:12px">${esc(r.mobile||'')}${r.mobile&&r.email?'<br>':''}${esc(r.email||'')}${!r.mobile&&!r.email?'—':''}</td><td>${esc((r.ts||'').slice(0,10))}</td><td><span class="tag">${esc(r.status||'Received')}</span></td></tr>`
    :`<tr class="cl" data-act="openr" data-ref="${esc(r.ref)}"><td>${esc(r.ref)}</td><td>${esc(r.name)}</td><td>${esc(mLabel(r.month))}</td><td>${esc(r.school)}</td><td>${esc(r.hours)}</td><td><span class="tag">${esc(r.status||'Submitted')}</span></td></tr>`).join('');
-  inner=chips+`<div style="overflow:auto"><table class="list">${head}${body||'<tr><td colspan="6" style="color:#64748b">Nothing yet.</td></tr>'}</table></div>`}
+  inner=chips+`<div style="overflow:auto"><table class="list">${head}${body||('<tr><td colspan="7" style="color:#64748b">'+(tab==='apps'&&list.length?'No application matches this filter.':'Nothing yet.')+'</td></tr>')}</table></div>`}
  else if(tab==='reg'){const ic=regOpt.onlyRec?'checked':'',io=regOpt.official?'checked':'';
   const H=isH(),inScope=H?allSchools().filter(n=>!regSel.district||districtOf(n)===regSel.district):[];
   const picker=H?`<div class="grid"><label class="f w3"><span>District</span><select id="regdist"><option value="">All districts</option>${districts().concat(['Other (not in the list)']).map(d=>`<option ${d===regSel.district?'selected':''}>${esc(d)}</option>`).join('')}</select></label><label class="f w3"><span>School</span><select id="regsch"><option value="">All schools${regSel.district?' in '+esc(regSel.district):' (whole SDO)'}</option>${inScope.map(n=>`<option ${n===regSel.school?'selected':''}>${esc(n)}</option>`).join('')}</select></label></div>`:schPicker('regsch',regData&&regData.school);
@@ -985,6 +992,11 @@ else if(a==='logout'){staffKeep=null;staff=false;list=[];rlist=[];detail=null;re
  else if(a==='cprint')doPrint(docE(detail.data,detail.eval));
  else if(a==='cword')doWordR(docE(detail.data,detail.eval),'ARAL_Contract_'+(detail.data.last||'tutor'));
  else if(a==='regrefresh')await loadReg();
+ else if(a==='appf-all'){appF={type:'',status:'',q:''};renderStaff()}
+ else if(a==='appf-tutor'){appF.type=appF.type==='tutor'?'':'tutor';renderStaff()}
+ else if(a==='appf-aide'){appF.type=appF.type==='aide'?'':'aide';renderStaff()}
+ else if(a.startsWith('appf-st-')){const k=['Received','Under evaluation','Recommended','Selected','Not selected','Approved by SDS','Engaged'][+a.slice(8)];appF.status=appF.status===k?'':k;renderStaff()}
+ else if(a==='appcsv'){const q=x=>'"'+String(x==null?'':x).replace(/"/g,'""')+'"';const rs=appRows();dl('ARAL_applications.csv',[['Ref','Name','Type','School','Mobile','Email','Date','Status']].concat(rs.map(r=>[r.ref,r.name,r.cat==='tutor'?'Tutor':'Support Aide',canonSchool(r.school),r.mobile||'',r.email||'',(r.ts||'').slice(0,10),r.status||'Received'])).map(r=>r.map(q).join(',')).join('\n'),'text/csv')}
  else if(a.startsWith('regview-')){regView=a.slice(8);renderStaff()}
  else if(a==='regSprint')doPrint(regDoc('S'));
  else if(a==='regSword')doWordR(regDoc('S'),'Summary_'+scopeLabel());
@@ -1002,7 +1014,7 @@ else if(a==='logout'){staffKeep=null;staff=false;list=[];rlist=[];detail=null;re
  else if(a==='regword')doWordR(reg.html,reg.title);
  else if(a==='regcsv')dl(reg.title+'.csv',reg.csv,'text/csv');
  }catch(err){staffMsg=err.message;renderStaff()}}
-document.addEventListener('change',e=>{const t=e.target;if(!t||!staff||typeof staff!=='object')return;if(t.id==='regdist'){regSel.district=t.value;regSel.school='';renderStaff()}else if(t.id==='regsch'){if(isH()){regSel.school=t.value;renderStaff()}else loadReg()}else if(t.id==='hsrc'){hSrc=t.value;buildH()}else if(t.id==='hall'){hAll=t.checked;mkH();renderStaff()}else if(t.dataset&&t.dataset.reg!==undefined){regOpt={onlyRec:!!($('#optC')||{}).checked,official:!!($('#optD')||{}).checked,sig:!!($('#useSig')||{}).checked};renderStaff()}});
+document.addEventListener('change',e=>{const t=e.target;if(!t||!staff||typeof staff!=='object')return;if(t.id==='aq'){appF.q=t.value.trim();renderStaff();return}if(t.id==='regdist'){regSel.district=t.value;regSel.school='';renderStaff()}else if(t.id==='regsch'){if(isH()){regSel.school=t.value;renderStaff()}else loadReg()}else if(t.id==='hsrc'){hSrc=t.value;buildH()}else if(t.id==='hall'){hAll=t.checked;mkH();renderStaff()}else if(t.dataset&&t.dataset.reg!==undefined){regOpt={onlyRec:!!($('#optC')||{}).checked,official:!!($('#optD')||{}).checked,sig:!!($('#useSig')||{}).checked};renderStaff()}});
 document.addEventListener('click',e=>{const tr=e.target.closest('tr[data-act]');if(tr&&!e.target.closest('button')){staffClick(tr,tr.dataset.act)}});
 render();loadConfig();
 </script>
