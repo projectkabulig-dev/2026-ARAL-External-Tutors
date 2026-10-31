@@ -111,7 +111,7 @@ div.ctr{page:ctr}
 <div id="printArea" class="doc"></div>
 <script>
 /* ================= CONFIG ================= */
-const API_URL = 'https://script.google.com/macros/s/AKfycbxuN2OVcDd3sxaKRWg4GId-nXqSbZ_9K5rOm87x_F2P048e4F99BXcfSuhysSwzgQg/exec';   // <-- paste your Apps Script Web App URL here (ends with /exec)
+const API_URL = '';   // <-- paste your Apps Script Web App URL here (ends with /exec)
 const BOX_YES='☒', BOX_NO='☐';
 
 /* ================= HELPERS ================= */
@@ -708,7 +708,7 @@ function docC(rep){
  const W=M?[3,9,9,8,3,4,7,8,8,6,6,5,6,7,5,6]:[3,11,9,4,6,8,10,9,6,8,5,7,8,6,6];
  return `<div class="Section2"><section class="page"><div class="ann">Annex C: Registry of External (non-DepEd) ARAL Tutor Applicants</div>
  <h2 style="text-align:left;margin:4pt 0 0">DEPARTMENT OF EDUCATION</h2><h2 style="text-align:left">REGISTRY OF ARAL TUTOR APPLICANTS</h2>
- <p style="margin:1pt 0">Name of Schools Division: ${UL(setg('SDO_NAME').replace('Schools Division Office of','Schools Division of'),30)}</p><p style="margin:1pt 0">${M?'Scope':'Name of School'}: ${UL(rep.school,40)}</p><p style="margin:1pt 0 6pt">Total Number of applicants ${UL(String(rs.length),8)}</p>
+ <p style="margin:1pt 0">Name of Schools Division: ${UL(setg('SDO_NAME').replace('Schools Division Office of','Schools Division of'),30)}</p><p style="margin:1pt 0">${M?'Scope':'Name of School'}: ${UL(rep.school,40)}</p><p style="margin:1pt 0 6pt">Total Number of applicants ${UL(String(rs.length),8)}</p>${(rep.onlyRec&&!rs.length&&rep.records.some(r=>r.cat==='tutor'&&r.appCat!=='DepEd teaching personnel'&&r.status!=='Not selected'))?'<p style="border:1px solid #999;padding:6pt;font-size:9pt"><b>No Recommended applicants yet.</b> Untick “Annex C: only recommended / selected” to see all external applicants.</p>':''}
  <table class="k tc"><colgroup>${W.map(w=>`<col style="width:${w}%">`).join('')}</colgroup><thead>
  <tr><th rowspan="2" colspan="${M?3:2}">NAME OF APPLICANT</th><th colspan="2">BASIC INFORMATION</th><th colspan="6">QUALIFICATIONS</th><th>ASSESSMENT RESULTS</th><th rowspan="2">REMARKS</th><th rowspan="2">RECOMMENDATION OF THE SCHOOL HEAD<br><i>(Indicate ‘Recommended’ if applicant is deemed qualified for hiring based on the set parameters)</i></th><th rowspan="2">FUND SOURCE<br><i>(To be accomplished by the SDO)</i></th><th rowspan="2">APPROVAL<br><i>(To be accomplished by the SDS; Affix signature if approved)</i></th></tr>
  <tr><th>ADDRESS</th><th>SEX<br><i>(by birth)</i></th><th>LET/ PBET/ Other Licenses<br><i>(Yes or No)</i></th><th>EDUCATION<br><i>(highest attainment)</i></th><th>TRAINING<br><i>(relevant, if any)</i></th><th>EXPERIENCE<br><i>(relevant, if any)</i></th><th>PERFORMANCE<br><i>(rating, if any)</i></th><th>OTHERS<br><i>(other qualifications)</i></th><th>INTERVIEW<br><i>(Score)</i></th></tr></thead><tbody>${rows}</tbody></table>
@@ -738,7 +738,7 @@ function docD(rep){
   :`<p style="margin:6pt 0 2pt">School: ${UL(rep.school,30)} &nbsp; School ID: ${UL(info.id,12)}</p><p style="margin:2pt 0">Complete School Address: ${UL(info.address,40)}</p><p style="margin:2pt 0 10pt">SDO: ${UL('Romblon',12)} &nbsp; Region: ${UL(setg('REGION'),12)}</p>`;
  return `<div class="Section1"><section class="page"><div class="ann">Annex D. Registry of Aral Tutors Per Learning Area</div>${head}
  ${hasDraft?'<p style="font-size:8pt;color:#555;margin:0 0 8pt"><i>Names in grey marked “Draft” are applicants who are not yet Selected. They become official when the School Head sets their status to Selected.</i></p>':''}
- ${tables||'<p><i>No tutors yet.</i></p>'}${unTable}<div class="sigbox" style="margin-top:14pt"><div>Prepared by:</div><div style="border:0;margin-top:20pt;border-top:1px solid #000">SDO HRMO</div></div></section></div>`}
+${pool.length?'':(rep.official&&all.length?`<p style="border:1px solid #999;padding:6pt"><b>No Selected tutors yet.</b> ${all.length} applicant${all.length===1?' is':'s are'} still Draft. A tutor becomes official when the School Head sets the status to Selected. To see the Draft applicants, untick “Annex D: official only (hide drafts)”.</p>`:'<p style="border:1px solid #999;padding:6pt"><i>No tutors yet. Tutors appear here after they submit an application.</i></p>')}${tables}${unTable}<div class="sigbox" style="margin-top:14pt"><div>Prepared by:</div><div style="border:0;margin-top:20pt;border-top:1px solid #000">SDO HRMO</div></div></section></div>`}
 function summarize(records){
  const T=records.filter(r=>r.cat==='tutor'&&r.status!=='Not selected');
  const mk=()=>({total:0,off:0,dr:0,dep:0,non:0});const add=(o,r)=>{o.total++;ENGAGED.includes(r.status)?o.off++:o.dr++;r.appCat==='DepEd teaching personnel'?o.dep++:o.non++};
@@ -866,7 +866,7 @@ const sdT=x=>x||'Schools Division Superintendent';
 
 /* ================= STAFF ================= */
 let hSrc='apps',hLoading=false;
-let list=[],rlist=[],detail=null,staffMsg='',tab='apps',reg=null,needMsg='',regData=null,regLoading=false,regOpt={onlyRec:false,official:false,sig:false},regSel={district:'',school:''};
+let list=[],rlist=[],detail=null,staffMsg='',tab='apps',reg=null,needMsg='',regData=null,regLoading=false,regOpt={onlyRec:false,official:false,sig:false},regSel={district:'',school:''},regView='S';
 async function buildH(){hLoading=true;renderStaff();try{const r=await api('registry',{code:staff.code,school:''});hLoading=false;if(!r.ok){staffMsg=r.error;reg=null}else{staffMsg='';const rep={records:r.records,needs:r.needs,source:hSrc};reg={html:docH(rep),title:'AnnexH_SDO_Consolidated',csv:csvH(rep)}}}catch(err){hLoading=false;staffMsg=err.message}renderStaff()}
 const isH=()=>staff&&staff.role==='HRMO';
 function scopeRecords(){const rs=regData?regData.records:[];if(!isH())return rs;return rs.filter(r=>(!regSel.district||districtOf(r.school)===regSel.district)&&(!regSel.school||r.school===regSel.school))}
@@ -930,7 +930,11 @@ function renderStaff(){
   <div class="nav" style="justify-content:flex-start"><button class="b2" data-act="buildH">Refresh</button></div>${hLoading?'<div class="msg info">Loading…</div>':''}`}
  const one=regData?scopeSingle():true,nSch=regData?new Set(scopeRecords().filter(r=>r.cat==='tutor'&&r.status!=='Not selected').map(r=>r.school)).size:0;
  const card=(k,t,note)=>`<div class="card"><div class="nav" style="justify-content:flex-start;flex-wrap:wrap;margin-top:0"><b style="align-self:center">${t}</b><button class="b3" data-act="reg${k}print">Print / Save as PDF</button><button class="b2" data-act="reg${k}word">Download Word</button></div>${note||''}</div>`;
- const regPrev=tab==='reg'&&regData&&!regLoading?[['S','Summary'],['C',one?'Annex C':'Annex C (all in one table)'],['D',one?'Annex D':'Annex D (all in one table)']].map(x=>card(x[0],x[1])+`<div class="card" style="overflow:auto"><div class="doc">${regDoc(x[0])}</div></div>`).join('')+(one?'':card('B','One official page per school (Annex C and D)',`<p class="hint">${nSch} school${nSch===1?'':'s'} with tutors, with the summary in front. Made when you press Print or Download, so it can take a few seconds.</p>`)):'';
+ const views=one?[['S','Summary'],['C','Annex C'],['D','Annex D']]:[['S','Summary'],['C','Annex C'],['D','Annex D'],['B','One page per school']];
+ if(!views.some(v=>v[0]===regView))regView='S';
+ const ttl={S:'Summary',C:one?'Annex C':'Annex C (all in one table)',D:one?'Annex D':'Annex D (all in one table)',B:'One official page per school (Annex C and D)'}[regView];
+ const regPrev=tab==='reg'&&regData&&!regLoading?`<div class="card"><div class="tabs" style="margin:0">${views.map(v=>`<button class="${regView===v[0]?'on':''}" data-act="regview-${v[0]}">${v[1]}</button>`).join('')}</div></div>`+
+  (regView==='B'?card('B',ttl,`<p class="hint">${nSch} school${nSch===1?'':'s'} with tutors, with the summary in front. It is made when you press Print or Download, so it can take a few seconds.</p>`):card(regView,ttl)+`<div class="card" style="overflow:auto"><div class="doc">${regDoc(regView)}</div></div>`):'';
  const prev=(tab==='h')&&reg?`<div class="card"><div class="nav" style="justify-content:flex-start;flex-wrap:wrap"><button class="b3" data-act="regprint">Print / Save as PDF</button><button class="b2" data-act="regword">Download Word</button>${reg.csv?'<button class="b2" data-act="regcsv">Download CSV</button>':''}</div></div><div class="card" style="overflow:auto"><div class="doc">${reg.html}</div></div>`:'';
  $('#app').innerHTML=`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><div><h2>${TABS.find(t=>t[0]===tab)[1]}</h2><p class="sub">${esc(staff.name||'')} · ${roleName(staff.role)}${staff.role==='HRMO'?'':': '+esc(staff.school)}</p></div><div><button class="b2" data-act="refresh">Refresh</button> <button class="b2" data-act="logout">Log out</button></div></div>
   <div class="tabs" style="flex-wrap:wrap">${TABS.map(t=>`<button class="${tab===t[0]?'on':''}" data-act="tab-${t[0]}">${t[1]}</button>`).join('')}</div>
@@ -960,6 +964,7 @@ else if(a==='logout'){staffKeep=null;staff=false;list=[];rlist=[];detail=null;re
  else if(a==='cprint')doPrint(docE(detail.data,detail.eval));
  else if(a==='cword')doWordR(docE(detail.data,detail.eval),'ARAL_Contract_'+(detail.data.last||'tutor'));
  else if(a==='regrefresh')await loadReg();
+ else if(a.startsWith('regview-')){regView=a.slice(8);renderStaff()}
  else if(a==='regSprint')doPrint(regDoc('S'));
  else if(a==='regSword')doWordR(regDoc('S'),'Summary_'+scopeLabel());
  else if(a==='regCprint')doPrint(regDoc('C'));
