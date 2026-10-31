@@ -111,7 +111,7 @@ div.ctr{page:ctr}
 <div id="printArea" class="doc"></div>
 <script>
 /* ================= CONFIG ================= */
-const API_URL = 'https://script.google.com/macros/s/AKfycbxuN2OVcDd3sxaKRWg4GId-nXqSbZ_9K5rOm87x_F2P048e4F99BXcfSuhysSwzgQg/exec';   // <-- paste your Apps Script Web App URL here (ends with /exec)
+const API_URL = '';   // <-- paste your Apps Script Web App URL here (ends with /exec)
 const BOX_YES='☒', BOX_NO='☐';
 
 /* ================= HELPERS ================= */
@@ -131,7 +131,7 @@ function fresh(){return{cat:'',sy:'2026-2027',school:'',district:'',schoolAddres
  work:[{from:'',to:'',position:'',company:'',tutoring:'',session:'',grade:'',hours:''}],
  bachelor:'',presentEmp:'',presentPos:'',gradeAssign:'',lengthService:'',activeApp:'',carRqa:'',carSdo:'',hoursDay:'',
  highestEdu:'',presentOcc:'',aideConfirm:'',
- areas:{reading:false,math:false,science:false,aide:false},appCat:'',moa:'',
+ areas:{reading:false,math:false,science:false,aide:false},areaSel:'',appCat:'',moa:'',
  adminOffense:'',adminDetails:'',charged:'',chargedDetails:'',convicted:'',convictedDetails:'',
  indigenous:'',indigenousSpec:'',pwd:'',pwdId:'',solo:'',soloId:'',sig:'',sigAt:'',ref:'',pin:''}}
 let savedMail=null,rsavedMail=null;
@@ -148,6 +148,8 @@ function SEL(label,p,opts,o={}){return `<label class="f ${o.w||''}"><span>${labe
 function RAD(label,p,opts,o={}){return `<div class="f ${o.w||''}"><span>${label}${o.req?' <b>*</b>':''}</span><div class="rad">${opts.map(([v,t])=>`<label><input type="radio" name="${p}" data-p="${p}" ${o.rr?'data-rr':''} value="${v}" ${getp(root(),p)===v?'checked':''}> ${t}</label>`).join('')}</div></div>`}
 function CB(label,p,o={}){return `<label class="f ${o.w||''}" style="flex-direction:row;gap:8px;align-items:center"><input type="checkbox" data-p="${p}" ${o.rr?'data-rr':''} ${getp(root(),p)?'checked':''}><span style="margin:0;font-weight:400">${label}</span></label>`}
 const YN=[['Yes','Yes'],['No','No']];
+const SCIENCE_ON=false; // Science is hidden for now: only Reading and Mathematics are tutored. Set to true to offer it again.
+const areaOpts=()=>S.cat==='aide'?[['aide','Applying as Support Aide']]:[['reading','Reading'],['math','Mathematics']].concat(SCIENCE_ON?[['science','Science']]:[]);
 function SCH(label,p,o={}){const ph='Start typing and pick from the list, or type the full name';return `<label class="f ${o.w||''}"><span>${label} <b>*</b></span><input type="text" list="schl" data-p="${p}" data-sch value="${esc(getp(root(),p))}" placeholder="${ph}"></label>`}
 const schoolMatch=v=>CFG.schools.find(x=>x.name.toLowerCase()===String(v||'').trim().toLowerCase());
 const schoolOK=v=>true; // schools that are not in the list are allowed: the user types the full name
@@ -184,11 +186,12 @@ const STEPS=[
   return `<h2>II. Educational Background (PDS)</h2><p class="sub">Indicate “N/A” if not applicable.</p>`+L.map(([k,n])=>`<h3>${n}</h3><div class="grid">${T('School / Institution/s','edu.'+k+'.school',{w:'w3'})}${T('Year Graduated','edu.'+k+'.year',{w:'w3'})}${T('Degree / Course','edu.'+k+'.degree',{w:k==='college'||k==='grad'?'w3':''})}${k==='college'||k==='grad'?T('Major / Specialization','edu.'+k+'.major',{w:'w3'}):''}</div>`).join('')}},
  {id:'train',pds:1,title:'Training/Certificates',req:[],render:()=>`<h2>III. Relevant Training/Certificates (PDS)</h2><p class="sub">Add as many rows as you need.</p>`+S.training.map((r,i)=>`<div class="rowbox"><div class="grid">${T('Training Title','training.'+i+'.title',{w:'w3'})}${T('Service Provider/s','training.'+i+'.provider',{w:'w3'})}${T('No. of Training Hours','training.'+i+'.hours',{w:'w3'})}${T('Inclusive Date/s Conducted','training.'+i+'.dates',{w:'w3'})}</div>${S.training.length>1?`<button class="bx" data-act="deltr" data-i="${i}" style="margin-top:8px">Remove row</button>`:''}</div>`).join('')+`<button class="b2" data-act="addtr">+ Add row</button>`},
  {id:'work',pds:1,title:'Work & tutoring experience',req:[],render:()=>`<h2>IV. Relevant Work and Tutoring Experience &amp; Skills (PDS)</h2><p class="sub">For “Regular Class or Tutorial Session?”, “Grade Level/s” and “No of Hours per week”, fill in only for tutoring/teaching experience; otherwise write “N/A”.</p>`+S.work.map((r,i)=>`<div class="rowbox"><div class="grid">${T('From','work.'+i+'.from',{type:'date',w:'w3'})}${T('To','work.'+i+'.to',{type:'date',w:'w3'})}${T('Position Title','work.'+i+'.position',{w:'w3'})}${T('Company/Organization','work.'+i+'.company',{w:'w3'})}${SEL('Tutoring/Teaching Experience?','work.'+i+'.tutoring',['Yes','No'],{w:'w2'})}${T('Regular Class or Tutorial Session?','work.'+i+'.session',{w:'w2'})}${T('Grade Level/s','work.'+i+'.grade',{w:'w2'})}${T('No of Hours per week','work.'+i+'.hours',{w:'w2'})}</div>${S.work.length>1?`<button class="bx" data-act="delwk" data-i="${i}" style="margin-top:8px">Remove row</button>`:''}</div>`).join('')+`<button class="b2" data-act="addwk">+ Add row</button>`},
- {id:'other',pds:1,title:'Other information',req:['appCat','adminOffense','charged','convicted','indigenous','pwd','solo'],render:()=>{
+ {id:'other',pds:1,title:'Other information',req:['areaSel','appCat','adminOffense','charged','convicted','indigenous','pwd','solo'],render:()=>{
+  if(S.cat==='aide'&&!S.areaSel){S.areaSel='aide';S.areas={reading:false,math:false,science:false,aide:true}}
   const cats=[['DepEd teaching personnel','DepEd teaching personnel'],['Remaining LET-eligible applicants in the recent and/or previous RQAs','Remaining LET-eligible applicants in the recent and/or previous Registries of Qualified Applicants (RQAs)'],['Other LET-eligible teacher applicants in the RQAs','Other LET-eligible teacher applicants in the RQAs who did not meet the cut-off score per existing DepEd hiring guidelines and other teaching practitioners in the community'],['Retired professional teachers','Retired professional teachers'],['Pre-service teachers','Pre-service teachers'],['Other LET-eligible in the locality','Other LET-eligible in the locality, such as but not limited to teachers from private schools, SUCs/LUCs'],['Para-teachers','Para-teachers who possess relevant experience and competency to provide academic support to learners'],['Non-licensed education graduates','Non-licensed education graduates'],['Other licensed professionals','Other licensed professionals'],['Other individuals in the community','Other individuals in the community deemed qualified, competent, and of good character']];
   const q=(k,label,det)=>RAD(label,k,YN,{req:1,rr:1})+(S[k]==='Yes'?T(det,({adminOffense:'adminDetails',charged:'chargedDetails',convicted:'convictedDetails'})[k],{}):'');
   return `<h2>V. Other Information (PDS)</h2>
-  <h3>Preferred Learning Area as ARAL Tutor (check all that applies)</h3><div class="chk">${CB('Reading','areas.reading')}${CB('Mathematics','areas.math')}${CB('Science','areas.science')}${CB('Applying as Support Aide','areas.aide')}</div>
+  <h3>Preferred Learning Area as ARAL Tutor (choose one) <b style="color:var(--err)">*</b></h3><p class="hint">Choose the one learning area you want to tutor. Elementary tutors are treated as generalists, so they can be given both Reading and Mathematics.</p>${RAD('','areaSel',areaOpts())}
   <h3>Applicant Category (check only one)</h3><div class="rad" style="flex-direction:column">${cats.map(([v,t])=>`<label><input type="radio" name="appCat" data-p="appCat" data-rr value="${esc(v)}" ${S.appCat===v?'checked':''}> ${esc(t)}</label>`).join('')}</div>
   ${S.appCat==='Pre-service teachers'?'<div class="grid" style="margin-top:8px">'+RAD('With T/HEI/LUC MOA or CHED/T/HEI Cert.?','moa',YN)+'</div>':''}
   <div class="grid" style="margin-top:12px">${q('adminOffense','Have you ever been found guilty of any administrative offense?','If YES, please give details')}${q('charged','Have you ever been criminally charged before any court?','If YES, please give details')}${q('convicted','Have you ever been convicted of any crime or violation of any law, decree, ordinance or regulation by any court or tribunal?','If YES, please give details')}</div>
@@ -228,7 +231,7 @@ function checkStep(){const st=active()[stepIdx];const miss=[];(st.req||[]).forEa
  return miss}
 document.addEventListener('click',async e=>{
  const b=e.target.closest('button');if(!b)return;
- if(b.dataset.cat){S.cat=b.dataset.cat;render();return}
+ if(b.dataset.cat){if(S.cat!==b.dataset.cat){S.areaSel='';S.areas={reading:false,math:false,science:false,aide:false}}S.cat=b.dataset.cat;render();return}
  const a=b.dataset.act;if(!a)return;
  if(a==='next'){const m=checkStep();if(m.length){$('#stMsg').innerHTML='<div class="msg err">Please complete the required fields (marked *).'+(m.includes('consent')?' You must tick the consent box.':'')+(m.includes('cat')?' Choose Tutor or Support Aide.':'')+'</div>';return}stepIdx++;render()}
  else if(a==='back'){stepIdx=Math.max(0,stepIdx-1);render()}
@@ -275,7 +278,8 @@ document.addEventListener('click',async e=>{
 });
 function onField(e){const t=e.target;if(!t.dataset||!t.dataset.p)return;
  if(t.dataset.sch!==undefined&&e.type==='change'){const m=schoolMatch(t.value);if(m){t.value=m.name;setp(root(),t.dataset.p,m.name);if(mode==='apply'){S.district=m.district||S.district;if(m.address&&!S.schoolAddress)S.schoolAddress=m.address;render();return}}}
- const O=root();if(t.type==='checkbox')setp(O,t.dataset.p,t.checked);else if(t.type==='radio'){if(t.checked)setp(O,t.dataset.p,t.value)}else setp(O,t.dataset.p,t.value);
+ const O=root();if(t.dataset.p==='areaSel'&&t.checked&&mode==='apply'){S.areas={reading:t.value==='reading',math:t.value==='math',science:t.value==='science',aide:t.value==='aide'}}
+ if(t.type==='checkbox')setp(O,t.dataset.p,t.checked);else if(t.type==='radio'){if(t.checked)setp(O,t.dataset.p,t.value)}else setp(O,t.dataset.p,t.value);
  if(mode==='report'&&staff===null)updTot();
  t.classList.remove('bad');if(t.dataset.rr!==undefined&&(e.type==='change'))render();}
 document.addEventListener('input',onField);document.addEventListener('change',onField);
